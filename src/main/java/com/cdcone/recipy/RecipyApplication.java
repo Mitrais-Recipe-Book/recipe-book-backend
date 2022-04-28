@@ -1,11 +1,14 @@
 package com.cdcone.recipy;
 
 import com.cdcone.recipy.dto.RecipeDtoAdd;
+import com.cdcone.recipy.entity.RoleEntity;
+import com.cdcone.recipy.repository.RoleDao;
 import com.cdcone.recipy.services.RecipeService;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
@@ -18,7 +21,8 @@ public class RecipyApplication {
 
 	@Bean
 	CommandLineRunner run(
-		RecipeService recipeService
+		RecipeService recipeService,
+		RoleDao roleDao
 	){
 		return args -> {
 			if (!generateDummyData){
@@ -31,10 +35,20 @@ public class RecipyApplication {
 				"Enak diminum pada saat buka puasa",
 				"Air, es batu, teh, gula",
 				"Silahkan klik link videonya",
-				"https://www.youtube.com/watch?v=biwLHUoPdPA&ab_channel=SajianSedap", 
-				false, 
+				"https://www.youtube.com/watch?v=biwLHUoPdPA&ab_channel=SajianSedap",
+				false,
 				null
 			));
+
+			RoleEntity userRole = new RoleEntity();
+			userRole.setName("User");
+			roleDao.save(userRole);
 		};
 	}
+
+	@Bean
+	BCryptPasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+
 }
