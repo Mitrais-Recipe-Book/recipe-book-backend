@@ -1,6 +1,8 @@
 package com.cdcone.recipy;
 
 import com.cdcone.recipy.dto.RecipeDtoAdd;
+import com.cdcone.recipy.entity.RoleEntity;
+import com.cdcone.recipy.repository.RoleDao;
 import com.cdcone.recipy.services.RecipeService;
 
 import org.springframework.boot.CommandLineRunner;
@@ -19,7 +21,8 @@ public class RecipyApplication {
 
 	@Bean
 	CommandLineRunner run(
-		RecipeService recipeService
+		RecipeService recipeService,
+		RoleDao roleDao
 	){
 		return args -> {
 			if (!generateDummyData){
@@ -36,6 +39,10 @@ public class RecipyApplication {
 				false,
 				null
 			));
+
+			RoleEntity userRole = new RoleEntity();
+			userRole.setName("User");
+			roleDao.save(userRole);
 		};
 	}
 

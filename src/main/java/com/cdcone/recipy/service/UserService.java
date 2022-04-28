@@ -41,7 +41,6 @@ public class UserService {
                     createdUser = userDao.save(user);
                     msg = "Success";
                 } catch (Exception e) {
-                    e.printStackTrace();
                     msg = "Failed to create user. Username or email is already exist";
                 }
             } else {
