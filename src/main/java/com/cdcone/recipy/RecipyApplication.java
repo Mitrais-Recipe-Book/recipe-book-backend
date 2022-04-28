@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class RecipyApplication {
-	private boolean generateDummyData = true;
+	public static boolean generateDummyData = true;
 
 	public static void main(String[] args) {
 		SpringApplication.run(RecipyApplication.class, args);
@@ -35,6 +35,8 @@ public class RecipyApplication {
 				false, 
 				null
 			));
+
+			System.out.println("\n\n---Feeding data complete---\n\n");
 		};
 	}
 }
