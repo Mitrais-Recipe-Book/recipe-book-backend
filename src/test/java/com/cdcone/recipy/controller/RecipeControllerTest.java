@@ -1,7 +1,7 @@
 package com.cdcone.recipy.controller;
 
 import com.cdcone.recipy.dto.RecipeDtoAdd;
-import com.cdcone.recipy.response.BasicResponse;
+import com.cdcone.recipy.response.CommonResponse;
 import com.cdcone.recipy.services.RecipeService;
 
 import org.junit.jupiter.api.Assertions;
@@ -22,7 +22,7 @@ public class RecipeControllerTest {
     @Test
     @Order(1)
     public void addData() {
-        BasicResponse response = recipeController.add(new RecipeDtoAdd(
+        CommonResponse response = recipeController.add(new RecipeDtoAdd(
                 "title",
                 "overview",
                 "ingredients",
