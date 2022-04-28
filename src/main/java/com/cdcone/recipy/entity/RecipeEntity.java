@@ -46,5 +46,6 @@ public class RecipeEntity {
     private boolean isDraft;
 
     @Lob
+    @Column(name="banner_image")
     private Byte[] bannerImage;
 }
