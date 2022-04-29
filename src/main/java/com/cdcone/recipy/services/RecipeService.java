@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import com.cdcone.recipy.dto.RecipeDtoAdd;
 import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.repository.RecipeRepository;
-
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
@@ -29,5 +28,9 @@ public class RecipeService {
         entity.setBannerImage(dto.getBannerImage());
 
         return recipeRepository.save(entity);
+    }
+
+    public long size(){
+        return recipeRepository.count();
     }
 }

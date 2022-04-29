@@ -1,9 +1,11 @@
 package com.cdcone.recipy.controller;
 
 import com.cdcone.recipy.dto.RecipeDtoAdd;
-import com.cdcone.recipy.response.BasicResponse;
+import com.cdcone.recipy.response.CommonResponse;
+import com.cdcone.recipy.response.ErrorClause;
 import com.cdcone.recipy.services.RecipeService;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,12 +22,12 @@ public class RecipeController {
     private final RecipeService recipeService;
 
     @PostMapping("/add")
-    public BasicResponse add(@RequestBody RecipeDtoAdd dto) {
+    public CommonResponse add(@RequestBody RecipeDtoAdd dto) {
         try {
             recipeService.add(dto);
         } catch (Exception e) {
-            return new BasicResponse(HttpStatus.BAD_REQUEST, e.toString());
+            return new CommonResponse(HttpStatus.BAD_REQUEST, e.getMessage());
         }
-        return new BasicResponse(HttpStatus.OK, "SUCCESS");
+        return new CommonResponse(HttpStatus.OK, "SUCCESS");
     }
 }

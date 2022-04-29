@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class RecipyApplication {
-	private boolean generateDummyData = true;
+	public static boolean generateDummyData = true;
 
 	public static void main(String[] args) {
 		SpringApplication.run(RecipyApplication.class, args);
@@ -30,6 +30,12 @@ public class RecipyApplication {
 			}
 
 			// Generate dummy data for database
+      // Role data
+      RoleEntity userRole = new RoleEntity();
+			userRole.setName("User");
+			roleDao.save(userRole);
+      
+      // Recipe data
 			recipeService.add(new RecipeDtoAdd(
 				"Es teh",
 				"Enak diminum pada saat buka puasa",
@@ -40,9 +46,8 @@ public class RecipyApplication {
 				null
 			));
 
-			RoleEntity userRole = new RoleEntity();
-			userRole.setName("User");
-			roleDao.save(userRole);
+
+			System.out.println("\n\n---Feeding data complete---\n\n");
 		};
 	}
 
@@ -50,5 +55,4 @@ public class RecipyApplication {
 	BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-
 }
