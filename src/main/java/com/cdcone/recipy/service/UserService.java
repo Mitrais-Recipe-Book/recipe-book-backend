@@ -7,19 +7,39 @@ import com.cdcone.recipy.repository.RoleDao;
 import com.cdcone.recipy.repository.UserDao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserDao userDao;
     private final RoleDao roleDao;
     private final BCryptPasswordEncoder passwordEncoder;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<UserEntity> byUsername = userDao.findByUsername(username);
+        if (byUsername.isEmpty()) {
+            throw new UsernameNotFoundException("Username not found");
+        }
+        UserEntity userEntity = byUsername.get();
+        List<SimpleGrantedAuthority> authorities = userEntity.getRoles()
+                .stream()
+                .map(it -> new SimpleGrantedAuthority(it.getName()))
+                .collect(Collectors.toList());
+        return new org.springframework.security.core.userdetails.User(userEntity.getUsername(), userEntity.getPassword(), authorities);
+    }
 
     public Pair<Optional<UserEntity>, String> addUser(SignUpDto signUpDto) {
         String msg;
