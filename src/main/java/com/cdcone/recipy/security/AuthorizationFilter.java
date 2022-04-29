@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
-@Component
 @RequiredArgsConstructor
 public class AuthorizationFilter extends OncePerRequestFilter {
 
