@@ -7,6 +7,7 @@ import javax.websocket.server.PathParam;
 import com.cdcone.recipy.dto.RecipeDtoList;
 import com.cdcone.recipy.entity.RecipeEntity;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,5 +21,5 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
             "r.title, r.bannerImage, r.overview, r.views, u.fullName, u.profilePhoto " +
             ") FROM RecipeEntity r JOIN r.user u " +
             "WHERE u.fullName LIKE %:authorName%")
-    public List<RecipeDtoList> getPublishedRecipes(@PathParam("authorName") String authorName, Pageable pageable);
+    public Page<RecipeDtoList> getPublishedRecipes(@PathParam("authorName") String authorName, Pageable pageable);
 }

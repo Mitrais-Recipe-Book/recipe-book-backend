@@ -8,6 +8,7 @@ import com.cdcone.recipy.dto.RecipeDtoList;
 import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.repository.RecipeRepository;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -38,7 +39,7 @@ public class RecipeService {
         recipeRepository.save(recipe);
     }
 
-    public List<RecipeDtoList> getPublishedRecipes(int page, int size, String filterAuthor){
+    public Page<RecipeDtoList> getPublishedRecipes(int page, int size, String filterAuthor){
         Pageable pageable = PageRequest.of(page, size, Sort.by("views"));
         return recipeRepository.getPublishedRecipes(filterAuthor, pageable);
     }    

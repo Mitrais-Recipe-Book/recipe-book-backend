@@ -1,9 +1,14 @@
 package com.cdcone.recipy.controller;
 
+import java.util.List;
+
 import com.cdcone.recipy.dto.RecipeDtoAdd;
+import com.cdcone.recipy.dto.RecipeDtoList;
+import com.cdcone.recipy.dto.RecipeSearchDto;
 import com.cdcone.recipy.response.CommonResponse;
 import com.cdcone.recipy.service.RecipeService;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,9 +36,10 @@ public class RecipeController {
     }
 
     @GetMapping("/list")
-    public CommonResponse getPublishedRecipe(int page, int size, String author) {
+    public CommonResponse getPublishedRecipe(RecipeSearchDto dto) {
         try {
-            return new CommonResponse(HttpStatus.OK, recipeService.getPublishedRecipes(page, size, author));
+            Page<RecipeDtoList> result = recipeService.getPublishedRecipes(dto.getPage(), dto.getSize(), dto.getAuthor());
+            return new CommonResponse(HttpStatus.OK, result);
         } catch (Exception e) {
             return new CommonResponse(HttpStatus.BAD_REQUEST, e.getMessage());
         }
