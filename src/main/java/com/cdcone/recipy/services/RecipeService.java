@@ -5,14 +5,14 @@ import java.time.LocalDate;
 import com.cdcone.recipy.dto.RecipeDtoAdd;
 import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.repository.RecipeRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import lombok.AllArgsConstructor;
-
 @Service
-@AllArgsConstructor
 public class RecipeService {
-    private final RecipeRepository recipeRepository;
+    @Autowired
+    private RecipeRepository recipeRepository;
 
     public RecipeEntity add(RecipeDtoAdd dto){
         RecipeEntity entity = new RecipeEntity();
@@ -29,6 +29,8 @@ public class RecipeService {
 
         return recipeRepository.save(entity);
     }
+
+    
 
     public long size(){
         return recipeRepository.count();
