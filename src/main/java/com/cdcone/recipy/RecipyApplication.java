@@ -1,9 +1,11 @@
 package com.cdcone.recipy;
 
 import com.cdcone.recipy.dto.RecipeDtoAdd;
+import com.cdcone.recipy.dto.SignUpDto;
 import com.cdcone.recipy.entity.RoleEntity;
 import com.cdcone.recipy.repository.RoleDao;
-import com.cdcone.recipy.services.RecipeService;
+import com.cdcone.recipy.service.UserService;
+import com.cdcone.recipy.service.RecipeService;
 
 import com.cdcone.recipy.util.JwtUtil;
 import org.springframework.boot.CommandLineRunner;
@@ -23,6 +25,7 @@ public class RecipyApplication {
 	@Bean
 	CommandLineRunner run(
 			RecipeService recipeService,
+			UserService userService,
 			RoleDao roleDao) {
 		return args -> {
 			if (!generateDummyData) {
@@ -35,8 +38,16 @@ public class RecipyApplication {
 			userRole.setName("User");
 			roleDao.save(userRole);
 
+			// User data
+			userService.addUser(new SignUpDto(
+					"user1@gmail.com",
+					"user1",
+					"123456",
+					"User 1"));
+
 			// Recipe data
 			recipeService.add(new RecipeDtoAdd(
+					1L,
 					"Es teh",
 					"Enak diminum pada saat buka puasa",
 					"Air, es batu, teh, gula",

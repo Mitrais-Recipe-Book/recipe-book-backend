@@ -68,4 +68,8 @@ public class UserService implements UserDetailsService {
         }
         return Pair.of(Optional.ofNullable(createdUser), msg);
     }
+
+    public UserEntity getById(long id){
+        return userDao.getById(id);
+    }
 }

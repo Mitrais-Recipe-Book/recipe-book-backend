@@ -1,11 +1,16 @@
 package com.cdcone.recipy.controller;
 
-import com.cdcone.recipy.dto.RecipeDtoAdd;
-import com.cdcone.recipy.response.CommonResponse;
-import com.cdcone.recipy.services.RecipeService;
 
+import com.cdcone.recipy.dto.RecipeDtoAdd;
+import com.cdcone.recipy.dto.RecipeDtoList;
+import com.cdcone.recipy.dto.RecipeSearchDto;
+import com.cdcone.recipy.response.CommonResponse;
+import com.cdcone.recipy.service.RecipeService;
+
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,5 +32,15 @@ public class RecipeController {
             return new CommonResponse(HttpStatus.BAD_REQUEST, e.getMessage());
         }
         return new CommonResponse(HttpStatus.OK, "SUCCESS");
+    }
+
+    @GetMapping("/list")
+    public CommonResponse getPublishedRecipe(RecipeSearchDto dto) {
+        try {
+            Page<RecipeDtoList> result = recipeService.getPublishedRecipes(dto.getPage(), dto.getSize(), dto.getAuthor());
+            return new CommonResponse(HttpStatus.OK, result);
+        } catch (Exception e) {
+            return new CommonResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 }

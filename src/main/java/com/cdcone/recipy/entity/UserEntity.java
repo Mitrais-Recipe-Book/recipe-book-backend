@@ -26,7 +26,7 @@ public class UserEntity {
 
     @Lob
     @Column(name = "profile_photo")
-    private byte[] profilePhoto;
+    private Byte[] profilePhoto;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -34,4 +34,7 @@ public class UserEntity {
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
     )
     private Set<RoleEntity> roles;
+
+    @OneToMany(mappedBy = "user")
+    private Set<RecipeEntity> recipes;
 }

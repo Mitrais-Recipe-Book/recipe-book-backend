@@ -22,6 +22,7 @@ public class RecipeControllerTest {
     @Order(1)
     public void addData() {
         CommonResponse response = recipeController.add(new RecipeDtoAdd(
+                1L,
                 "title2",
                 "overview",
                 "ingredients",
@@ -35,8 +36,9 @@ public class RecipeControllerTest {
 
     @Test
     @Order(2)
-    public void cantAddData(){
+    public void cantAddData() {
         CommonResponse response = recipeController.add(new RecipeDtoAdd(
+                1L,
                 "title2",
                 "overview",
                 "ingredients",
