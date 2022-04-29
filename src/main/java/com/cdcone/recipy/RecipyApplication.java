@@ -7,6 +7,7 @@ import com.cdcone.recipy.repository.RoleDao;
 import com.cdcone.recipy.service.UserService;
 import com.cdcone.recipy.service.RecipeService;
 
+import com.cdcone.recipy.util.JwtUtil;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -63,4 +64,10 @@ public class RecipyApplication {
 	BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
+
+	@Bean
+	JwtUtil jwtUtil() {
+		return new JwtUtil();
+	}
+
 }
