@@ -54,9 +54,4 @@ public class RecipyApplication {
 		return new BCryptPasswordEncoder();
 	}
 
-	@Bean
-	JwtUtil jwtUtil() {
-		return new JwtUtil();
-	}
-
 }
