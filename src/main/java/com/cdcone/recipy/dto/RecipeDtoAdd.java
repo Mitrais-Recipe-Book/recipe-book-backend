@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class RecipeDtoAdd {
+    private long userId;
     @NotEmpty
     private String title;
     private String overview;

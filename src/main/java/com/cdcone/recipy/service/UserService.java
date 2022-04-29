@@ -48,4 +48,8 @@ public class UserService {
         }
         return Pair.of(Optional.ofNullable(createdUser), msg);
     }
+
+    public UserEntity getById(long id){
+        return userDao.getById(id);
+    }
 }

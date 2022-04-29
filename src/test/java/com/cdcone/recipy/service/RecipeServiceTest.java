@@ -1,7 +1,7 @@
 package com.cdcone.recipy.service;
 
 import com.cdcone.recipy.dto.RecipeDtoAdd;
-import com.cdcone.recipy.services.RecipeService;
+import com.cdcone.recipy.service.recipe.RecipeService;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
@@ -17,13 +17,14 @@ import org.springframework.dao.DataIntegrityViolationException;
 public class RecipeServiceTest {
     @Autowired
     private RecipeService recipeService;
-    
+
     @Test
     @Order(1)
     public void addData() {
-        long prevSize = recipeService.size();
+        long prevSize = recipeService.totalRecipes();
 
         recipeService.add(new RecipeDtoAdd(
+                1,
                 "title",
                 "overview",
                 "ingredients",
@@ -32,27 +33,28 @@ public class RecipeServiceTest {
                 true,
                 null));
 
-        Assertions.assertEquals(prevSize + 1, recipeService.size());
+        Assertions.assertEquals(prevSize + 1, recipeService.totalRecipes());
     }
 
     @Test
     @Order(2)
-    public void cantAddData(){ 
-        long prevSize = recipeService.size();
+    public void cantAddData() {
+        long prevSize = recipeService.totalRecipes();
 
-        try{
-        recipeService.add(new RecipeDtoAdd(
-                "title",
-                "overview",
-                "ingredients",
-                "content",
-                "videoURL",
-                true,
-                null));
-        } catch(DataIntegrityViolationException e){
+        try {
+            recipeService.add(new RecipeDtoAdd(
+                    1,
+                    "title",
+                    "overview",
+                    "ingredients",
+                    "content",
+                    "videoURL",
+                    true,
+                    null));
+        } catch (DataIntegrityViolationException e) {
             e.printStackTrace();
-        }        
-        
-        Assertions.assertEquals(prevSize, recipeService.size());
+        }
+
+        Assertions.assertEquals(prevSize, recipeService.totalRecipes());
     }
 }

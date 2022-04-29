@@ -52,4 +52,36 @@ public class RecipeEntity {
     @Lob
     @Column(name = "banner_image")
     private Byte[] bannerImage;
+
+    /**
+     * @param title
+     * @param overview
+     * @param dateCreated
+     * @param ingredients
+     * @param content
+     * @param videoURL
+     * @param views
+     * @param isDraft
+     * @param bannerImage
+     */
+    public RecipeEntity(
+            String title,
+            String overview,
+            LocalDate dateCreated,
+            String ingredients,
+            String content,
+            String videoURL,
+            int views,
+            boolean isDraft,
+            Byte[] bannerImage) {
+        this.title = title;
+        this.overview = overview;
+        this.dateCreated = dateCreated;
+        this.ingredients = ingredients;
+        this.content = content;
+        this.videoURL = videoURL;
+        this.views = views;
+        this.isDraft = isDraft;
+        this.bannerImage = bannerImage;
+    }
 }

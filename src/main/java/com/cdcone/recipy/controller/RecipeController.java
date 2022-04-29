@@ -2,7 +2,7 @@ package com.cdcone.recipy.controller;
 
 import com.cdcone.recipy.dto.RecipeDtoAdd;
 import com.cdcone.recipy.response.CommonResponse;
-import com.cdcone.recipy.services.RecipeService;
+import com.cdcone.recipy.service.recipe.RecipeService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
