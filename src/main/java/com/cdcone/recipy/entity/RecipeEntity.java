@@ -6,7 +6,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -53,18 +55,25 @@ public class RecipeEntity {
     @Column(name = "banner_image")
     private Byte[] bannerImage;
 
-    /**
-     * @param title
-     * @param overview
-     * @param dateCreated
-     * @param ingredients
-     * @param content
-     * @param videoURL
-     * @param views
-     * @param isDraft
-     * @param bannerImage
-     */
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
+
+   /**
+    * 
+    * @param userEntity
+    * @param title
+    * @param overview
+    * @param dateCreated
+    * @param ingredients
+    * @param content
+    * @param videoURL
+    * @param views
+    * @param isDraft
+    * @param bannerImage
+    */
     public RecipeEntity(
+            UserEntity userEntity,
             String title,
             String overview,
             LocalDate dateCreated,
@@ -74,6 +83,7 @@ public class RecipeEntity {
             int views,
             boolean isDraft,
             Byte[] bannerImage) {
+        this.user = userEntity;
         this.title = title;
         this.overview = overview;
         this.dateCreated = dateCreated;

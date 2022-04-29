@@ -35,10 +35,6 @@ public class UserEntity {
     )
     private Set<RoleEntity> roles;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-        joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name ="recipes_id", referencedColumnName = "id")
-    )
+    @OneToMany(mappedBy = "user")
     private Set<RecipeEntity> recipes;
 }

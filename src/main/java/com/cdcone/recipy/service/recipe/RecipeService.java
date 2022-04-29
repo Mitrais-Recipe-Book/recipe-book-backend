@@ -1,11 +1,9 @@
 package com.cdcone.recipy.service.recipe;
 
 import java.time.LocalDate;
-import java.util.Set;
 
 import com.cdcone.recipy.dto.RecipeDtoAdd;
 import com.cdcone.recipy.entity.RecipeEntity;
-import com.cdcone.recipy.entity.UserEntity;
 import com.cdcone.recipy.repository.RecipeRepository;
 import com.cdcone.recipy.service.UserService;
 
@@ -22,6 +20,7 @@ public class RecipeService {
 
     public void add(RecipeDtoAdd dto) {
         RecipeEntity recipe = new RecipeEntity(
+                userService.getById(dto.getUserId()),
                 dto.getTitle(),
                 dto.getOverview(),
                 LocalDate.now(),
@@ -32,9 +31,6 @@ public class RecipeService {
                 dto.isDraft(),
                 dto.getBannerImage());
         recipeRepository.save(recipe);
-
-        UserEntity user = userService.getById(dto.getUserId());
-        user.setRecipes(Set.of(recipe));
     }
 
     public long totalRecipes() {
