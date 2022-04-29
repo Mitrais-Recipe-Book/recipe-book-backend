@@ -40,7 +40,7 @@ public class RecipeService {
     }
 
     public Page<RecipeDtoList> getPublishedRecipes(int page, int size, String filterAuthor){
-        Pageable pageable = PageRequest.of(page, size, Sort.by("views"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by("views").descending());
         return recipeRepository.getPublishedRecipes(filterAuthor, pageable);
     }    
 
