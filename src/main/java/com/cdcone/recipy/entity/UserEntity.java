@@ -26,7 +26,7 @@ public class UserEntity {
 
     @Lob
     @Column(name = "profile_photo")
-    private byte[] profilePhoto;
+    private Byte[] profilePhoto;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

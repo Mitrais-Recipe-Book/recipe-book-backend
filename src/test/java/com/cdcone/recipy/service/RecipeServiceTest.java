@@ -1,7 +1,6 @@
 package com.cdcone.recipy.service;
 
 import com.cdcone.recipy.dto.RecipeDtoAdd;
-import com.cdcone.recipy.service.recipe.RecipeService;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
@@ -24,7 +23,7 @@ public class RecipeServiceTest {
         long prevSize = recipeService.totalRecipes();
 
         recipeService.add(new RecipeDtoAdd(
-                1,
+                1L,
                 "title",
                 "overview",
                 "ingredients",
@@ -43,7 +42,7 @@ public class RecipeServiceTest {
 
         try {
             recipeService.add(new RecipeDtoAdd(
-                    1,
+                    1L,
                     "title",
                     "overview",
                     "ingredients",

@@ -5,7 +5,7 @@ import com.cdcone.recipy.dto.SignUpDto;
 import com.cdcone.recipy.entity.RoleEntity;
 import com.cdcone.recipy.repository.RoleDao;
 import com.cdcone.recipy.service.UserService;
-import com.cdcone.recipy.service.recipe.RecipeService;
+import com.cdcone.recipy.service.RecipeService;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -46,7 +46,7 @@ public class RecipyApplication {
 
 			// Recipe data
 			recipeService.add(new RecipeDtoAdd(
-					1,
+					1L,
 					"Es teh",
 					"Enak diminum pada saat buka puasa",
 					"Air, es batu, teh, gula",

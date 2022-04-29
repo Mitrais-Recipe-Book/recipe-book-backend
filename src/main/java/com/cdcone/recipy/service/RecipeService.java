@@ -1,22 +1,27 @@
-package com.cdcone.recipy.service.recipe;
+package com.cdcone.recipy.service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import com.cdcone.recipy.dto.RecipeDtoAdd;
+import com.cdcone.recipy.dto.RecipeDtoList;
 import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.repository.RecipeRepository;
-import com.cdcone.recipy.service.UserService;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-@Service
-public class RecipeService {
-    @Autowired
-    private RecipeRepository recipeRepository;
+import lombok.RequiredArgsConstructor;
 
-    @Autowired
-    private UserService userService;
+
+@Service
+@RequiredArgsConstructor
+public class RecipeService {    
+    private final RecipeRepository recipeRepository;
+
+    private final UserService userService;
 
     public void add(RecipeDtoAdd dto) {
         RecipeEntity recipe = new RecipeEntity(
@@ -32,6 +37,11 @@ public class RecipeService {
                 dto.getBannerImage());
         recipeRepository.save(recipe);
     }
+
+    public List<RecipeDtoList> getPublishedRecipes(int page, int size, String filterAuthor){
+        Pageable pageable = PageRequest.of(page, size, Sort.by("views"));
+        return recipeRepository.getPublishedRecipes(filterAuthor, pageable);
+    }    
 
     public long totalRecipes() {
         return recipeRepository.count();
