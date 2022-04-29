@@ -15,9 +15,9 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@Entity(name = "Recipes")
-@Table(name = "recipes", uniqueConstraints = {
-    @UniqueConstraint(name = "recipe_title_unique", columnNames = "title")
+@Entity(name = "recipes")
+@Table(uniqueConstraints = {
+        @UniqueConstraint(name = "recipe_title_unique", columnNames = "title")
 })
 public class RecipeEntity {
     @Id
@@ -25,31 +25,31 @@ public class RecipeEntity {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @Column(name ="title", nullable = false)
+    @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name="overview", columnDefinition = "TEXT")
+    @Column(name = "overview", columnDefinition = "TEXT")
     private String overview;
 
-    @Column(name="date_created", nullable = false)
+    @Column(name = "date_created", nullable = false)
     private LocalDate dateCreated;
 
-    @Column(name="ingredients", columnDefinition = "TEXT")
+    @Column(name = "ingredients", columnDefinition = "TEXT")
     private String ingredients;
 
-    @Column(name="content", columnDefinition = "TEXT")
+    @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
     @Column(name = "video_url", columnDefinition = "TEXT")
     private String videoURL;
 
-    @Column(name="views", nullable = false)
+    @Column(name = "views", nullable = false)
     private int views;
 
-    @Column(name="is_draft", nullable = false)
+    @Column(name = "is_draft", nullable = false)
     private boolean isDraft;
 
     @Lob
-    @Column(name="banner_image")
+    @Column(name = "banner_image")
     private Byte[] bannerImage;
 }
