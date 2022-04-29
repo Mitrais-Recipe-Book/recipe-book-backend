@@ -38,7 +38,7 @@ public class UserEntity {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name ="recipes", referencedColumnName = "id")
+        inverseJoinColumns = @JoinColumn(name ="recipes_id", referencedColumnName = "id")
     )
     private Set<RecipeEntity> recipes;
 }
