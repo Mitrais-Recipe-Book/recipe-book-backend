@@ -1,8 +1,10 @@
 package com.cdcone.recipy.service;
 
 import com.cdcone.recipy.dto.RecipeDtoAdd;
+import com.cdcone.recipy.dto.RecipeDtoList;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -17,12 +19,12 @@ public class RecipeServiceTest {
     @Autowired
     private RecipeService recipeService;
 
-    @Test
-    @Order(1)
-    public void addData() {
-        long prevSize = recipeService.totalRecipes();
+    private static RecipeDtoAdd recipeDtoAdd;
+    private static int initSize;
 
-        recipeService.add(new RecipeDtoAdd(
+    @BeforeAll
+    public static void init() {
+        recipeDtoAdd = new RecipeDtoAdd(
                 1L,
                 "title",
                 "overview",
@@ -30,30 +32,37 @@ public class RecipeServiceTest {
                 "content",
                 "videoURL",
                 true,
-                null));
+                null);
+    }
 
-        Assertions.assertEquals(prevSize + 1, recipeService.totalRecipes());
+    @Test
+    @Order(1)
+    public void addData() {
+        initSize = (int) recipeService.totalRecipes();
+        recipeService.add(recipeDtoAdd);
+        Assertions.assertEquals(initSize + 1, recipeService.totalRecipes());
     }
 
     @Test
     @Order(2)
-    public void cantAddData() {
-        long prevSize = recipeService.totalRecipes();
-
+    public void cantAddDuplicateData() {
         try {
-            recipeService.add(new RecipeDtoAdd(
-                    1L,
-                    "title",
-                    "overview",
-                    "ingredients",
-                    "content",
-                    "videoURL",
-                    true,
-                    null));
+            recipeService.add(recipeDtoAdd);
         } catch (DataIntegrityViolationException e) {
             e.printStackTrace();
         }
 
-        Assertions.assertEquals(prevSize, recipeService.totalRecipes());
+        Assertions.assertEquals(initSize + 1, recipeService.totalRecipes());
+    }
+
+    @Test
+    @Order(3)
+    public void getNewlyPublishedRecipes() {
+        RecipeDtoList result = recipeService.getPublishedRecipes(0, 10, "")
+                .getContent().get((int)recipeService.totalRecipes() - 1);
+
+        Assertions.assertEquals(initSize + 1, recipeService.totalRecipes());
+        Assertions.assertEquals(recipeDtoAdd.getTitle(), result.getRecipeName());
+        Assertions.assertEquals(recipeDtoAdd.getOverview(), result.getDescription());
     }
 }
