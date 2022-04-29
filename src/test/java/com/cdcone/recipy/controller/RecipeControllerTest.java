@@ -45,7 +45,6 @@ public class RecipeControllerTest {
                 true,
                 null));
 
-        Assertions.assertEquals(HttpStatus.BAD_REQUESTresponse.getStatus());
-    }
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
     }
 }

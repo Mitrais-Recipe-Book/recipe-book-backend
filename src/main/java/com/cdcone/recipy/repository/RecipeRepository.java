@@ -1,6 +1,5 @@
 package com.cdcone.recipy.repository;
 
-import java.util.List;
 
 import com.cdcone.recipy.entity.RecipeEntity;
 
