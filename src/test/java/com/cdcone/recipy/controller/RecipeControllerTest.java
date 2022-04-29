@@ -22,7 +22,7 @@ public class RecipeControllerTest {
     @Order(1)
     public void addData() {
         CommonResponse response = recipeController.add(new RecipeDtoAdd(
-                "title",
+                "title2",
                 "overview",
                 "ingredients",
                 "content",
@@ -31,5 +31,20 @@ public class RecipeControllerTest {
                 null));
 
         Assertions.assertEquals(HttpStatus.OK, response.getStatus());
+    }
+
+    @Test
+    @Order(2)
+    public void cantAddData(){
+        CommonResponse response = recipeController.add(new RecipeDtoAdd(
+                "title2",
+                "overview",
+                "ingredients",
+                "content",
+                "videoURL",
+                true,
+                null));
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
     }
 }
