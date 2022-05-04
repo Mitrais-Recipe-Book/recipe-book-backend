@@ -35,7 +35,7 @@ public class RecipeController {
     }
 
     @GetMapping("/list")
-    public CommonResponse getPublishedRecipe(RecipeSearchDto dto) {
+    public CommonResponse getPublishedRecipes(RecipeSearchDto dto) {
         try {
             Page<RecipeDtoList> result = recipeService.getPublishedRecipes(dto.getPage(), dto.getSize(), dto.getAuthor());
             return new CommonResponse(HttpStatus.OK, result);
