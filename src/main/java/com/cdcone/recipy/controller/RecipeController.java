@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,6 +43,16 @@ public class RecipeController {
             Page<RecipeDtoList> result = recipeService.getPublishedRecipes(dto.getPage(), dto.getSize(), dto.getAuthor());
             return new CommonResponse(HttpStatus.OK, result);
         } catch (Exception e) {
+            return new CommonResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PutMapping("/view")
+    public CommonResponse addViewer(Long recipeId){
+        try{
+            recipeService.addView(recipeId);
+            return new CommonResponse(HttpStatus.OK, "SUCCESS");
+        } catch(Exception e){
             return new CommonResponse(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
