@@ -4,6 +4,8 @@ import java.util.NoSuchElementException;
 
 import com.cdcone.recipy.dto.RecipeDtoAdd;
 import com.cdcone.recipy.dto.RecipeDtoList;
+import com.cdcone.recipy.dto.RecipeSearchDto;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -59,7 +61,7 @@ public class RecipeServiceTest {
     @Test
     @Order(3)
     public void getNewlyPublishedRecipes() {
-        RecipeDtoList result = recipeService.getPublishedRecipes(0, 10, "")
+        RecipeDtoList result = recipeService.getPublishedRecipes(new RecipeSearchDto("", "", null, 0))
                 .getContent().get((int) recipeService.totalRecipes() - 1);
 
         Assertions.assertEquals(initSize + 1, recipeService.totalRecipes());
@@ -72,7 +74,7 @@ public class RecipeServiceTest {
     public void addView() {
         recipeService.addView(2L);
 
-        RecipeDtoList result = recipeService.getPublishedRecipes(0, 10, "")
+        RecipeDtoList result = recipeService.getPublishedRecipes(new RecipeSearchDto("", "", null, 0))
                 .getContent().get((int) recipeService.totalRecipes() - 1);
 
         Assertions.assertEquals(1, result.getRecipeViews());

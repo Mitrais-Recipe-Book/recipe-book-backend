@@ -40,7 +40,7 @@ public class RecipeController {
     @GetMapping("/list")
     public CommonResponse getPublishedRecipes(RecipeSearchDto dto) {
         try {
-            Page<RecipeDtoList> result = recipeService.getPublishedRecipes(dto.getPage(), dto.getSize(), dto.getAuthor());
+            Page<RecipeDtoList> result = recipeService.getPublishedRecipes(dto);
             return new CommonResponse(HttpStatus.OK, result);
         } catch (Exception e) {
             return new CommonResponse(HttpStatus.BAD_REQUEST, e.getMessage());

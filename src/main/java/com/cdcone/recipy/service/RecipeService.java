@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import com.cdcone.recipy.dto.RecipeDtoAdd;
 import com.cdcone.recipy.dto.RecipeDtoList;
+import com.cdcone.recipy.dto.RecipeSearchDto;
 import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.repository.RecipeRepository;
 
@@ -42,9 +43,9 @@ public class RecipeService {
         recipeRepository.save(recipe);
     }
 
-    public Page<RecipeDtoList> getPublishedRecipes(int page, int size, String filterAuthor){
-        Pageable pageable = PageRequest.of(page, size, Sort.by("views").descending());
-        return recipeRepository.getPublishedRecipes(filterAuthor, pageable);
+    public Page<RecipeDtoList> getPublishedRecipes(RecipeSearchDto dto){
+        Pageable pageable = PageRequest.of(dto.getPage(), 10, Sort.by("views").descending());
+        return recipeRepository.getPublishedRecipes(dto.getAuthor(), pageable);
     }    
 
     public Set<RecipeDtoList> getPopularRecipes(int limit){
