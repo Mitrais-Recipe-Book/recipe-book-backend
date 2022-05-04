@@ -2,6 +2,8 @@ package com.cdcone.recipy.service;
 
 import java.time.LocalDate;
 import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import com.cdcone.recipy.dto.RecipeDtoAdd;
 import com.cdcone.recipy.dto.RecipeDtoList;
@@ -44,8 +46,9 @@ public class RecipeService {
         return recipeRepository.getPublishedRecipes(filterAuthor, pageable);
     }    
 
-    public Set<RecipeDtoList> getPopularRecipes(int total){
-        return recipeRepository.getPopularRecipes(total);
+    public Set<RecipeDtoList> getPopularRecipes(int limit){
+        Set<RecipeDtoList> result = recipeRepository.getPopularRecipes();
+        return result.stream().limit(limit).collect(Collectors.toSet());
     }
 
     public long totalRecipes() {

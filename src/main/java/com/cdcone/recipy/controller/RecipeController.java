@@ -37,7 +37,7 @@ public class RecipeController {
     }
 
     @GetMapping("/list")
-    public CommonResponse getPublishedRecipes(@RequestBody RecipeSearchDto dto) {
+    public CommonResponse getPublishedRecipes(RecipeSearchDto dto) {
         try {
             Page<RecipeDtoList> result = recipeService.getPublishedRecipes(dto.getPage(), dto.getSize(), dto.getAuthor());
             return new CommonResponse(HttpStatus.OK, result);
@@ -47,9 +47,9 @@ public class RecipeController {
     }
 
     @GetMapping("/popular")
-    public CommonResponse getPopularRecipes(@RequestBody int total){
+    public CommonResponse getPopularRecipes(int limit){
         try{
-            Set<RecipeDtoList> result = recipeService.getPopularRecipes(total);
+            Set<RecipeDtoList> result = recipeService.getPopularRecipes(limit);
             return new CommonResponse(HttpStatus.OK, result);
         } catch(Exception e){
             return new CommonResponse(HttpStatus.BAD_REQUEST, e.getMessage());
