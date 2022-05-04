@@ -1,7 +1,5 @@
 package com.cdcone.recipy.controller;
 
-import java.util.List;
-
 import com.cdcone.recipy.dto.RecipeDtoAdd;
 import com.cdcone.recipy.dto.RecipeDtoList;
 import com.cdcone.recipy.dto.RecipeSearchDto;
@@ -57,7 +55,7 @@ public class RecipeControllerTest {
     @Order(3)
     public void getNewlyPublishedRecipes() {
         Page<RecipeDtoList> result = (Page<RecipeDtoList>) recipeController
-                .getPublishedRecipe(new RecipeSearchDto(10, 0, "", null)).getPayload();
+                .getPublishedRecipes(new RecipeSearchDto("", "", null, 0)).getPayload();
                 
         Assertions.assertEquals(2, result.getContent().size());
     }

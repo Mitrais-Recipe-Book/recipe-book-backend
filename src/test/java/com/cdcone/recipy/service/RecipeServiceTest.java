@@ -1,7 +1,11 @@
 package com.cdcone.recipy.service;
 
+import java.util.NoSuchElementException;
+
 import com.cdcone.recipy.dto.RecipeDtoAdd;
 import com.cdcone.recipy.dto.RecipeDtoList;
+import com.cdcone.recipy.dto.RecipeSearchDto;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -57,11 +61,41 @@ public class RecipeServiceTest {
     @Test
     @Order(3)
     public void getNewlyPublishedRecipes() {
-        RecipeDtoList result = recipeService.getPublishedRecipes(0, 10, "")
-                .getContent().get((int)recipeService.totalRecipes() - 1);
+        RecipeDtoList result = recipeService.getPublishedRecipes(new RecipeSearchDto("", "", null, 0))
+                .getContent().get((int) recipeService.totalRecipes() - 1);
 
         Assertions.assertEquals(initSize + 1, recipeService.totalRecipes());
         Assertions.assertEquals(recipeDtoAdd.getTitle(), result.getRecipeName());
         Assertions.assertEquals(recipeDtoAdd.getOverview(), result.getDescription());
+    }
+
+    @Test
+    @Order(4)
+    public void addView() {
+        recipeService.addView(2L);
+
+        RecipeDtoList result = recipeService.getPublishedRecipes(new RecipeSearchDto("", "", null, 0))
+                .getContent().get((int) recipeService.totalRecipes() - 1);
+
+        Assertions.assertEquals(1, result.getRecipeViews());
+    }
+
+    @Test
+    @Order(5)
+    public void cantAddView() {
+        try {
+            recipeService.addView(3L);
+        } catch (NoSuchElementException e) {
+            Assertions.assertTrue(e.getMessage().contains("No value"));
+        }
+    }
+
+    @Test
+    @Order(6)
+    public void getPopularRecipe(){
+        recipeService.addView(2L);
+        RecipeDtoList result = recipeService.getPopularRecipes(1).stream().findAny().get();
+
+        Assertions.assertEquals(recipeDtoAdd.getTitle(), result.getRecipeName());
     }
 }
