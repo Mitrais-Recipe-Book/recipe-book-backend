@@ -1,6 +1,8 @@
 package com.cdcone.recipy.controller;
 
 
+import java.util.Set;
+
 import com.cdcone.recipy.dto.RecipeDtoAdd;
 import com.cdcone.recipy.dto.RecipeDtoList;
 import com.cdcone.recipy.dto.RecipeSearchDto;
@@ -35,11 +37,21 @@ public class RecipeController {
     }
 
     @GetMapping("/list")
-    public CommonResponse getPublishedRecipes(RecipeSearchDto dto) {
+    public CommonResponse getPublishedRecipes(@RequestBody RecipeSearchDto dto) {
         try {
             Page<RecipeDtoList> result = recipeService.getPublishedRecipes(dto.getPage(), dto.getSize(), dto.getAuthor());
             return new CommonResponse(HttpStatus.OK, result);
         } catch (Exception e) {
+            return new CommonResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @GetMapping("/popular")
+    public CommonResponse getPopularRecipes(@RequestBody int total){
+        try{
+            Set<RecipeDtoList> result = recipeService.getPopularRecipes(total);
+            return new CommonResponse(HttpStatus.OK, result);
+        } catch(Exception e){
             return new CommonResponse(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }

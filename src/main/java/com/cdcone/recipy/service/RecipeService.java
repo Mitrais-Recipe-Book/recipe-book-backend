@@ -45,7 +45,9 @@ public class RecipeService {
         return recipeRepository.getPublishedRecipes(filterAuthor, pageable);
     }    
 
-   
+    public Set<RecipeDtoList> getPopularRecipes(int total){
+        return recipeRepository.getPopularRecipes(total);
+    }
 
     public long totalRecipes() {
         return recipeRepository.count();
