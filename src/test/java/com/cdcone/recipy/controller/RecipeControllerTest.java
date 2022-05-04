@@ -57,7 +57,7 @@ public class RecipeControllerTest {
     @Order(3)
     public void getNewlyPublishedRecipes() {
         Page<RecipeDtoList> result = (Page<RecipeDtoList>) recipeController
-                .getPublishedRecipe(new RecipeSearchDto(10, 0, "", null)).getPayload();
+                .getPublishedRecipes(new RecipeSearchDto(10, 0, "", null)).getPayload();
                 
         Assertions.assertEquals(2, result.getContent().size());
     }
