@@ -14,9 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
+@CrossOrigin("*")
 @RequiredArgsConstructor
 @RequestMapping("api/v1/user")
 public class UserController {
@@ -56,5 +58,11 @@ public class UserController {
             status = HttpStatus.OK;
         }
         return ResponseEntity.status(status).body(new CommonResponse(status, savedPhoto.getSecond()));
+    }
+
+    @GetMapping
+    public ResponseEntity<CommonResponse> getAllUsers(@RequestParam(defaultValue = "0") Integer page) {
+        List<UserDto> allUsers = userService.getAllUsers(page);
+        return ResponseEntity.ok(new CommonResponse(HttpStatus.OK, allUsers));
     }
 }

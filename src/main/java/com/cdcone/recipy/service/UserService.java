@@ -2,11 +2,14 @@ package com.cdcone.recipy.service;
 
 import com.cdcone.recipy.dto.PhotoDto;
 import com.cdcone.recipy.dto.SignUpDto;
+import com.cdcone.recipy.dto.UserDto;
 import com.cdcone.recipy.entity.RoleEntity;
 import com.cdcone.recipy.entity.UserEntity;
 import com.cdcone.recipy.repository.RoleDao;
 import com.cdcone.recipy.repository.UserDao;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -101,5 +104,12 @@ public class UserService implements UserDetailsService {
             }
         }
         return Pair.of(uploadedPhoto, msg);
+    }
+
+    public List<UserDto> getAllUsers(int page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        return userDao.findAllPaged(pageable).stream()
+                .map(UserDto::toDto)
+                .collect(Collectors.toList());
     }
 }
