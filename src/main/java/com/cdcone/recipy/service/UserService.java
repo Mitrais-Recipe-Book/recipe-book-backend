@@ -1,5 +1,6 @@
 package com.cdcone.recipy.service;
 
+import com.cdcone.recipy.dto.PhotoDto;
 import com.cdcone.recipy.dto.SignUpDto;
 import com.cdcone.recipy.entity.RoleEntity;
 import com.cdcone.recipy.entity.UserEntity;
@@ -13,7 +14,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -75,5 +78,28 @@ public class UserService implements UserDetailsService {
 
     public Optional<UserEntity> findByUsername(String username) {
         return userDao.findByUsername(username);
+    }
+
+    public PhotoDto getUserPhoto(String username) {
+        return userDao.getProfilePhoto(username);
+    }
+
+    public Pair<Boolean, String> saveProfilePhoto(MultipartFile photo, String username) {
+        Optional<UserEntity> byUsername = findByUsername(username);
+        String msg = "User not found.";
+        boolean uploadedPhoto = false;
+        if (byUsername.isPresent()) {
+            try {
+                UserEntity user = byUsername.get();
+                user.setProfilePhoto(photo.getBytes());
+                user.setProfilePhotoType(photo.getContentType());
+                userDao.save(user);
+                msg = "Success";
+                uploadedPhoto = true;
+            } catch (IOException e) {
+                msg = "Failed to save profile photo.";
+            }
+        }
+        return Pair.of(uploadedPhoto, msg);
     }
 }
