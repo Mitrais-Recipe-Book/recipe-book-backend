@@ -72,4 +72,8 @@ public class UserService implements UserDetailsService {
     public UserEntity getById(long id){
         return userDao.getById(id);
     }
+
+    public Optional<UserEntity> findByUsername(String username) {
+        return userDao.findByUsername(username);
+    }
 }
