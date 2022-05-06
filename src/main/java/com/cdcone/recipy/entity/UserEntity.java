@@ -34,7 +34,10 @@ public class UserEntity {
     @Column(name = "profile_photo")
     @Type(type = "org.hibernate.type.BinaryType")
     @JsonIgnore
-    private Byte[] profilePhoto;
+    private byte[] profilePhoto;
+
+    @Column(name = "profile_photo_type")
+    private String profilePhotoType;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
