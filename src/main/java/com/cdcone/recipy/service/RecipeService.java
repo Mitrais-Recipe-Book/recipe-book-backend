@@ -1,9 +1,7 @@
 package com.cdcone.recipy.service;
 
 import java.time.LocalDate;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import com.cdcone.recipy.dto.RecipeDtoAdd;
@@ -51,6 +49,10 @@ public class RecipeService {
     public Set<RecipeDtoList> getPopularRecipes(int limit){
         Set<RecipeDtoList> result = recipeRepository.getPopularRecipes();
         return result.stream().limit(limit).collect(Collectors.toSet());
+    }
+
+    public RecipeEntity getById(Long recipeId){
+        return recipeRepository.findById(recipeId).get();
     }
 
     public void addView(Long id){

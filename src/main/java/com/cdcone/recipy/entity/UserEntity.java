@@ -3,10 +3,16 @@ package com.cdcone.recipy.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import org.hibernate.annotations.Type;
+
 import java.util.Set;
 
 @Data
-@Entity(name = "users")
+@Entity()
+@Table(name = "users")
 public class UserEntity {
 
     @Id
@@ -26,7 +32,12 @@ public class UserEntity {
 
     @Lob
     @Column(name = "profile_photo")
-    private Byte[] profilePhoto;
+    @Type(type = "org.hibernate.type.BinaryType")
+    @JsonIgnore
+    private byte[] profilePhoto;
+
+    @Column(name = "profile_photo_type")
+    private String profilePhotoType;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

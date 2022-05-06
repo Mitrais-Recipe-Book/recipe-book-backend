@@ -1,11 +1,11 @@
 package com.cdcone.recipy.controller;
 
-
 import java.util.Set;
 
 import com.cdcone.recipy.dto.RecipeDtoAdd;
 import com.cdcone.recipy.dto.RecipeDtoList;
 import com.cdcone.recipy.dto.RecipeSearchDto;
+import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.response.CommonResponse;
 import com.cdcone.recipy.service.RecipeService;
 
@@ -47,22 +47,34 @@ public class RecipeController {
         }
     }
 
+    @GetMapping("image/{id}")
+    public CommonResponse getRecipeImage(Long recipeId) {
+        try {
+            RecipeEntity entity = recipeService.getById(recipeId);
+            CommonResponse response = new CommonResponse(HttpStatus.OK, entity.getBannerImage());
+            response.setMessage("filename:\\profile-" + entity.getTitle());
+            return response;
+        } catch (Exception e) {
+            return new CommonResponse(HttpStatus.NOT_FOUND, e.getMessage());
+        }
+    }
+
     @PutMapping("/view")
-    public CommonResponse addViewer(Long recipeId){
-        try{
+    public CommonResponse addViewer(Long recipeId) {
+        try {
             recipeService.addView(recipeId);
             return new CommonResponse(HttpStatus.OK, "SUCCESS");
-        } catch(Exception e){
+        } catch (Exception e) {
             return new CommonResponse(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 
     @GetMapping("/popular")
-    public CommonResponse getPopularRecipes(int limit){
-        try{
+    public CommonResponse getPopularRecipes(int limit) {
+        try {
             Set<RecipeDtoList> result = recipeService.getPopularRecipes(limit);
             return new CommonResponse(HttpStatus.OK, result);
-        } catch(Exception e){
+        } catch (Exception e) {
             return new CommonResponse(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
