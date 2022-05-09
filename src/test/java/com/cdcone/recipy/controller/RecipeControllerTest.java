@@ -21,12 +21,38 @@ import com.cdcone.recipy.service.UserService;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+@ContextConfiguration(classes = {RecipeController.class, RecipeService.class, UserService.class,
+        BCryptPasswordEncoder.class})
+@ExtendWith(SpringExtension.class)
 class RecipeControllerTest {
+    @Autowired
+    private RecipeController recipeController;
+
+    @MockBean
+    private RecipeRepository recipeRepository;
+
+    @MockBean
+    private RoleDao roleDao;
+
+    @MockBean
+    private UserDao userDao;
+
     /**
      * Method under test: {@link RecipeController#add(RecipeDtoAdd)}
      */
@@ -278,6 +304,236 @@ class RecipeControllerTest {
         assertNull(actualAddResult.getPayload());
         verify(recipeRepository).save((RecipeEntity) any());
         verify(userService).getById(anyLong());
+    }
+
+    /**
+     * Method under test: {@link RecipeController#getPopularRecipes(int)}
+     */
+    @Test
+    void testGetPopularRecipes() throws Exception {
+        when(this.recipeRepository.getPopularRecipes()).thenReturn(new HashSet<>());
+        MockHttpServletRequestBuilder getResult = MockMvcRequestBuilders.get("/api/v1/recipe/popular");
+        MockHttpServletRequestBuilder requestBuilder = getResult.param("limit", String.valueOf(1));
+        MockMvcBuilders.standaloneSetup(this.recipeController)
+                .build()
+                .perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(
+                        MockMvcResultMatchers.content().string("{\"status\":\"OK\",\"message\":\"SUCCESS\",\"payload\":[]}"));
+    }
+
+    /**
+     * Method under test: {@link RecipeController#getPopularRecipes(int)}
+     */
+    @Test
+    void testGetPopularRecipes2() throws Exception {
+        when(this.recipeRepository.getPopularRecipes()).thenReturn(new HashSet<>());
+        MockHttpServletRequestBuilder getResult = MockMvcRequestBuilders.get("/api/v1/recipe/popular");
+        MockHttpServletRequestBuilder requestBuilder = getResult.param("limit", String.valueOf(-1));
+        MockMvcBuilders.standaloneSetup(this.recipeController)
+                .build()
+                .perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(
+                        MockMvcResultMatchers.content().string("{\"status\":\"BAD_REQUEST\",\"message\":\"-1\",\"payload\":null}"));
+    }
+
+    /**
+     * Method under test: {@link RecipeController#getPopularRecipes(int)}
+     */
+    @Test
+    void testGetPopularRecipes3() throws Exception {
+        when(this.recipeRepository.getPopularRecipes()).thenReturn(new HashSet<>());
+        MockHttpServletRequestBuilder getResult = MockMvcRequestBuilders.get("/api/v1/recipe/popular");
+        getResult.contentType("https://example.org/example");
+        MockHttpServletRequestBuilder requestBuilder = getResult.param("limit", String.valueOf(1));
+        MockMvcBuilders.standaloneSetup(this.recipeController)
+                .build()
+                .perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(
+                        MockMvcResultMatchers.content().string("{\"status\":\"OK\",\"message\":\"SUCCESS\",\"payload\":[]}"));
+    }
+
+    /**
+     * Method under test: {@link RecipeController#addViewer(Long)}
+     */
+    @Test
+    void testAddViewer() throws Exception {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setEmail("jane.doe@example.org");
+        userEntity.setFullName("Dr Jane Doe");
+        userEntity.setId(123L);
+        userEntity.setPassword("iloveyou");
+        userEntity.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
+        userEntity.setRecipes(new HashSet<>());
+        userEntity.setRoles(new HashSet<>());
+        userEntity.setUsername("janedoe");
+
+        RecipeEntity recipeEntity = new RecipeEntity();
+        recipeEntity.setBannerImage(new Byte[]{'A'});
+        recipeEntity.setContent("Not all who wander are lost");
+        recipeEntity.setDateCreated(LocalDate.ofEpochDay(1L));
+        recipeEntity.setDraft(true);
+        recipeEntity.setId(123L);
+        recipeEntity.setIngredients("Ingredients");
+        recipeEntity.setOverview("Overview");
+        recipeEntity.setTags(new HashSet<>());
+        recipeEntity.setTitle("Dr");
+        recipeEntity.setUser(userEntity);
+        recipeEntity.setVideoURL("https://example.org/example");
+        recipeEntity.setViews(1);
+        Optional<RecipeEntity> ofResult = Optional.of(recipeEntity);
+
+        UserEntity userEntity1 = new UserEntity();
+        userEntity1.setEmail("jane.doe@example.org");
+        userEntity1.setFullName("Dr Jane Doe");
+        userEntity1.setId(123L);
+        userEntity1.setPassword("iloveyou");
+        userEntity1.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
+        userEntity1.setRecipes(new HashSet<>());
+        userEntity1.setRoles(new HashSet<>());
+        userEntity1.setUsername("janedoe");
+
+        RecipeEntity recipeEntity1 = new RecipeEntity();
+        recipeEntity1.setBannerImage(new Byte[]{'A'});
+        recipeEntity1.setContent("Not all who wander are lost");
+        recipeEntity1.setDateCreated(LocalDate.ofEpochDay(1L));
+        recipeEntity1.setDraft(true);
+        recipeEntity1.setId(123L);
+        recipeEntity1.setIngredients("Ingredients");
+        recipeEntity1.setOverview("Overview");
+        recipeEntity1.setTags(new HashSet<>());
+        recipeEntity1.setTitle("Dr");
+        recipeEntity1.setUser(userEntity1);
+        recipeEntity1.setVideoURL("https://example.org/example");
+        recipeEntity1.setViews(1);
+        when(this.recipeRepository.save((RecipeEntity) any())).thenReturn(recipeEntity1);
+        when(this.recipeRepository.findById((Long) any())).thenReturn(ofResult);
+        MockHttpServletRequestBuilder putResult = MockMvcRequestBuilders.put("/api/v1/recipe/view");
+        MockHttpServletRequestBuilder requestBuilder = putResult.param("recipeId", String.valueOf(1L));
+        MockMvcBuilders.standaloneSetup(this.recipeController)
+                .build()
+                .perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(
+                        MockMvcResultMatchers.content().string("{\"status\":\"OK\",\"message\":\"SUCCESS\",\"payload\":null}"));
+    }
+
+    /**
+     * Method under test: {@link RecipeController#getPublishedRecipes(com.cdcone.recipy.dto.RecipeSearchDto)}
+     */
+    @Test
+    void testGetPublishedRecipes() throws Exception {
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/recipe/list");
+        ResultActions actualPerformResult = MockMvcBuilders.standaloneSetup(this.recipeController)
+                .build()
+                .perform(requestBuilder);
+        actualPerformResult.andExpect(MockMvcResultMatchers.status().is(400));
+    }
+
+    /**
+     * Method under test: {@link RecipeController#getRecipeImage(Long)}
+     */
+    @Test
+    void testGetRecipeImage() throws Exception {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setEmail("jane.doe@example.org");
+        userEntity.setFullName("Dr Jane Doe");
+        userEntity.setId(123L);
+        userEntity.setPassword("iloveyou");
+        userEntity.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
+        userEntity.setRecipes(new HashSet<>());
+        userEntity.setRoles(new HashSet<>());
+        userEntity.setUsername("janedoe");
+
+        RecipeEntity recipeEntity = new RecipeEntity();
+        recipeEntity.setBannerImage(new Byte[]{'A'});
+        recipeEntity.setContent("Not all who wander are lost");
+        recipeEntity.setDateCreated(LocalDate.ofEpochDay(1L));
+        recipeEntity.setDraft(true);
+        recipeEntity.setId(123L);
+        recipeEntity.setIngredients("Ingredients");
+        recipeEntity.setOverview("Overview");
+        recipeEntity.setTags(new HashSet<>());
+        recipeEntity.setTitle("Dr");
+        recipeEntity.setUser(userEntity);
+        recipeEntity.setVideoURL("https://example.org/example");
+        recipeEntity.setViews(1);
+        Optional<RecipeEntity> ofResult = Optional.of(recipeEntity);
+        when(this.recipeRepository.findById((Long) any())).thenReturn(ofResult);
+        MockHttpServletRequestBuilder getResult = MockMvcRequestBuilders.get("/api/v1/recipe/image/*");
+        MockHttpServletRequestBuilder requestBuilder = getResult.param("recipeId", String.valueOf(1L));
+        MockMvcBuilders.standaloneSetup(this.recipeController)
+                .build()
+                .perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.content()
+                        .string("{\"status\":\"OK\",\"message\":\"filename:\\\\profile-Dr\",\"payload\":[65]}"));
+    }
+
+    /**
+     * Method under test: {@link RecipeController#getRecipeImage(Long)}
+     */
+    @Test
+    void testGetRecipeImage2() throws Exception {
+        when(this.recipeRepository.findById((Long) any())).thenReturn(Optional.empty());
+        MockHttpServletRequestBuilder getResult = MockMvcRequestBuilders.get("/api/v1/recipe/image/*");
+        MockHttpServletRequestBuilder requestBuilder = getResult.param("recipeId", String.valueOf(1L));
+        MockMvcBuilders.standaloneSetup(this.recipeController)
+                .build()
+                .perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.content()
+                        .string("{\"status\":\"NOT_FOUND\",\"message\":\"No value present\",\"payload\":null}"));
+    }
+
+    /**
+     * Method under test: {@link RecipeController#getRecipeImage(Long)}
+     */
+    @Test
+    void testGetRecipeImage3() throws Exception {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setEmail("jane.doe@example.org");
+        userEntity.setFullName("Dr Jane Doe");
+        userEntity.setId(123L);
+        userEntity.setPassword("iloveyou");
+        userEntity.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
+        userEntity.setRecipes(new HashSet<>());
+        userEntity.setRoles(new HashSet<>());
+        userEntity.setUsername("janedoe");
+
+        RecipeEntity recipeEntity = new RecipeEntity();
+        recipeEntity.setBannerImage(new Byte[]{'A'});
+        recipeEntity.setContent("Not all who wander are lost");
+        recipeEntity.setDateCreated(LocalDate.ofEpochDay(1L));
+        recipeEntity.setDraft(true);
+        recipeEntity.setId(123L);
+        recipeEntity.setIngredients("Ingredients");
+        recipeEntity.setOverview("Overview");
+        recipeEntity.setTags(new HashSet<>());
+        recipeEntity.setTitle("Dr");
+        recipeEntity.setUser(userEntity);
+        recipeEntity.setVideoURL("https://example.org/example");
+        recipeEntity.setViews(1);
+        Optional<RecipeEntity> ofResult = Optional.of(recipeEntity);
+        when(this.recipeRepository.findById((Long) any())).thenReturn(ofResult);
+        MockHttpServletRequestBuilder getResult = MockMvcRequestBuilders.get("/api/v1/recipe/image/*");
+        getResult.contentType("https://example.org/example");
+        MockHttpServletRequestBuilder requestBuilder = getResult.param("recipeId", String.valueOf(1L));
+        MockMvcBuilders.standaloneSetup(this.recipeController)
+                .build()
+                .perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.content()
+                        .string("{\"status\":\"OK\",\"message\":\"filename:\\\\profile-Dr\",\"payload\":[65]}"));
     }
 }
 
