@@ -1,6 +1,5 @@
 package com.cdcone.recipy.repository;
 
-
 import java.util.Set;
 
 import javax.websocket.server.PathParam;
@@ -21,12 +20,16 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
     @Query("SELECT new com.cdcone.recipy.dto.RecipeDtoList " +
             "(r.title, r.overview, r.views, u.fullName) " +
             "FROM RecipeEntity r JOIN r.user u " +
-            "WHERE u.fullName LIKE %:authorName%")
-    public Page<RecipeDtoList> getPublishedRecipes(@PathParam("authorName") String authorName, Pageable pageable);
+            "WHERE LOWER(r.title) LIKE LOWER(CONCAT('%', :titleName, '%')) " +
+            "AND  LOWER(u.fullName) LIKE LOWER(CONCAT('%', :authorName, '%')) ")
+    public Page<RecipeDtoList> getPublishedRecipes(
+            @PathParam("titleName") String titleName,
+            @PathParam("authorName") String authorName,
+            Pageable pageable);
 
-    @Query("SELECT new com.cdcone.recipy.dto.RecipeDtoList "+
-        "(r.title, r.overview, r.views, u.fullName) "+
-        "FROM RecipeEntity r JOIN r.user u " +
-        "ORDER BY r.views DESC ")
+    @Query("SELECT new com.cdcone.recipy.dto.RecipeDtoList " +
+            "(r.title, r.overview, r.views, u.fullName) " +
+            "FROM RecipeEntity r JOIN r.user u " +
+            "ORDER BY r.views DESC ")
     public Set<RecipeDtoList> getPopularRecipes();
 }
