@@ -8,6 +8,7 @@ import com.cdcone.recipy.entity.UserEntity;
 import com.cdcone.recipy.repository.RoleDao;
 import com.cdcone.recipy.repository.UserDao;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
@@ -106,10 +107,8 @@ public class UserService implements UserDetailsService {
         return Pair.of(uploadedPhoto, msg);
     }
 
-    public List<UserDto> getAllUsers(int page) {
+    public Page<UserDto> getAllUsers(int page) {
         Pageable pageable = PageRequest.of(page, 10);
-        return userDao.findAllPaged(pageable).stream()
-                .map(UserDto::toDto)
-                .collect(Collectors.toList());
+        return userDao.findAllPaged(pageable);
     }
 }
