@@ -27,23 +27,28 @@ public class UserController {
 
     @GetMapping("{username}")
     public ResponseEntity<CommonResponse> getByUsername(@PathVariable String username) {
-        Optional<UserEntity> byUsername = userService.findByUsername(username);
-        HttpStatus status = HttpStatus.NOT_FOUND;
-        UserDto userDto = null;
-        String msg = "User not found.";
-        if (byUsername.isPresent()) {
-            status = HttpStatus.OK;
-            userDto = UserDto.toDto(byUsername.get());
-            msg = "Success";
+        try {
+            Optional<UserEntity> byUsername = userService.findByUsername(username);
+            HttpStatus status = HttpStatus.NOT_FOUND;
+            UserDto userDto = null;
+            String msg = "User not found.";
+            if (byUsername.isPresent()) {
+                status = HttpStatus.OK;
+                userDto = UserDto.toDto(byUsername.get());
+                msg = "success: data retrieved";
+            }
+            return ResponseEntity.status(status).body(new CommonResponse(msg, userDto));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
         }
-        return ResponseEntity.status(status).body(new CommonResponse(status, msg, userDto));
     }
 
     @GetMapping("{username}/photo")
     public ResponseEntity<byte[]> getProfilePhoto(@PathVariable String username) {
         PhotoDto userPhoto = userService.getUserPhoto(username);
         if (userPhoto != null && userPhoto.getPhoto() != null) {
-            return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + username + " profile photo")
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + username + " profile photo")
                     .contentType(MediaType.valueOf(userPhoto.getType()))
                     .body(userPhoto.getPhoto());
         }
@@ -51,18 +56,19 @@ public class UserController {
     }
 
     @PutMapping(value = "{username}/photo", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse> saveProfilePhoto(@PathVariable String username, @RequestParam("photo") MultipartFile photo) {
+    public ResponseEntity<CommonResponse> saveProfilePhoto(@PathVariable String username,
+            @RequestParam("photo") MultipartFile photo) {
         Pair<Boolean, String> savedPhoto = userService.saveProfilePhoto(photo, username);
         HttpStatus status = HttpStatus.BAD_REQUEST;
         if (savedPhoto.getFirst()) {
             status = HttpStatus.OK;
         }
-        return ResponseEntity.status(status).body(new CommonResponse(status, savedPhoto.getSecond()));
+        return ResponseEntity.status(status).body(new CommonResponse( savedPhoto.getSecond()));
     }
 
     @GetMapping
     public ResponseEntity<CommonResponse> getAllUsers(@RequestParam(defaultValue = "0") Integer page) {
         List<UserDto> allUsers = userService.getAllUsers(page);
-        return ResponseEntity.ok(new CommonResponse(HttpStatus.OK, allUsers));
+        return ResponseEntity.ok(new CommonResponse(allUsers));
     }
 }

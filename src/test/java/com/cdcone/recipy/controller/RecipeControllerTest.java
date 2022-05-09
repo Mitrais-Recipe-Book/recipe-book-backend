@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -40,22 +41,22 @@ public class RecipeControllerTest {
     @Test
     @Order(1)
     public void addData() {
-        CommonResponse response = recipeController.add(recipeDtoAdd);
-        Assertions.assertEquals(HttpStatus.OK, response.getStatus());
+        ResponseEntity<CommonResponse> response = recipeController.add(recipeDtoAdd);
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Test
     @Order(2)
     public void cantAddData() {
-        CommonResponse response = recipeController.add(recipeDtoAdd);
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
+        ResponseEntity<CommonResponse> response = recipeController.add(recipeDtoAdd);
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
     @Test
     @Order(3)
     public void getNewlyPublishedRecipes() {
         Page<RecipeDtoList> result = (Page<RecipeDtoList>) recipeController
-                .getPublishedRecipes(new RecipeSearchDto("", "", null, 0)).getPayload();
+                .getPublishedRecipes(new RecipeSearchDto("", "", null, 0)).getBody().getPayload();
                 
         Assertions.assertEquals(2, result.getContent().size());
     }
