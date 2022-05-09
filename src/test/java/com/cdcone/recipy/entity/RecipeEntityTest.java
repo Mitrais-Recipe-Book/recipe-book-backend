@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,13 +18,13 @@ class RecipeEntityTest {
      * Method under test: {@link RecipeEntity#RecipeEntity(UserEntity, String, String, LocalDate, String, String, String, int, boolean, Byte[])}
      */
     @Test
-    void testConstructor() {
+    void testConstructor() throws UnsupportedEncodingException {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail("jane.doe@example.org");
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(123L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        userEntity.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         HashSet<RecipeEntity> recipeEntitySet = new HashSet<>();
         userEntity.setRecipes(recipeEntitySet);
         HashSet<RoleEntity> roleEntitySet = new HashSet<>();
@@ -51,13 +52,12 @@ class RecipeEntityTest {
         assertSame(ofEpochDayResult, dateCreated);
         assertEquals("1970-01-02", dateCreated.toString());
         assertEquals("Overview", actualRecipeEntity.getOverview());
+        assertNull(actualRecipeEntity.getTags());
         assertEquals(123L, user.getId().longValue());
         assertEquals("Dr Jane Doe", user.getFullName());
         assertEquals("jane.doe@example.org", user.getEmail());
-        Byte[] profilePhoto = user.getProfilePhoto();
-        assertEquals(1, profilePhoto.length);
-        assertArrayEquals(new Byte[]{'A'}, profilePhoto);
-        //assertEquals('A', profilePhoto[0]);
+        assertEquals(8, user.getProfilePhoto().length);
+        assertNull(user.getProfilePhotoType());
         Set<RoleEntity> roles = user.getRoles();
         assertSame(roleEntitySet, roles);
         assertTrue(roles.isEmpty());

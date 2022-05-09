@@ -173,7 +173,7 @@ class RecipyApplicationTest {
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(123L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        //userEntity.setProfilePhoto(new Byte[]{'A'});
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("janedoe");
@@ -198,7 +198,7 @@ class RecipyApplicationTest {
         userEntity1.setFullName("Dr Jane Doe");
         userEntity1.setId(123L);
         userEntity1.setPassword("iloveyou");
-        userEntity1.setProfilePhoto(new Byte[]{'A'});
+        //userEntity1.setProfilePhoto(new Byte[]{'A'});
         userEntity1.setRecipes(new HashSet<>());
         userEntity1.setRoles(new HashSet<>());
         userEntity1.setUsername("janedoe");
@@ -213,7 +213,7 @@ class RecipyApplicationTest {
         userEntity2.setFullName("Dr Jane Doe");
         userEntity2.setId(123L);
         userEntity2.setPassword("iloveyou");
-        userEntity2.setProfilePhoto(new Byte[]{'A'});
+        //userEntity2.setProfilePhoto(new Byte[]{'A'});
         userEntity2.setRecipes(new HashSet<>());
         userEntity2.setRoles(new HashSet<>());
         userEntity2.setUsername("janedoe");
@@ -402,7 +402,7 @@ class RecipyApplicationTest {
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(123L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        //userEntity.setProfilePhoto(new Byte[]{'A'});
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("janedoe");
@@ -428,7 +428,7 @@ class RecipyApplicationTest {
         userEntity1.setFullName("Dr Jane Doe");
         userEntity1.setId(123L);
         userEntity1.setPassword("iloveyou");
-        userEntity1.setProfilePhoto(new Byte[]{'A'});
+        //userEntity1.setProfilePhoto(new Byte[]{'A'});
         userEntity1.setRecipes(new HashSet<>());
         userEntity1.setRoles(new HashSet<>());
         userEntity1.setUsername("janedoe");
@@ -598,7 +598,7 @@ class RecipyApplicationTest {
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(123L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        //userEntity.setProfilePhoto(new Byte[]{'A'});
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("janedoe");
@@ -623,7 +623,7 @@ class RecipyApplicationTest {
         userEntity1.setFullName("Dr Jane Doe");
         userEntity1.setId(123L);
         userEntity1.setPassword("iloveyou");
-        userEntity1.setProfilePhoto(new Byte[]{'A'});
+        //userEntity1.setProfilePhoto(new Byte[]{'A'});
         userEntity1.setRecipes(new HashSet<>());
         userEntity1.setRoles(new HashSet<>());
         userEntity1.setUsername("janedoe");
@@ -638,7 +638,7 @@ class RecipyApplicationTest {
         userEntity2.setFullName("Dr Jane Doe");
         userEntity2.setId(123L);
         userEntity2.setPassword("iloveyou");
-        userEntity2.setProfilePhoto(new Byte[]{'A'});
+        //userEntity2.setProfilePhoto(new Byte[]{'A'});
         userEntity2.setRecipes(new HashSet<>());
         userEntity2.setRoles(new HashSet<>());
         userEntity2.setUsername("janedoe");
@@ -825,7 +825,7 @@ class RecipyApplicationTest {
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(123L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        //userEntity.setProfilePhoto(new Byte[]{'A'});
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("janedoe");
@@ -850,7 +850,7 @@ class RecipyApplicationTest {
         userEntity1.setFullName("Dr Jane Doe");
         userEntity1.setId(123L);
         userEntity1.setPassword("iloveyou");
-        userEntity1.setProfilePhoto(new Byte[]{'A'});
+        //userEntity1.setProfilePhoto(new Byte[]{'A'});
         userEntity1.setRecipes(new HashSet<>());
         userEntity1.setRoles(new HashSet<>());
         userEntity1.setUsername("janedoe");

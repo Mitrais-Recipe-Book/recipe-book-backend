@@ -130,7 +130,7 @@ public class RecipeControllerTest {
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(123L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        //userEntity.setProfilePhoto(new Byte[]{'A'});
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("janedoe");
@@ -155,7 +155,7 @@ public class RecipeControllerTest {
         userEntity1.setFullName("Dr Jane Doe");
         userEntity1.setId(123L);
         userEntity1.setPassword("iloveyou");
-        userEntity1.setProfilePhoto(new Byte[]{'A'});
+        //userEntity1.setProfilePhoto(new Byte[]{'A'});
         userEntity1.setRecipes(new HashSet<>());
         userEntity1.setRoles(new HashSet<>());
         userEntity1.setUsername("janedoe");
@@ -219,7 +219,7 @@ public class RecipeControllerTest {
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(123L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        //userEntity.setProfilePhoto(new Byte[]{'A'});
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("janedoe");
@@ -293,7 +293,7 @@ public class RecipeControllerTest {
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(123L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        //userEntity.setProfilePhoto(new Byte[]{'A'});
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("janedoe");
@@ -318,7 +318,7 @@ public class RecipeControllerTest {
         userEntity1.setFullName("Dr Jane Doe");
         userEntity1.setId(123L);
         userEntity1.setPassword("iloveyou");
-        userEntity1.setProfilePhoto(new Byte[]{'A'});
+        //userEntity1.setProfilePhoto(new Byte[]{'A'});
         userEntity1.setRecipes(new HashSet<>());
         userEntity1.setRoles(new HashSet<>());
         userEntity1.setUsername("janedoe");
@@ -484,7 +484,7 @@ public class RecipeControllerTest {
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(123L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        //userEntity.setProfilePhoto(new Byte[]{'A'});
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("janedoe");
@@ -509,7 +509,7 @@ public class RecipeControllerTest {
         userEntity1.setFullName("Dr Jane Doe");
         userEntity1.setId(123L);
         userEntity1.setPassword("iloveyou");
-        userEntity1.setProfilePhoto(new Byte[]{'A'});
+        //userEntity1.setProfilePhoto(new Byte[]{'A'});
         userEntity1.setRecipes(new HashSet<>());
         userEntity1.setRoles(new HashSet<>());
         userEntity1.setUsername("janedoe");
@@ -543,10 +543,6 @@ public class RecipeControllerTest {
 //                .getPublishedRecipe(new RecipeSearchDto(10, 0, "", null)).getPayload();
 //        Assertions.assertEquals(1, result.getContent().size());
 //    }
-
-    /**
-     * Method under test: {@link RecipeController#getPublishedRecipe(com.cdcone.recipy.dto.RecipeSearchDto)}
-     */
     @Test
     void testGetPublishedRecipe() throws Exception {
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/recipe/list");

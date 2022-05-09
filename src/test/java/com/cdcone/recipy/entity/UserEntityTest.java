@@ -3,9 +3,11 @@ package com.cdcone.recipy.entity;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -25,7 +27,7 @@ class UserEntityTest {
      * Method under test: {@link UserEntity#canEqual(Object)}
      */
     @Test
-    void testCanEqual2() {
+    void testCanEqual2() throws UnsupportedEncodingException {
         UserEntity userEntity = new UserEntity();
 
         UserEntity userEntity1 = new UserEntity();
@@ -33,7 +35,7 @@ class UserEntityTest {
         userEntity1.setFullName("Dr Jane Doe");
         userEntity1.setId(123L);
         userEntity1.setPassword("iloveyou");
-        userEntity1.setProfilePhoto(new Byte[]{'A'});
+        userEntity1.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity1.setRecipes(new HashSet<>());
         userEntity1.setRoles(new HashSet<>());
         userEntity1.setUsername("janedoe");
@@ -49,20 +51,20 @@ class UserEntityTest {
      *   <li>{@link UserEntity#setFullName(String)}
      *   <li>{@link UserEntity#setId(Long)}
      *   <li>{@link UserEntity#setPassword(String)}
-     *   <li>{@link UserEntity#setProfilePhoto(Byte[])}
+     *   <li>{@link UserEntity#setProfilePhoto(byte[])}
      *   <li>{@link UserEntity#setRecipes(Set)}
      *   <li>{@link UserEntity#setRoles(Set)}
      *   <li>{@link UserEntity#setUsername(String)}
      * </ul>
      */
     @Test
-    void testConstructor() {
+    void testConstructor() throws UnsupportedEncodingException {
         UserEntity actualUserEntity = new UserEntity();
         actualUserEntity.setEmail("jane.doe@example.org");
         actualUserEntity.setFullName("Dr Jane Doe");
         actualUserEntity.setId(123L);
         actualUserEntity.setPassword("iloveyou");
-        actualUserEntity.setProfilePhoto(new Byte[]{'A'});
+        actualUserEntity.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         HashSet<RecipeEntity> recipeEntitySet = new HashSet<>();
         actualUserEntity.setRecipes(recipeEntitySet);
         HashSet<RoleEntity> roleEntitySet = new HashSet<>();
@@ -72,6 +74,7 @@ class UserEntityTest {
         assertEquals("Dr Jane Doe", actualUserEntity.getFullName());
         assertEquals(123L, actualUserEntity.getId().longValue());
         assertEquals("iloveyou", actualUserEntity.getPassword());
+        assertNull(actualUserEntity.getProfilePhotoType());
         assertSame(recipeEntitySet, actualUserEntity.getRecipes());
         assertSame(roleEntitySet, actualUserEntity.getRoles());
         assertEquals("janedoe", actualUserEntity.getUsername());
@@ -81,13 +84,13 @@ class UserEntityTest {
      * Method under test: {@link UserEntity#equals(Object)}
      */
     @Test
-    void testEquals() {
+    void testEquals() throws UnsupportedEncodingException {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail("jane.doe@example.org");
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(123L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        userEntity.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("janedoe");
@@ -98,13 +101,13 @@ class UserEntityTest {
      * Method under test: {@link UserEntity#equals(Object)}
      */
     @Test
-    void testEquals2() {
+    void testEquals2() throws UnsupportedEncodingException {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail("jane.doe@example.org");
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(123L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        userEntity.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("janedoe");
@@ -115,13 +118,13 @@ class UserEntityTest {
      * Method under test: {@link UserEntity#equals(Object)}
      */
     @Test
-    void testEquals3() {
+    void testEquals3() throws UnsupportedEncodingException {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail("jane.doe@example.org");
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(123L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        userEntity.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("janedoe");
@@ -134,13 +137,13 @@ class UserEntityTest {
      * Method under test: {@link UserEntity#equals(Object)}
      */
     @Test
-    void testEquals4() {
+    void testEquals4() throws UnsupportedEncodingException {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail("jane.doe@example.org");
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(123L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        userEntity.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("janedoe");
@@ -150,7 +153,7 @@ class UserEntityTest {
         userEntity1.setFullName("Dr Jane Doe");
         userEntity1.setId(123L);
         userEntity1.setPassword("iloveyou");
-        userEntity1.setProfilePhoto(new Byte[]{'A'});
+        userEntity1.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity1.setRecipes(new HashSet<>());
         userEntity1.setRoles(new HashSet<>());
         userEntity1.setUsername("janedoe");
@@ -163,13 +166,13 @@ class UserEntityTest {
      * Method under test: {@link UserEntity#equals(Object)}
      */
     @Test
-    void testEquals5() {
+    void testEquals5() throws UnsupportedEncodingException {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail("janedoe");
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(123L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        userEntity.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("janedoe");
@@ -179,7 +182,7 @@ class UserEntityTest {
         userEntity1.setFullName("Dr Jane Doe");
         userEntity1.setId(123L);
         userEntity1.setPassword("iloveyou");
-        userEntity1.setProfilePhoto(new Byte[]{'A'});
+        userEntity1.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity1.setRecipes(new HashSet<>());
         userEntity1.setRoles(new HashSet<>());
         userEntity1.setUsername("janedoe");
@@ -190,13 +193,13 @@ class UserEntityTest {
      * Method under test: {@link UserEntity#equals(Object)}
      */
     @Test
-    void testEquals6() {
+    void testEquals6() throws UnsupportedEncodingException {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail(null);
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(123L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        userEntity.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("janedoe");
@@ -206,7 +209,7 @@ class UserEntityTest {
         userEntity1.setFullName("Dr Jane Doe");
         userEntity1.setId(123L);
         userEntity1.setPassword("iloveyou");
-        userEntity1.setProfilePhoto(new Byte[]{'A'});
+        userEntity1.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity1.setRecipes(new HashSet<>());
         userEntity1.setRoles(new HashSet<>());
         userEntity1.setUsername("janedoe");
@@ -217,13 +220,13 @@ class UserEntityTest {
      * Method under test: {@link UserEntity#equals(Object)}
      */
     @Test
-    void testEquals7() {
+    void testEquals7() throws UnsupportedEncodingException {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail("jane.doe@example.org");
         userEntity.setFullName("jane.doe@example.org");
         userEntity.setId(123L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        userEntity.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("janedoe");
@@ -233,7 +236,7 @@ class UserEntityTest {
         userEntity1.setFullName("Dr Jane Doe");
         userEntity1.setId(123L);
         userEntity1.setPassword("iloveyou");
-        userEntity1.setProfilePhoto(new Byte[]{'A'});
+        userEntity1.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity1.setRecipes(new HashSet<>());
         userEntity1.setRoles(new HashSet<>());
         userEntity1.setUsername("janedoe");
@@ -244,13 +247,13 @@ class UserEntityTest {
      * Method under test: {@link UserEntity#equals(Object)}
      */
     @Test
-    void testEquals8() {
+    void testEquals8() throws UnsupportedEncodingException {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail("jane.doe@example.org");
         userEntity.setFullName(null);
         userEntity.setId(123L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        userEntity.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("janedoe");
@@ -260,7 +263,7 @@ class UserEntityTest {
         userEntity1.setFullName("Dr Jane Doe");
         userEntity1.setId(123L);
         userEntity1.setPassword("iloveyou");
-        userEntity1.setProfilePhoto(new Byte[]{'A'});
+        userEntity1.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity1.setRecipes(new HashSet<>());
         userEntity1.setRoles(new HashSet<>());
         userEntity1.setUsername("janedoe");
@@ -271,13 +274,13 @@ class UserEntityTest {
      * Method under test: {@link UserEntity#equals(Object)}
      */
     @Test
-    void testEquals9() {
+    void testEquals9() throws UnsupportedEncodingException {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail("jane.doe@example.org");
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(1L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        userEntity.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("janedoe");
@@ -287,7 +290,7 @@ class UserEntityTest {
         userEntity1.setFullName("Dr Jane Doe");
         userEntity1.setId(123L);
         userEntity1.setPassword("iloveyou");
-        userEntity1.setProfilePhoto(new Byte[]{'A'});
+        userEntity1.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity1.setRecipes(new HashSet<>());
         userEntity1.setRoles(new HashSet<>());
         userEntity1.setUsername("janedoe");
@@ -298,13 +301,13 @@ class UserEntityTest {
      * Method under test: {@link UserEntity#equals(Object)}
      */
     @Test
-    void testEquals10() {
+    void testEquals10() throws UnsupportedEncodingException {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail("jane.doe@example.org");
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(null);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        userEntity.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("janedoe");
@@ -314,7 +317,7 @@ class UserEntityTest {
         userEntity1.setFullName("Dr Jane Doe");
         userEntity1.setId(123L);
         userEntity1.setPassword("iloveyou");
-        userEntity1.setProfilePhoto(new Byte[]{'A'});
+        userEntity1.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity1.setRecipes(new HashSet<>());
         userEntity1.setRoles(new HashSet<>());
         userEntity1.setUsername("janedoe");
@@ -325,13 +328,13 @@ class UserEntityTest {
      * Method under test: {@link UserEntity#equals(Object)}
      */
     @Test
-    void testEquals11() {
+    void testEquals11() throws UnsupportedEncodingException {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail("jane.doe@example.org");
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(123L);
         userEntity.setPassword("jane.doe@example.org");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        userEntity.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("janedoe");
@@ -341,7 +344,7 @@ class UserEntityTest {
         userEntity1.setFullName("Dr Jane Doe");
         userEntity1.setId(123L);
         userEntity1.setPassword("iloveyou");
-        userEntity1.setProfilePhoto(new Byte[]{'A'});
+        userEntity1.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity1.setRecipes(new HashSet<>());
         userEntity1.setRoles(new HashSet<>());
         userEntity1.setUsername("janedoe");
@@ -352,13 +355,13 @@ class UserEntityTest {
      * Method under test: {@link UserEntity#equals(Object)}
      */
     @Test
-    void testEquals12() {
+    void testEquals12() throws UnsupportedEncodingException {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail("jane.doe@example.org");
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(123L);
         userEntity.setPassword(null);
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        userEntity.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("janedoe");
@@ -368,7 +371,7 @@ class UserEntityTest {
         userEntity1.setFullName("Dr Jane Doe");
         userEntity1.setId(123L);
         userEntity1.setPassword("iloveyou");
-        userEntity1.setProfilePhoto(new Byte[]{'A'});
+        userEntity1.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity1.setRecipes(new HashSet<>());
         userEntity1.setRoles(new HashSet<>());
         userEntity1.setUsername("janedoe");
@@ -379,13 +382,13 @@ class UserEntityTest {
      * Method under test: {@link UserEntity#equals(Object)}
      */
     @Test
-    void testEquals13() {
+    void testEquals13() throws UnsupportedEncodingException {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail("jane.doe@example.org");
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(123L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{1});
+        userEntity.setProfilePhoto(new byte[]{1, 'A', 'A', 'A', 'A', 'A', 'A', 'A'});
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("janedoe");
@@ -395,7 +398,7 @@ class UserEntityTest {
         userEntity1.setFullName("Dr Jane Doe");
         userEntity1.setId(123L);
         userEntity1.setPassword("iloveyou");
-        userEntity1.setProfilePhoto(new Byte[]{'A'});
+        userEntity1.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity1.setRecipes(new HashSet<>());
         userEntity1.setRoles(new HashSet<>());
         userEntity1.setUsername("janedoe");
@@ -406,13 +409,13 @@ class UserEntityTest {
      * Method under test: {@link UserEntity#equals(Object)}
      */
     @Test
-    void testEquals14() {
+    void testEquals14() throws UnsupportedEncodingException {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail("jane.doe@example.org");
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(123L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        userEntity.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("janedoe");
@@ -425,6 +428,7 @@ class UserEntityTest {
         recipeEntity.setId(123L);
         recipeEntity.setIngredients("jane.doe@example.org");
         recipeEntity.setOverview("jane.doe@example.org");
+        recipeEntity.setTags(new HashSet<>());
         recipeEntity.setTitle("Dr");
         recipeEntity.setUser(userEntity);
         recipeEntity.setVideoURL("https://example.org/example");
@@ -438,7 +442,7 @@ class UserEntityTest {
         userEntity1.setFullName("Dr Jane Doe");
         userEntity1.setId(123L);
         userEntity1.setPassword("iloveyou");
-        userEntity1.setProfilePhoto(new Byte[]{'A'});
+        userEntity1.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity1.setRecipes(recipeEntitySet);
         userEntity1.setRoles(new HashSet<>());
         userEntity1.setUsername("janedoe");
@@ -448,7 +452,7 @@ class UserEntityTest {
         userEntity2.setFullName("Dr Jane Doe");
         userEntity2.setId(123L);
         userEntity2.setPassword("iloveyou");
-        userEntity2.setProfilePhoto(new Byte[]{'A'});
+        userEntity2.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity2.setRecipes(new HashSet<>());
         userEntity2.setRoles(new HashSet<>());
         userEntity2.setUsername("janedoe");
@@ -459,7 +463,7 @@ class UserEntityTest {
      * Method under test: {@link UserEntity#equals(Object)}
      */
     @Test
-    void testEquals15() {
+    void testEquals15() throws UnsupportedEncodingException {
         RoleEntity roleEntity = new RoleEntity();
         roleEntity.setId(123L);
         roleEntity.setName("jane.doe@example.org");
@@ -472,7 +476,7 @@ class UserEntityTest {
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(123L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        userEntity.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(roleEntitySet);
         userEntity.setUsername("janedoe");
@@ -482,7 +486,7 @@ class UserEntityTest {
         userEntity1.setFullName("Dr Jane Doe");
         userEntity1.setId(123L);
         userEntity1.setPassword("iloveyou");
-        userEntity1.setProfilePhoto(new Byte[]{'A'});
+        userEntity1.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity1.setRecipes(new HashSet<>());
         userEntity1.setRoles(new HashSet<>());
         userEntity1.setUsername("janedoe");
@@ -493,13 +497,13 @@ class UserEntityTest {
      * Method under test: {@link UserEntity#equals(Object)}
      */
     @Test
-    void testEquals16() {
+    void testEquals16() throws UnsupportedEncodingException {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail("jane.doe@example.org");
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(123L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        userEntity.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername("jane.doe@example.org");
@@ -509,7 +513,7 @@ class UserEntityTest {
         userEntity1.setFullName("Dr Jane Doe");
         userEntity1.setId(123L);
         userEntity1.setPassword("iloveyou");
-        userEntity1.setProfilePhoto(new Byte[]{'A'});
+        userEntity1.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity1.setRecipes(new HashSet<>());
         userEntity1.setRoles(new HashSet<>());
         userEntity1.setUsername("janedoe");
@@ -520,13 +524,13 @@ class UserEntityTest {
      * Method under test: {@link UserEntity#equals(Object)}
      */
     @Test
-    void testEquals17() {
+    void testEquals17() throws UnsupportedEncodingException {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail("jane.doe@example.org");
         userEntity.setFullName("Dr Jane Doe");
         userEntity.setId(123L);
         userEntity.setPassword("iloveyou");
-        userEntity.setProfilePhoto(new Byte[]{'A'});
+        userEntity.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity.setRecipes(new HashSet<>());
         userEntity.setRoles(new HashSet<>());
         userEntity.setUsername(null);
@@ -536,7 +540,7 @@ class UserEntityTest {
         userEntity1.setFullName("Dr Jane Doe");
         userEntity1.setId(123L);
         userEntity1.setPassword("iloveyou");
-        userEntity1.setProfilePhoto(new Byte[]{'A'});
+        userEntity1.setProfilePhoto("AAAAAAAA".getBytes("UTF-8"));
         userEntity1.setRecipes(new HashSet<>());
         userEntity1.setRoles(new HashSet<>());
         userEntity1.setUsername("janedoe");
