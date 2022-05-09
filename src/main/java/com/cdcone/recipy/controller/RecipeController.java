@@ -37,7 +37,7 @@ public class RecipeController {
         return new CommonResponse(HttpStatus.OK, "SUCCESS");
     }
 
-    @GetMapping("/list")
+    @GetMapping("/search")
     public CommonResponse getPublishedRecipes(RecipeSearchDto dto) {
         try {
             Page<RecipeDtoList> result = recipeService.getPublishedRecipes(dto);
@@ -62,7 +62,7 @@ public class RecipeController {
     @PutMapping("/view")
     public CommonResponse addViewer(Long recipeId) {
         try {
-            recipeService.addView(recipeId);
+            recipeService.addViewer(recipeId);
             return new CommonResponse(HttpStatus.OK, "SUCCESS");
         } catch (Exception e) {
             return new CommonResponse(HttpStatus.BAD_REQUEST, e.getMessage());
