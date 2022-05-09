@@ -10,6 +10,6 @@ import lombok.Data;
 public class RecipeSearchDto {
     private String title;
     private String author;
-    private Set<String> tags;    
+    private Set<Integer> tagId;    
     private int page = 0;
 }

@@ -1,5 +1,8 @@
 package com.cdcone.recipy.controller;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.cdcone.recipy.dto.RecipeDtoAdd;
 import com.cdcone.recipy.dto.RecipeDtoList;
 import com.cdcone.recipy.dto.RecipeSearchDto;
@@ -27,8 +30,12 @@ public class RecipeControllerTest {
 
     @BeforeAll
     public static void init() {
+        Set<Integer> tags = new HashSet<Integer>();
+        tags.add(1);
+        tags.add(2);
         recipeDtoAdd = new RecipeDtoAdd(
                 1L,
+                tags,
                 "title",
                 "overview",
                 "ingredients",
