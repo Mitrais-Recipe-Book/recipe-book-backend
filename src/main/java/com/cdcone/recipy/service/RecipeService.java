@@ -1,10 +1,12 @@
 package com.cdcone.recipy.service;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.cdcone.recipy.dto.RecipeDtoAdd;
 import com.cdcone.recipy.dto.RecipeDtoList;
+import com.cdcone.recipy.dto.RecipeSearchDto;
 import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.repository.RecipeRepository;
 
@@ -39,10 +41,25 @@ public class RecipeService {
         recipeRepository.save(recipe);
     }
 
-    public Page<RecipeDtoList> getPublishedRecipes(int page, int size, String filterAuthor){
-        Pageable pageable = PageRequest.of(page, size, Sort.by("views").descending());
-        return recipeRepository.getPublishedRecipes(filterAuthor, pageable);
+    public Page<RecipeDtoList> getPublishedRecipes(RecipeSearchDto dto){
+        Pageable pageable = PageRequest.of(dto.getPage(), 10, Sort.by("views").descending());
+        return recipeRepository.getPublishedRecipes(dto.getAuthor(), pageable);
     }    
+
+    public Set<RecipeDtoList> getPopularRecipes(int limit){
+        Set<RecipeDtoList> result = recipeRepository.getPopularRecipes();
+        return result.stream().limit(limit).collect(Collectors.toSet());
+    }
+
+    public RecipeEntity getById(Long recipeId){
+        return recipeRepository.findById(recipeId).get();
+    }
+
+    public void addView(Long id){
+        RecipeEntity entity = recipeRepository.findById(id).get();
+        entity.setViews(entity.getViews() + 1);
+        recipeRepository.save(entity);
+    }
 
     public long totalRecipes() {
         return recipeRepository.count();

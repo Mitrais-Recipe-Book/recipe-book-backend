@@ -7,7 +7,6 @@ import com.cdcone.recipy.repository.RoleDao;
 import com.cdcone.recipy.service.UserService;
 import com.cdcone.recipy.service.RecipeService;
 
-import com.cdcone.recipy.util.JwtUtil;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -55,6 +54,8 @@ public class RecipyApplication {
 					"https://www.youtube.com/watch?v=biwLHUoPdPA&ab_channel=SajianSedap",
 					false,
 					null));
+
+			recipeService.addView(1L);
 
 			System.out.println("\n\n---Feeding data complete---\n\n");
 		};

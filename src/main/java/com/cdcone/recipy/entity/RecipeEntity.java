@@ -1,24 +1,34 @@
 package com.cdcone.recipy.entity;
 
 import java.time.LocalDate;
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import org.hibernate.annotations.Type;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@Entity
-@Table(uniqueConstraints = {
+@Entity()
+@Table(name = "recipes",
+    uniqueConstraints = {
         @UniqueConstraint(name = "recipe_title_unique", columnNames = "title")
 })
 public class RecipeEntity {
@@ -53,25 +63,21 @@ public class RecipeEntity {
 
     @Lob
     @Column(name = "banner_image")
+    @Type(type = "org.hibernate.type.BinaryType")
+    @JsonIgnore
     private Byte[] bannerImage;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-   /**
-    * 
-    * @param userEntity
-    * @param title
-    * @param overview
-    * @param dateCreated
-    * @param ingredients
-    * @param content
-    * @param videoURL
-    * @param views
-    * @param isDraft
-    * @param bannerImage
-    */
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        joinColumns = @JoinColumn(name = "recipe_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id")
+    )
+    private Set<TagEntity> tags;
+
     public RecipeEntity(
             UserEntity userEntity,
             String title,
