@@ -1,5 +1,6 @@
 package com.cdcone.recipy.controller;
 
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import com.cdcone.recipy.dto.RecipeDtoAdd;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException.NotFound;
+
 import lombok.RequiredArgsConstructor;
 
 @CrossOrigin("*")
@@ -33,10 +36,9 @@ public class RecipeController {
         try {
             recipeService.add(dto);
             return ResponseEntity.ok(new CommonResponse("success: data saved"));
-        }catch(DataIntegrityViolationException e){
+        } catch (DataIntegrityViolationException e) {
             return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
-        }
-         catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.internalServerError().body(new CommonResponse(e.getCause().toString()));
         }
     }
@@ -47,7 +49,7 @@ public class RecipeController {
             Page<RecipeDtoList> result = recipeService.getPublishedRecipes(dto);
             return ResponseEntity.ok(new CommonResponse("success: data retrieved", result));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
+            return ResponseEntity.internalServerError().body(new CommonResponse(e.getCause().toString()));
         }
     }
 
@@ -55,10 +57,14 @@ public class RecipeController {
     public ResponseEntity<CommonResponse> getRecipeImage(Long recipeId) {
         try {
             RecipeEntity entity = recipeService.getById(recipeId);
-            CommonResponse response = new CommonResponse("filename:\\profile-" + entity.getTitle(), entity.getBannerImage());
+            CommonResponse response = new CommonResponse("filename:\\profile-" + entity.getTitle(),
+                    entity.getBannerImage());
             return ResponseEntity.ok(response);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.badRequest()
+                    .body(new CommonResponse("failed: recipe with id: (" + recipeId + ") not found"));
         } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.internalServerError().body(new CommonResponse(e.getCause().toString()));
         }
     }
 
@@ -67,13 +73,16 @@ public class RecipeController {
         try {
             recipeService.addViewer(recipeId);
             return ResponseEntity.ok(new CommonResponse("success: data updated"));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.badRequest()
+                    .body(new CommonResponse("failed: recipe with id: (" + recipeId + ") not found"));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
+            return ResponseEntity.internalServerError().body(new CommonResponse(e.getCause().toString()));
         }
     }
 
     @GetMapping("/popular")
-    public  ResponseEntity<CommonResponse> getPopularRecipes(int limit) {
+    public ResponseEntity<CommonResponse> getPopularRecipes(int limit) {
         try {
             Set<RecipeDtoList> result = recipeService.getPopularRecipes(limit);
             return ResponseEntity.ok(new CommonResponse("success: data retrieved", result));
