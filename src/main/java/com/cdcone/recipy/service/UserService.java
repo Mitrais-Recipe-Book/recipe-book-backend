@@ -2,6 +2,7 @@ package com.cdcone.recipy.service;
 
 import com.cdcone.recipy.dto.PhotoDto;
 import com.cdcone.recipy.dto.SignUpDto;
+import com.cdcone.recipy.dto.UserDetailDto;
 import com.cdcone.recipy.dto.UserDto;
 import com.cdcone.recipy.entity.RoleEntity;
 import com.cdcone.recipy.entity.UserEntity;
@@ -80,8 +81,8 @@ public class UserService implements UserDetailsService {
         return userDao.getById(id);
     }
 
-    public Optional<UserEntity> findByUsername(String username) {
-        return userDao.findByUsername(username);
+    public Optional<UserDetailDto> findByUsername(String username) {
+        return userDao.findDetailByUsername(username);
     }
 
     public PhotoDto getUserPhoto(String username) {
@@ -89,7 +90,7 @@ public class UserService implements UserDetailsService {
     }
 
     public Pair<Boolean, String> saveProfilePhoto(MultipartFile photo, String username) {
-        Optional<UserEntity> byUsername = findByUsername(username);
+        Optional<UserEntity> byUsername = userDao.findByUsername(username);
         String msg = "User not found.";
         boolean uploadedPhoto = false;
         if (byUsername.isPresent()) {
