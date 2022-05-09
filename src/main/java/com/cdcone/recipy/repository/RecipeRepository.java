@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -36,4 +37,9 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
             "FROM RecipeEntity recipe JOIN recipe.user user " +
             "ORDER BY recipe.views DESC ")
     public Set<RecipeDtoList> getPopularRecipes();
+
+    @Query("SELECT NEW com.cdcone.recipy.dto.RecipeDtoList" +
+            "(r.title, r.overview, r.views, r.user.fullName) " +
+            "FROM RecipeEntity r WHERE r.user.username = :username")
+    Page<RecipeDtoList> findByUsername(@Param("username") String username, Pageable pageable);
 }
