@@ -1,13 +1,11 @@
 package com.cdcone.recipy.dto;
 
-import javax.persistence.Lob;
 
 import lombok.Data;
 
 @Data
 public class RecipeDtoList {
     private String recipeName;
-
     private String description;
     private int recipeViews;
     private String author;

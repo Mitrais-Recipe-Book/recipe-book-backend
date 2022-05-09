@@ -20,12 +20,11 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
     @Query("SELECT new com.cdcone.recipy.dto.RecipeDtoList " +
             "(r.title, r.overview, r.views, u.fullName) " +
             "FROM RecipeEntity r JOIN r.user u " +
-            "WHERE r.title LIKE %:titleName% " +
-            "AND u.fullName LIKE %:authorName% ")
+            "WHERE LOWER(r.title) LIKE LOWER(CONCAT('%', :titleName, '%')) " +
+            "AND  LOWER(u.fullName) LIKE LOWER(CONCAT('%', :authorName, '%')) ")
     public Page<RecipeDtoList> getPublishedRecipes(
             @PathParam("titleName") String titleName,
             @PathParam("authorName") String authorName,
-            @PathParam("tags") Set<String> tags,
             Pageable pageable);
 
     @Query("SELECT new com.cdcone.recipy.dto.RecipeDtoList " +

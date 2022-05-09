@@ -43,7 +43,7 @@ public class RecipeService {
 
     public Page<RecipeDtoList> getPublishedRecipes(RecipeSearchDto dto){
         Pageable pageable = PageRequest.of(dto.getPage(), 10, Sort.by("views").descending());
-        return recipeRepository.getPublishedRecipes(dto.getTitle(), dto.getAuthor(), dto.getTags(), pageable);
+        return recipeRepository.getPublishedRecipes(dto.getTitle(), dto.getAuthor(), pageable);
     }    
 
     public Set<RecipeDtoList> getPopularRecipes(int limit){

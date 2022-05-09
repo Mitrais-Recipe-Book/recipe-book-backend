@@ -9,6 +9,7 @@ import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.response.CommonResponse;
 import com.cdcone.recipy.service.RecipeService;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -31,10 +32,12 @@ public class RecipeController {
     public CommonResponse add(@RequestBody RecipeDtoAdd dto) {
         try {
             recipeService.add(dto);
+            return new CommonResponse(HttpStatus.OK, "SUCCESS");
+        } catch (DataIntegrityViolationException e) {
+            return new CommonResponse(HttpStatus.BAD_REQUEST,e.getCause().toString());
         } catch (Exception e) {
-            return new CommonResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+            return new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getCause().toString());
         }
-        return new CommonResponse(HttpStatus.OK, "SUCCESS");
     }
 
     @GetMapping("/search")
@@ -43,7 +46,7 @@ public class RecipeController {
             Page<RecipeDtoList> result = recipeService.getPublishedRecipes(dto);
             return new CommonResponse(HttpStatus.OK, result);
         } catch (Exception e) {
-            return new CommonResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+            return new CommonResponse(HttpStatus.BAD_REQUEST, e.getCause().toString());
         }
     }
 
@@ -55,17 +58,17 @@ public class RecipeController {
             response.setMessage("filename:\\profile-" + entity.getTitle());
             return response;
         } catch (Exception e) {
-            return new CommonResponse(HttpStatus.NOT_FOUND, e.getMessage());
+            return new CommonResponse(HttpStatus.NOT_FOUND,e.getCause().toString());
         }
     }
 
-    @PutMapping("/view")
+    @PutMapping("/addview")
     public CommonResponse addViewer(Long recipeId) {
         try {
             recipeService.addViewer(recipeId);
             return new CommonResponse(HttpStatus.OK, "SUCCESS");
         } catch (Exception e) {
-            return new CommonResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+            return new CommonResponse(HttpStatus.BAD_REQUEST, e.getCause().toString());
         }
     }
 
@@ -75,7 +78,7 @@ public class RecipeController {
             Set<RecipeDtoList> result = recipeService.getPopularRecipes(limit);
             return new CommonResponse(HttpStatus.OK, result);
         } catch (Exception e) {
-            return new CommonResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+            return new CommonResponse(HttpStatus.BAD_REQUEST, e.getCause().toString());
         }
     }
 }
