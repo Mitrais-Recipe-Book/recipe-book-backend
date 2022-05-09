@@ -59,8 +59,8 @@ public class UserService implements UserDetailsService {
             if (userRole.isPresent()) {
                 try {
                     UserEntity user = new UserEntity();
-                    user.setEmail(signUpDto.getEmail());
-                    user.setUsername(signUpDto.getUsername());
+                    user.setEmail(signUpDto.getEmail().toLowerCase());
+                    user.setUsername(signUpDto.getUsername().toLowerCase());
                     user.setPassword(passwordEncoder.encode(signUpDto.getPassword()));
                     user.setRoles(Set.of(userRole.get()));
                     user.setFullName(signUpDto.getFullName());

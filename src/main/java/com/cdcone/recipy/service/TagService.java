@@ -23,7 +23,7 @@ public class TagService {
     }
 
     public String saveTag(String name) {
-        TagEntity newTag = new TagEntity(name);
+        TagEntity newTag = new TagEntity(name.toLowerCase());
         String s;
         try {
             tagDao.save(newTag);
