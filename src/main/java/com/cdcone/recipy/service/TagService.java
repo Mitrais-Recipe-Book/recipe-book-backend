@@ -34,6 +34,10 @@ public class TagService {
         return s;
     }
 
+    public TagEntity getById(int id){
+        return tagDao.findById(id).get();
+    }
+
     public String editTag(String old, String tag) {
         Optional<TagEntity> byName = tagDao.findByName(old);
         if (byName.isPresent()) {
