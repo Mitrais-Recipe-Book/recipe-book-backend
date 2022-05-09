@@ -44,7 +44,7 @@ public class RecipeService {
 
     public Page<RecipeDtoList> getPublishedRecipes(RecipeSearchDto dto){
         Pageable pageable = PageRequest.of(dto.getPage(), 10, Sort.by("views").descending());
-        return recipeRepository.getPublishedRecipes(dto.getAuthor(), pageable);
+        return recipeRepository.getPublishedRecipes(dto.getTitle(), dto.getAuthor(), pageable);
     }    
 
     public Set<RecipeDtoList> getPopularRecipes(int limit){
@@ -56,7 +56,7 @@ public class RecipeService {
         return recipeRepository.findById(recipeId).get();
     }
 
-    public void addView(Long id){
+    public void addViewer(Long id){
         RecipeEntity entity = recipeRepository.findById(id).get();
         entity.setViews(entity.getViews() + 1);
         recipeRepository.save(entity);

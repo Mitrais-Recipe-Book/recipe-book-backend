@@ -36,16 +36,16 @@ public class AuthController {
             userDto = UserDto.toDto(signUpUser.getFirst().get());
             httpStatus = HttpStatus.OK;
         }
-        return ResponseEntity.status(httpStatus).body(new CommonResponse(httpStatus, signUpUser.getSecond(), userDto));
+        return ResponseEntity.status(httpStatus).body(new CommonResponse(signUpUser.getSecond(), userDto));
     }
 
     @PostMapping("sign-in")
     public ResponseEntity<CommonResponse> signIn(@RequestBody SignInDto signInDto) {
         Optional<String> auth = authService.auth(signInDto);
         if (auth.isPresent()) {
-            return ResponseEntity.ok(new CommonResponse(HttpStatus.OK, "Success", Map.of("access_token", auth.get())));
+            return ResponseEntity.ok(new CommonResponse("Success", Map.of("access_token", auth.get())));
         } else {
-            return ResponseEntity.badRequest().body(new CommonResponse(HttpStatus.BAD_REQUEST, "Wrong username or password"));
+            return ResponseEntity.badRequest().body(new CommonResponse("Wrong username or password"));
         }
     }
 }

@@ -8,7 +8,7 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class RecipeSearchDto {
-    private String search;
+    private String title;
     private String author;
     private Set<String> tags;    
     private int page = 0;

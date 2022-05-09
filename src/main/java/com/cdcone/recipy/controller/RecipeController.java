@@ -1,5 +1,6 @@
 package com.cdcone.recipy.controller;
 
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import com.cdcone.recipy.dto.RecipeDtoAdd;
@@ -9,8 +10,9 @@ import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.response.CommonResponse;
 import com.cdcone.recipy.service.RecipeService;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException.NotFound;
+
 import lombok.RequiredArgsConstructor;
 
 @CrossOrigin("*")
@@ -28,54 +32,62 @@ public class RecipeController {
     private final RecipeService recipeService;
 
     @PostMapping("/add")
-    public CommonResponse add(@RequestBody RecipeDtoAdd dto) {
+    public ResponseEntity<CommonResponse> add(@RequestBody RecipeDtoAdd dto) {
         try {
             recipeService.add(dto);
+            return ResponseEntity.ok(new CommonResponse("success: data saved"));
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
         } catch (Exception e) {
-            return new CommonResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+            return ResponseEntity.internalServerError().body(new CommonResponse(e.getCause().toString()));
         }
-        return new CommonResponse(HttpStatus.OK, "SUCCESS");
     }
 
-    @GetMapping("/list")
-    public CommonResponse getPublishedRecipes(RecipeSearchDto dto) {
+    @GetMapping("/search")
+    public ResponseEntity<CommonResponse> getPublishedRecipes(RecipeSearchDto dto) {
         try {
             Page<RecipeDtoList> result = recipeService.getPublishedRecipes(dto);
-            return new CommonResponse(HttpStatus.OK, result);
+            return ResponseEntity.ok(new CommonResponse("success: data retrieved", result));
         } catch (Exception e) {
-            return new CommonResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+            return ResponseEntity.internalServerError().body(new CommonResponse(e.getCause().toString()));
         }
     }
 
     @GetMapping("image/{id}")
-    public CommonResponse getRecipeImage(Long recipeId) {
+    public ResponseEntity<CommonResponse> getRecipeImage(Long recipeId) {
         try {
             RecipeEntity entity = recipeService.getById(recipeId);
-            CommonResponse response = new CommonResponse(HttpStatus.OK, entity.getBannerImage());
-            response.setMessage("filename:\\profile-" + entity.getTitle());
-            return response;
+            CommonResponse response = new CommonResponse("filename:\\profile-" + entity.getTitle(),
+                    entity.getBannerImage());
+            return ResponseEntity.ok(response);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.badRequest()
+                    .body(new CommonResponse("failed: recipe with id: (" + recipeId + ") not found"));
         } catch (Exception e) {
-            return new CommonResponse(HttpStatus.NOT_FOUND, e.getMessage());
+            return ResponseEntity.internalServerError().body(new CommonResponse(e.getCause().toString()));
         }
     }
 
-    @PutMapping("/view")
-    public CommonResponse addViewer(Long recipeId) {
+    @PutMapping("/addview")
+    public ResponseEntity<CommonResponse> addViewer(Long recipeId) {
         try {
-            recipeService.addView(recipeId);
-            return new CommonResponse(HttpStatus.OK, "SUCCESS");
+            recipeService.addViewer(recipeId);
+            return ResponseEntity.ok(new CommonResponse("success: data updated"));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.badRequest()
+                    .body(new CommonResponse("failed: recipe with id: (" + recipeId + ") not found"));
         } catch (Exception e) {
-            return new CommonResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+            return ResponseEntity.internalServerError().body(new CommonResponse(e.getCause().toString()));
         }
     }
 
     @GetMapping("/popular")
-    public CommonResponse getPopularRecipes(int limit) {
+    public ResponseEntity<CommonResponse> getPopularRecipes(int limit) {
         try {
             Set<RecipeDtoList> result = recipeService.getPopularRecipes(limit);
-            return new CommonResponse(HttpStatus.OK, result);
+            return ResponseEntity.ok(new CommonResponse("success: data retrieved", result));
         } catch (Exception e) {
-            return new CommonResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+            return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
         }
     }
 }

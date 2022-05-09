@@ -55,7 +55,7 @@ public class RecipyApplication {
 					false,
 					null));
 
-			recipeService.addView(1L);
+			recipeService.addViewer(1L);
 
 			System.out.println("\n\n---Feeding data complete---\n\n");
 		};
