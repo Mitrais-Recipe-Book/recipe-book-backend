@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.cdcone.recipy.dto.PaginatedDto;
 import com.cdcone.recipy.dto.RecipeDtoAdd;
 import com.cdcone.recipy.dto.RecipeDtoList;
 import com.cdcone.recipy.dto.RecipeSearchDto;
@@ -72,5 +73,11 @@ public class RecipeService {
 
     public long totalRecipes() {
         return recipeRepository.count();
+    }
+
+    public PaginatedDto<RecipeDtoList> getByUsername(String userId, int page) {
+        Pageable pageable = PageRequest.of(page, 10 );
+        Page<RecipeDtoList> byUserId = recipeRepository.findByUsername(userId, pageable);
+        return new PaginatedDto<>(byUserId.getContent(), byUserId.getNumber(), byUserId.getTotalPages());
     }
 }
