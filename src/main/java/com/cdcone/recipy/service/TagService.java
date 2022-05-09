@@ -15,11 +15,8 @@ public class TagService {
 
     private final TagDao tagDao;
 
-    public List<String> getAllTags() {
-        return tagDao.findAll()
-                .stream()
-                .map(TagEntity::getName)
-                .collect(Collectors.toList());
+    public List<TagEntity> getAllTags() {
+        return tagDao.findAll();
     }
 
     public String saveTag(String name) {
