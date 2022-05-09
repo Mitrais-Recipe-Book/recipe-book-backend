@@ -1,6 +1,8 @@
 package com.cdcone.recipy.service;
 
+import java.util.HashSet;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import com.cdcone.recipy.dto.RecipeDtoAdd;
 import com.cdcone.recipy.dto.RecipeDtoList;
@@ -27,8 +29,12 @@ public class RecipeServiceTest {
 
     @BeforeAll
     public static void init() {
+        Set<Integer> tags = new HashSet<Integer>();
+			tags.add(1);
+			tags.add(2);
         recipeDtoAdd = new RecipeDtoAdd(
                 1L,
+                tags,
                 "title",
                 "overview",
                 "ingredients",
@@ -72,7 +78,7 @@ public class RecipeServiceTest {
     @Test
     @Order(4)
     public void addView() {
-        recipeService.addView(2L);
+        recipeService.addViewer(2L);
 
         RecipeDtoList result = recipeService.getPublishedRecipes(new RecipeSearchDto("", "", null, 0))
                 .getContent().get((int) recipeService.totalRecipes() - 1);
@@ -84,7 +90,7 @@ public class RecipeServiceTest {
     @Order(5)
     public void cantAddView() {
         try {
-            recipeService.addView(3L);
+            recipeService.addViewer(3L);
         } catch (NoSuchElementException e) {
             Assertions.assertTrue(e.getMessage().contains("No value"));
         }
@@ -93,7 +99,7 @@ public class RecipeServiceTest {
     @Test
     @Order(6)
     public void getPopularRecipe(){
-        recipeService.addView(2L);
+        recipeService.addViewer(2L);
         RecipeDtoList result = recipeService.getPopularRecipes(1).stream().findAny().get();
 
         Assertions.assertEquals(recipeDtoAdd.getTitle(), result.getRecipeName());

@@ -80,6 +80,7 @@ public class RecipeEntity {
 
     public RecipeEntity(
             UserEntity userEntity,
+            Set<TagEntity> tags,
             String title,
             String overview,
             LocalDate dateCreated,
@@ -90,6 +91,7 @@ public class RecipeEntity {
             boolean isDraft,
             Byte[] bannerImage) {
         this.user = userEntity;
+        this.tags = tags;
         this.title = title;
         this.overview = overview;
         this.dateCreated = dateCreated;

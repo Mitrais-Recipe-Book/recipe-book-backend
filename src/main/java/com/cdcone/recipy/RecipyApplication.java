@@ -1,11 +1,15 @@
 package com.cdcone.recipy;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.cdcone.recipy.dto.RecipeDtoAdd;
 import com.cdcone.recipy.dto.SignUpDto;
 import com.cdcone.recipy.entity.RoleEntity;
 import com.cdcone.recipy.repository.RoleDao;
 import com.cdcone.recipy.service.UserService;
 import com.cdcone.recipy.service.RecipeService;
+import com.cdcone.recipy.service.TagService;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -25,7 +29,8 @@ public class RecipyApplication {
 	CommandLineRunner run(
 			RecipeService recipeService,
 			UserService userService,
-			RoleDao roleDao) {
+			RoleDao roleService,
+			TagService tagService) {
 		return args -> {
 			if (!generateDummyData) {
 				return;
@@ -35,7 +40,7 @@ public class RecipyApplication {
 			// Role data
 			RoleEntity userRole = new RoleEntity();
 			userRole.setName("User");
-			roleDao.save(userRole);
+			roleService.save(userRole);
 
 			// User data
 			userService.addUser(new SignUpDto(
@@ -44,9 +49,16 @@ public class RecipyApplication {
 					"123456",
 					"User 1"));
 
+			// Tag data
+			tagService.saveTag("Breakfast");
+			tagService.saveTag("Light Meal");
+
 			// Recipe data
+			Set<Integer> tags = new HashSet<Integer>();
+			tags.add(1);
 			recipeService.add(new RecipeDtoAdd(
 					1L,
+					tags, 
 					"Es teh",
 					"Enak diminum pada saat buka puasa",
 					"Air, es batu, teh, gula",
@@ -55,7 +67,7 @@ public class RecipyApplication {
 					false,
 					null));
 
-			recipeService.addView(1L);
+			recipeService.addViewer(1L);
 
 			System.out.println("\n\n---Feeding data complete---\n\n");
 		};
