@@ -38,13 +38,9 @@ public class TagService {
         return tagDao.findById(id).get();
     }
 
-    public String editTag(String old, String tag) {
-        Optional<TagEntity> byName = tagDao.findByName(old);
-        if (byName.isPresent()) {
-            TagEntity tagEntity = byName.get();
-            tagEntity.setName(tag);
-            return tagDao.save(tagEntity).getName();
-        }
-        return "Tag not found";
+    public void editTag(int old, String tag) {
+        TagEntity byName = tagDao.findById(old).get();
+        byName.setName(tag);
+        tagDao.save(byName);
     }
 }

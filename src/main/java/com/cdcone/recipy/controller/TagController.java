@@ -1,5 +1,6 @@
 package com.cdcone.recipy.controller;
 
+import com.cdcone.recipy.dto.EditTagDto;
 import com.cdcone.recipy.response.CommonResponse;
 import com.cdcone.recipy.service.TagService;
 import lombok.RequiredArgsConstructor;
@@ -36,11 +37,11 @@ public class TagController {
         }
     }
 
-    @PutMapping("{name}")
-    public ResponseEntity<CommonResponse> editTag(@PathVariable String name, @RequestBody String newTag) {
+    @PutMapping("")
+    public ResponseEntity<CommonResponse> editTag(@RequestBody EditTagDto dto) {
         try {
-            String editedTag = tagService.editTag(name, newTag);
-            return ResponseEntity.ok(new CommonResponse("success: data updated", editedTag));
+            tagService.editTag(dto.getTagId(), dto.getTagReplace());
+            return ResponseEntity.ok(new CommonResponse("success: data updated", dto.getTagReplace()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
         }
