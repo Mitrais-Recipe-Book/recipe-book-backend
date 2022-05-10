@@ -36,4 +36,14 @@ public class TagService {
         byName.get().setName(tag);
         tagDao.save(byName.get());
     }
+
+    public TagEntity deleteTag(int tagId) {
+        Optional<TagEntity> byId = tagDao.findById(tagId);
+        if (byId.isPresent()) {
+            TagEntity toBeDeleted = byId.get();
+            tagDao.delete(toBeDeleted);
+            return toBeDeleted;
+        }
+        return null;
+    }
 }
