@@ -5,6 +5,7 @@ import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.response.CommonResponse;
 import com.cdcone.recipy.service.TagService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,5 +47,17 @@ public class TagController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new CommonResponse(e.toString()));
         }
+    }
+
+    @DeleteMapping("{tag_id}")
+    public ResponseEntity<CommonResponse> deleteTag(@PathVariable(name = "tag_id") int tagId) {
+        TagEntity tagEntity = tagService.deleteTag(tagId);
+        HttpStatus status = HttpStatus.OK;
+        String msg = "success: data deleted";
+        if (tagEntity == null) {
+            status = HttpStatus.BAD_REQUEST;
+            msg = "error: Tag not found";
+        }
+        return ResponseEntity.status(status).body(new CommonResponse(msg, tagEntity));
     }
 }
