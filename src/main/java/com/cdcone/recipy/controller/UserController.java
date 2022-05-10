@@ -73,7 +73,7 @@ public class UserController {
     }
 
     @GetMapping("{username}/recipes")
-    public ResponseEntity<CommonResponse> getRecipesById(@PathVariable(name = "username") String username, @RequestParam(defaultValue = "0") int page) {
+    public ResponseEntity<CommonResponse> getRecipesByUsername(@PathVariable(name = "username") String username, @RequestParam(defaultValue = "0") int page) {
         PaginatedDto<RecipeDtoList> byUserId = recipeService.getByUsername(username, page);
         return ResponseEntity.ok(new CommonResponse(byUserId));
     }
