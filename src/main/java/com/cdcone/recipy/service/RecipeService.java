@@ -3,6 +3,7 @@ package com.cdcone.recipy.service;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import com.cdcone.recipy.dto.PaginatedDto;
@@ -21,10 +22,9 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
-
 @Service
 @RequiredArgsConstructor
-public class RecipeService {    
+public class RecipeService {
     private final RecipeRepository recipeRepository;
     private final UserService userService;
     private final TagService tagService;
@@ -51,21 +51,29 @@ public class RecipeService {
         recipeRepository.save(recipe);
     }
 
-    public Page<RecipeDtoList> getPublishedRecipes(RecipeSearchDto dto){
-        Pageable pageable = PageRequest.of(dto.getPage(), 10, Sort.by("views").descending());
-        return recipeRepository.getPublishedRecipes(dto.getTitle(), dto.getAuthor(),dto.getTagId(), pageable);
-    }    
+    public Page<RecipeDtoList> getPublishedRecipes(RecipeSearchDto dto) {
+        if (dto.getTagId().isEmpty()) {
+            Set<Integer> allTags = tagService.getAllTags()
+                    .stream()
+                    .map(n -> n.getId())
+                    .collect(Collectors.toSet());
+            dto.setTagId(allTags);
+        }
 
-    public Set<RecipeDtoList> getPopularRecipes(int limit){
+        Pageable pageable = PageRequest.of(dto.getPage(), 10, Sort.by("views").descending());
+        return recipeRepository.getPublishedRecipes(dto.getTitle(), dto.getAuthor(), dto.getTagId(), pageable);
+    }
+
+    public Set<RecipeDtoList> getPopularRecipes(int limit) {
         Set<RecipeDtoList> result = recipeRepository.getPopularRecipes();
         return result.stream().limit(limit).collect(Collectors.toSet());
     }
 
-    public RecipeEntity getById(Long recipeId){
+    public RecipeEntity getById(Long recipeId) {
         return recipeRepository.findById(recipeId).get();
     }
 
-    public void addViewer(Long id){
+    public void addViewer(Long id) {
         RecipeEntity entity = recipeRepository.findById(id).get();
         entity.setViews(entity.getViews() + 1);
         recipeRepository.save(entity);
@@ -75,9 +83,9 @@ public class RecipeService {
         return recipeRepository.count();
     }
 
-    public PaginatedDto<RecipeDtoList> getByUsername(String userId, int page) {
-        Pageable pageable = PageRequest.of(page, 10 );
-        Page<RecipeDtoList> byUserId = recipeRepository.findByUsername(userId, pageable);
+    public PaginatedDto<RecipeDtoList> getByUsername(String userName, int page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        Page<RecipeDtoList> byUserId = recipeRepository.findByUsername(userName, pageable);
         return new PaginatedDto<>(byUserId.getContent(), byUserId.getNumber(), byUserId.getTotalPages());
     }
 }
