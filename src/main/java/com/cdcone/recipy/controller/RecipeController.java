@@ -85,6 +85,16 @@ public class RecipeController {
         }
     }
 
+    @GetMapping("/discover")
+    public ResponseEntity<CommonResponse> getDiscoverRecipes(int limit) {
+        try {
+            Set<RecipeDtoList> result = recipeService.getDiscoverRecipes(limit);
+            return ResponseEntity.ok(new CommonResponse("success: data retrieved", result));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
+        }
+    }
+
     @DeleteMapping("{id}")
     public ResponseEntity<CommonResponse> deleteRecipe(@PathVariable(name = "id") long recipeId) {
         RecipeDtoList recipeDtoList = recipeService.deleteRecipe(recipeId);

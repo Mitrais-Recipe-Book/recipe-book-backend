@@ -44,4 +44,11 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
                         "(r.title, r.overview, r.views, r.user.fullName) " +
                         "FROM RecipeEntity r WHERE r.user.username = :username")
         Page<RecipeDtoList> findByUsername(@Param("username") String username, Pageable pageable);
+
+        @Query("SELECT NEW com.cdcone.recipy.dto.RecipeDtoList " +
+        "(r.title, r.overview, r.views, r.user.fullName) " +
+        "FROM RecipeEntity r "+
+        "WHERE r.isDraft = FALSE "+
+        "ORDER BY r.id DESC")
+        public Set<RecipeDtoList> getDiscoverRecipes();
 }
