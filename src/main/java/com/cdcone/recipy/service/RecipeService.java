@@ -65,8 +65,17 @@ public class RecipeService {
     }
 
     public Set<RecipeDtoList> getPopularRecipes(int limit) {
-        Set<RecipeDtoList> result = recipeRepository.getPopularRecipes();
-        return result.stream().limit(limit).collect(Collectors.toSet());
+        return recipeRepository.getPopularRecipes()
+                .stream()
+                .limit(limit)
+                .collect(Collectors.toSet());
+    }
+
+    public Set<RecipeDtoList> getDiscoverRecipes(int limit) {
+        return recipeRepository.getDiscoverRecipes()
+                .stream()
+                .limit(limit)
+                .collect(Collectors.toSet());
     }
 
     public RecipeEntity getById(Long recipeId) {

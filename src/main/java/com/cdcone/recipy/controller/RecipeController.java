@@ -89,4 +89,14 @@ public class RecipeController {
             return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
         }
     }
+
+    @GetMapping("/discover")
+    public ResponseEntity<CommonResponse> getDiscoverRecipes(int limit) {
+        try {
+            Set<RecipeDtoList> result = recipeService.getDiscoverRecipes(limit);
+            return ResponseEntity.ok(new CommonResponse("success: data retrieved", result));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
+        }
+    }
 }
