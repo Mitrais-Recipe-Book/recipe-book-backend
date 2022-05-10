@@ -12,14 +12,9 @@ import com.cdcone.recipy.service.RecipeService;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 
@@ -98,5 +93,17 @@ public class RecipeController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
         }
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<CommonResponse> deleteRecipe(@PathVariable(name = "id") long recipeId) {
+        RecipeDtoList recipeDtoList = recipeService.deleteRecipe(recipeId);
+        HttpStatus status = HttpStatus.OK;
+        String msg = "success: data deleted";
+        if (recipeDtoList == null) {
+            status = HttpStatus.NOT_FOUND;
+            msg = "error: recipe not found";
+        }
+        return ResponseEntity.status(status).body(new CommonResponse(msg, recipeDtoList));
     }
 }
