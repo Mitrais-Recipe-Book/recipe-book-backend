@@ -31,7 +31,7 @@ public class TagController {
     @PostMapping
     public ResponseEntity<CommonResponse> addTag(@RequestBody String tagName) {
         try {
-            String savedTag = tagService.saveTag(tagName);
+            TagEntity savedTag = tagService.saveTag(tagName);
             return ResponseEntity.ok(new CommonResponse("success: data saved", savedTag));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
@@ -44,7 +44,7 @@ public class TagController {
             tagService.editTag(dto.getTagId(), dto.getTagReplace());
             return ResponseEntity.ok(new CommonResponse("success: data updated", dto.getTagReplace()));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
+            return ResponseEntity.badRequest().body(new CommonResponse(e.toString()));
         }
     }
 }
