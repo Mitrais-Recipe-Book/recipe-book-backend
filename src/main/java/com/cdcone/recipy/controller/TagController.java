@@ -1,5 +1,6 @@
 package com.cdcone.recipy.controller;
 
+import com.cdcone.recipy.dto.EditTagDto;
 import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.response.CommonResponse;
 import com.cdcone.recipy.service.TagService;
@@ -30,20 +31,20 @@ public class TagController {
     @PostMapping
     public ResponseEntity<CommonResponse> addTag(@RequestBody String tagName) {
         try {
-            String savedTag = tagService.saveTag(tagName);
+            TagEntity savedTag = tagService.saveTag(tagName);
             return ResponseEntity.ok(new CommonResponse("success: data saved", savedTag));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
         }
     }
 
-    @PutMapping("{name}")
-    public ResponseEntity<CommonResponse> editTag(@PathVariable String name, @RequestBody String newTag) {
+    @PutMapping("")
+    public ResponseEntity<CommonResponse> editTag(@RequestBody EditTagDto dto) {
         try {
-            String editedTag = tagService.editTag(name, newTag);
-            return ResponseEntity.ok(new CommonResponse("success: data updated", editedTag));
+            tagService.editTag(dto.getTagId(), dto.getTagReplace());
+            return ResponseEntity.ok(new CommonResponse("success: data updated", dto.getTagReplace()));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
+            return ResponseEntity.badRequest().body(new CommonResponse(e.toString()));
         }
     }
 }
