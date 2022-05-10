@@ -2,6 +2,7 @@ package com.cdcone.recipy.service;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -79,5 +80,16 @@ public class RecipeService {
         Pageable pageable = PageRequest.of(page, 10 );
         Page<RecipeDtoList> byUserId = recipeRepository.findByUsername(userId, pageable);
         return new PaginatedDto<>(byUserId.getContent(), byUserId.getNumber(), byUserId.getTotalPages());
+    }
+
+    public RecipeDtoList deleteRecipe(long recipeId) {
+        Optional<RecipeEntity> byId = recipeRepository.findById(recipeId);
+        RecipeDtoList deleted = null;
+        if (byId.isPresent()) {
+            RecipeEntity toBeDeleted = byId.get();
+            recipeRepository.delete(toBeDeleted);
+            deleted = new RecipeDtoList(toBeDeleted.getTitle(), toBeDeleted.getOverview(), toBeDeleted.getViews(), toBeDeleted.getUser().getFullName());
+        }
+        return deleted;
     }
 }
