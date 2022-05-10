@@ -1,6 +1,7 @@
 package com.cdcone.recipy.controller;
 
 import com.cdcone.recipy.dto.EditTagDto;
+import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.response.CommonResponse;
 import com.cdcone.recipy.service.TagService;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ public class TagController {
     @GetMapping
     public ResponseEntity<CommonResponse> getAll() {
         try {
-            List<String> allTags = tagService.getAllTags();
+            List<TagEntity> allTags = tagService.getAllTags();
             return ResponseEntity.ok(new CommonResponse("success: data retrieved", allTags));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
