@@ -6,9 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -45,5 +44,9 @@ public class TagService {
             return toBeDeleted;
         }
         return null;
+    }
+
+    public Set<TagEntity> getByRecipeId(Long recipeId) {
+        return tagDao.findByRecipeId(recipeId);
     }
 }
