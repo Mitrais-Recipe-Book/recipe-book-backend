@@ -65,7 +65,7 @@ public class RecipeEntity {
     @Column(name = "banner_image")
     @Type(type = "org.hibernate.type.BinaryType")
     @JsonIgnore
-    private Byte[] bannerImage;
+    private byte[] bannerImage;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -89,7 +89,7 @@ public class RecipeEntity {
             String videoURL,
             int views,
             boolean isDraft,
-            Byte[] bannerImage) {
+            byte[] bannerImage) {
         this.user = userEntity;
         this.tags = tags;
         this.title = title;
