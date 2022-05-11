@@ -67,6 +67,9 @@ public class RecipeEntity {
     @JsonIgnore
     private byte[] bannerImage;
 
+    @Column(name ="banner_image_type")
+    private String bannerImageType;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;

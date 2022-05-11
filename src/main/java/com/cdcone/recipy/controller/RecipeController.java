@@ -12,9 +12,11 @@ import com.cdcone.recipy.service.RecipeService;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 
@@ -60,6 +62,17 @@ public class RecipeController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(new CommonResponse(e.getCause().toString()));
         }
+    }
+
+    @PutMapping(value = "{recipe}/photo", consumes = "multipart/form-data")
+    public ResponseEntity<CommonResponse> saveRecipePhoto(@PathVariable Long recipeId,
+            @RequestParam("photo") MultipartFile photo) {
+        Pair<Boolean, String> savedPhoto = recipeService.saveRecipePhoto(photo, recipeId);
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        if (savedPhoto.getFirst()) {
+            status = HttpStatus.OK;
+        }
+        return ResponseEntity.status(status).body(new CommonResponse( savedPhoto.getSecond()));
     }
 
     @PutMapping("/addview")
