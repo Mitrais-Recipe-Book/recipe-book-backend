@@ -12,6 +12,6 @@ public interface TagDao extends JpaRepository<TagEntity, Integer> {
 
     Optional<TagEntity> findByName(String name);
 
-    @Query(value = "SELECT t.* FROM tags t JOIN recipes_tags rt ON rt.recipe_id = :recipeId", nativeQuery = true)
+    @Query(value = "SELECT t.* FROM tags t JOIN recipes_tags rt ON rt.recipe_id = :recipeId WHERE t.id = rt.tag_id", nativeQuery = true)
     Set<TagEntity> findByRecipeId(@Param("recipeId") Long recipeId);
 }
