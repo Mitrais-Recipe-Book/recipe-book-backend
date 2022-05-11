@@ -40,10 +40,10 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
                         "ORDER BY recipe.views DESC ")
         public Set<RecipeDtoList> getPopularRecipes();
 
-        @Query("SELECT NEW com.cdcone.recipy.dto.RecipeDtoList" +
-                        "(r.title, r.overview, r.views, r.user.fullName) " +
-                        "FROM RecipeEntity r WHERE r.user.username = :username")
-        Page<RecipeDtoList> findByUsername(@Param("username") String username, Pageable pageable);
+        @Query(value = "SELECT " +
+                "r.id, r.title, r.overview, u.full_name, r.views " +
+                "FROM recipes r JOIN users u ON u.username = :username", nativeQuery = true)
+        Page<Object[]> findByUsername(@Param("username") String username, Pageable pageable);
 
         @Query("SELECT NEW com.cdcone.recipy.dto.RecipeDtoList " +
         "(r.title, r.overview, r.views, r.user.fullName) " +
