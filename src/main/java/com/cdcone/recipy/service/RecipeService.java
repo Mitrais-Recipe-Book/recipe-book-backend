@@ -1,16 +1,11 @@
 package com.cdcone.recipy.service;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collector;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import com.cdcone.recipy.dto.PaginatedDto;
-import com.cdcone.recipy.dto.RecipeDtoAdd;
-import com.cdcone.recipy.dto.RecipeDtoList;
-import com.cdcone.recipy.dto.RecipeSearchDto;
+import com.cdcone.recipy.dto.*;
 import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.repository.RecipeRepository;
@@ -93,10 +88,16 @@ public class RecipeService {
         return recipeRepository.count();
     }
 
-    public PaginatedDto<RecipeDtoList> getByUsername(String userName, int page) {
-        Pageable pageable = PageRequest.of(page, 10);
-        Page<RecipeDtoList> byUserId = recipeRepository.findByUsername(userName, pageable);
-        return new PaginatedDto<>(byUserId.getContent(), byUserId.getNumber(), byUserId.getTotalPages());
+    public PaginatedDto<UserRecipeDto> getByUsername(String userName, int page) {
+        Pageable pageable = PageRequest.of(page, 5);
+        Page<Object[]> byUserId = recipeRepository.findByUsername(userName, pageable);
+        List<UserRecipeDto> result = new ArrayList<>();
+        byUserId.getContent().forEach(it -> {
+            BigInteger id = (BigInteger) it[0];
+            Set<TagEntity> tags = tagService.getByRecipeId(id.longValue());
+            result.add(new UserRecipeDto(id.longValue(), (String) it[1], (String) it[2], (String) it[3], (Integer) it[4], tags));
+        });
+        return new PaginatedDto<>(result, byUserId.getNumber(), byUserId.getTotalPages());
     }
 
     public RecipeDtoList deleteRecipe(long recipeId) {
