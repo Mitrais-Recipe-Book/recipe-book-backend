@@ -21,6 +21,4 @@ public class RecipeDtoAdd {
     private String content;
     private String videoURL;
     private boolean isDraft;
-    @Lob
-    private byte[] bannerImage;
 }
