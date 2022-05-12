@@ -87,9 +87,11 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+					<mainClass>com.cdcone.recipy.RecipyApplication</mainClass>
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>recipy</finalName>
 	</build>
 
 </project>

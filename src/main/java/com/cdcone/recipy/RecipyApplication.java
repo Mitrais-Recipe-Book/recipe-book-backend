@@ -64,8 +64,7 @@ public class RecipyApplication {
 					"Air, es batu, teh, gula",
 					"Silahkan klik link videonya",
 					"https://www.youtube.com/watch?v=biwLHUoPdPA&ab_channel=SajianSedap",
-					false,
-					null));
+					false));
 
 			recipeService.addViewer(1L);
 
