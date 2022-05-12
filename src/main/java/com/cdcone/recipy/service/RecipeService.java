@@ -29,7 +29,7 @@ public class RecipeService {
     private final TagService tagService;
 
 
-    public void add(RecipeDtoAdd dto) {
+    public RecipeEntity add(RecipeDtoAdd dto) {
         Set<TagEntity> tagEntities = new HashSet<TagEntity>();
 
         for (Integer id : dto.getTagIds()) {
@@ -47,7 +47,7 @@ public class RecipeService {
                 dto.getVideoURL(),
                 0,
                 dto.isDraft());
-        recipeRepository.save(recipe);
+        return recipeRepository.save(recipe);
     }
 
 

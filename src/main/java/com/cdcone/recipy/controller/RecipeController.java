@@ -30,8 +30,8 @@ public class RecipeController {
     @PostMapping("/add")
     public ResponseEntity<CommonResponse> add(@RequestBody RecipeDtoAdd dto) {
         try {
-            recipeService.add(dto);
-            return ResponseEntity.ok(new CommonResponse("success: data saved"));
+            Long entityId = recipeService.add(dto).getId();            
+            return ResponseEntity.ok(new CommonResponse("success: data saved", entityId));
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
         } catch (Exception e) {
