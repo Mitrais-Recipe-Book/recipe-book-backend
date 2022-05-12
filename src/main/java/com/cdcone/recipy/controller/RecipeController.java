@@ -3,9 +3,10 @@ package com.cdcone.recipy.controller;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import com.cdcone.recipy.dto.RecipeDtoAdd;
-import com.cdcone.recipy.dto.RecipeDtoList;
-import com.cdcone.recipy.dto.RecipeSearchDto;
+import com.cdcone.recipy.dtoAccess.PhotoDto;
+import com.cdcone.recipy.dtoAccess.RecipeDtoList;
+import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
+import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
 import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.response.CommonResponse;
 import com.cdcone.recipy.service.RecipeService;
@@ -53,8 +54,10 @@ public class RecipeController {
     public ResponseEntity<CommonResponse> getRecipeImage(Long recipeId) {
         try {
             RecipeEntity entity = recipeService.getById(recipeId);
+            PhotoDto photoDto = new PhotoDto(entity.getBannerImageType(), entity.getBannerImage());
+            
             CommonResponse response = new CommonResponse("filename:\\profile-" + entity.getTitle(),
-                    entity.getBannerImage());
+                    photoDto);
             return ResponseEntity.ok(response);
         } catch (NoSuchElementException e) {
             return ResponseEntity.badRequest()

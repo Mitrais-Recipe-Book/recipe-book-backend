@@ -1,4 +1,4 @@
-package com.cdcone.recipy.dto;
+package com.cdcone.recipy.dtoRequest;
 
 import lombok.Data;
 

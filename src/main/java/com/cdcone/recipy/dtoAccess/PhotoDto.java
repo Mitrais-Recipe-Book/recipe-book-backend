@@ -1,4 +1,4 @@
-package com.cdcone.recipy.dto;
+package com.cdcone.recipy.dtoAccess;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

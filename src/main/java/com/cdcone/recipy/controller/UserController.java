@@ -1,6 +1,10 @@
 package com.cdcone.recipy.controller;
 
-import com.cdcone.recipy.dto.*;
+import com.cdcone.recipy.dtoAccess.PhotoDto;
+import com.cdcone.recipy.dtoAccess.UserDetailDto;
+import com.cdcone.recipy.dtoAccess.UserDto;
+import com.cdcone.recipy.dtoAccess.UserRecipeDto;
+import com.cdcone.recipy.dtoRequest.*;
 import com.cdcone.recipy.response.CommonResponse;
 import com.cdcone.recipy.service.RecipeService;
 import com.cdcone.recipy.service.UserService;
