@@ -40,8 +40,7 @@ public class RecipeServiceTest {
                 "ingredients",
                 "content",
                 "videoURL",
-                true,
-                null);
+                true);
     }
 
     @Test
