@@ -46,7 +46,7 @@ public class RecipeService {
                 dto.getContent(),
                 dto.getVideoURL(),
                 0,
-                dto.isDraft())
+                dto.isDraft());
         recipeRepository.save(recipe);
     }
 

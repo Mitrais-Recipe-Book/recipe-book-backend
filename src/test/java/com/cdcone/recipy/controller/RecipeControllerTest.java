@@ -41,8 +41,7 @@ public class RecipeControllerTest {
                 "ingredients",
                 "content",
                 "videoURL",
-                true,
-                null);
+                true);
     }
 
     @Test

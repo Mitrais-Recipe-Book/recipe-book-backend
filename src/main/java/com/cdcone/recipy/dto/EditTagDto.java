@@ -8,5 +8,4 @@ import lombok.Data;
 public class EditTagDto {
     private int tagId;
     private String tagReplace;
-    //tes 2
 } 
