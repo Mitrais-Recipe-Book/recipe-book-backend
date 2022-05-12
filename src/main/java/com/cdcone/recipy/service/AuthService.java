@@ -1,6 +1,6 @@
 package com.cdcone.recipy.service;
 
-import com.cdcone.recipy.dto.SignInDto;
+import com.cdcone.recipy.dtoRequest.SignInDto;
 import com.cdcone.recipy.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;

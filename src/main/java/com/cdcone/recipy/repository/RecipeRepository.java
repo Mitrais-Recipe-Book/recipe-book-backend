@@ -4,7 +4,7 @@ import java.util.Set;
 
 import javax.websocket.server.PathParam;
 
-import com.cdcone.recipy.dto.RecipeDtoList;
+import com.cdcone.recipy.dtoAccess.RecipeDtoList;
 import com.cdcone.recipy.entity.RecipeEntity;
 
 import org.springframework.data.domain.Page;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Repository;
 public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
 
         // this is jpa, not sql
-        @Query("SELECT new com.cdcone.recipy.dto.RecipeDtoList " +
+        @Query("SELECT new com.cdcone.recipy.dtoAccess.RecipeDtoList " +
                         "(recipe.title, recipe.overview, recipe.views, user.fullName) " +
                         "FROM RecipeEntity recipe " +
                         "JOIN recipe.user user " +
@@ -33,7 +33,7 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
                         @PathParam("tagId") Set<Integer> tagId,
                         Pageable pageable);
 
-        @Query("SELECT new com.cdcone.recipy.dto.RecipeDtoList " +
+        @Query("SELECT new com.cdcone.recipy.dtoAccess.RecipeDtoList " +
                         "(recipe.title, recipe.overview, recipe.views, user.fullName) " +
                         "FROM RecipeEntity recipe JOIN recipe.user user " +
                         "WHERE recipe.isDraft = FALSE " +
@@ -45,7 +45,7 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
                 "FROM recipes r JOIN users u ON u.username = :username", nativeQuery = true)
         Page<Object[]> findByUsername(@Param("username") String username, Pageable pageable);
 
-        @Query("SELECT NEW com.cdcone.recipy.dto.RecipeDtoList " +
+        @Query("SELECT NEW com.cdcone.recipy.dtoAccess.RecipeDtoList " +
         "(r.title, r.overview, r.views, r.user.fullName) " +
         "FROM RecipeEntity r "+
         "WHERE r.isDraft = FALSE "+

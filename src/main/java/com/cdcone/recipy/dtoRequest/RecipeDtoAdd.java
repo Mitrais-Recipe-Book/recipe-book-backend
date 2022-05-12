@@ -1,8 +1,7 @@
-package com.cdcone.recipy.dto;
+package com.cdcone.recipy.dtoRequest;
 
 import java.util.Set;
 
-import javax.persistence.Lob;
 import javax.validation.constraints.NotEmpty;
 
 import lombok.AllArgsConstructor;

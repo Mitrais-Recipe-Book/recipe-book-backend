@@ -1,9 +1,9 @@
 package com.cdcone.recipy.service;
 
-import com.cdcone.recipy.dto.PhotoDto;
-import com.cdcone.recipy.dto.SignUpDto;
-import com.cdcone.recipy.dto.UserDetailDto;
-import com.cdcone.recipy.dto.UserDto;
+import com.cdcone.recipy.dtoAccess.PhotoDto;
+import com.cdcone.recipy.dtoAccess.UserDetailDto;
+import com.cdcone.recipy.dtoAccess.UserDto;
+import com.cdcone.recipy.dtoRequest.SignUpDto;
 import com.cdcone.recipy.entity.RoleEntity;
 import com.cdcone.recipy.entity.UserEntity;
 import com.cdcone.recipy.repository.RoleDao;

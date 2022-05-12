@@ -1,4 +1,4 @@
-package com.cdcone.recipy.dto;
+package com.cdcone.recipy.dtoAccess;
 
 import com.cdcone.recipy.entity.TagEntity;
 import lombok.Getter;

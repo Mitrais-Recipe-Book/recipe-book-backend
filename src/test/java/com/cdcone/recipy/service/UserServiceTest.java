@@ -1,6 +1,6 @@
 package com.cdcone.recipy.service;
 
-import com.cdcone.recipy.dto.SignUpDto;
+import com.cdcone.recipy.dtoRequest.SignUpDto;
 import com.cdcone.recipy.entity.RoleEntity;
 import com.cdcone.recipy.entity.UserEntity;
 import com.cdcone.recipy.repository.RoleDao;
