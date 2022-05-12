@@ -3,6 +3,7 @@ package com.cdcone.recipy.service;
 import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.repository.TagDao;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,20 +21,33 @@ public class TagService {
     }
 
     public TagEntity saveTag(String name) {
-        TagEntity newTag = new TagEntity(name.toLowerCase());
-        tagDao.save(newTag);
-        return newTag;
+        try {
+            TagEntity newTag = new TagEntity(name.toLowerCase());
+            return tagDao.save(newTag);
+        } catch (DataIntegrityViolationException e) {
+            return null;
+        }
     }
 
     public TagEntity getById(int id) {
         return tagDao.findById(id).get();
     }
 
-    public void editTag(int old, String tag) {
+    public String editTag(int old, String tag) {
         Optional<TagEntity> byName = tagDao.findById(old);
-
-        byName.get().setName(tag);
-        tagDao.save(byName.get());
+        String s = null;
+        if (byName.isPresent()) {
+            TagEntity toBeEdited = byName.get();
+            tag = tag.toLowerCase();
+            if (tag.equals(toBeEdited.getName())) {
+                s = "error: tag already exist";
+            } else {
+                toBeEdited.setName(tag);
+                tagDao.save(toBeEdited);
+                s = "success: data updated";
+            }
+        }
+        return s;
     }
 
     public TagEntity deleteTag(int tagId) {
