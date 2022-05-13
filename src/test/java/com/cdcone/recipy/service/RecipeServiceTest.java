@@ -4,9 +4,9 @@ import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import com.cdcone.recipy.dto.RecipeDtoAdd;
-import com.cdcone.recipy.dto.RecipeDtoList;
-import com.cdcone.recipy.dto.RecipeSearchDto;
+import com.cdcone.recipy.dtoAccess.RecipeDtoList;
+import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
+import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;

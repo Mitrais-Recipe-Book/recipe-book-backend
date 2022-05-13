@@ -6,7 +6,9 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.cdcone.recipy.dto.*;
+import com.cdcone.recipy.dtoAccess.RecipeDtoList;
+import com.cdcone.recipy.dtoAccess.UserRecipeDto;
+import com.cdcone.recipy.dtoRequest.*;
 import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.repository.RecipeRepository;

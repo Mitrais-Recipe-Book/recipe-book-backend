@@ -1,6 +1,6 @@
 package com.cdcone.recipy.controller;
 
-import com.cdcone.recipy.dto.EditTagDto;
+import com.cdcone.recipy.dtoRequest.EditTagDto;
 import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.response.CommonResponse;
 import com.cdcone.recipy.service.TagService;
