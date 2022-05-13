@@ -4,11 +4,11 @@ import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.repository.TagDao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.util.Pair;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -33,21 +33,38 @@ public class TagService {
         return tagDao.findById(id).get();
     }
 
-    public String editTag(int old, String tag) {
+    public Pair<HttpStatus, Map<String, String>> editTag(int old, String tag) {
         Optional<TagEntity> byName = tagDao.findById(old);
-        String s = null;
+        HttpStatus status;
+        Map<String, String> payload = new HashMap<>();
         if (byName.isPresent()) {
             TagEntity toBeEdited = byName.get();
+            String oldName = toBeEdited.getName();
+            payload.put("toBeEdited", oldName);
             tag = tag.toLowerCase();
-            if (tag.equals(toBeEdited.getName())) {
-                s = "error: tag already exist";
-            } else {
-                toBeEdited.setName(tag);
-                tagDao.save(toBeEdited);
-                s = "success: data updated";
+            try {
+                if (!tag.equals(oldName)) {
+                    toBeEdited.setName(tag);
+                    tagDao.save(toBeEdited);
+                    payload.put("msg", "success: data updated");
+                    payload.put("new", toBeEdited.getName());
+                    status = HttpStatus.OK;
+                } else {
+                    payload.put("msg", "error: tag must be different");
+                    payload.put("input", tag);
+                    status = HttpStatus.BAD_REQUEST;
+                }
+            } catch (DataIntegrityViolationException e) {
+                payload.put("msg", "error: tag already exist");
+                payload.put("input", tag);
+                status = HttpStatus.BAD_REQUEST;
             }
+        } else {
+            payload.put("msg", "error: tag not found");
+            payload.put("input", tag);
+            status = HttpStatus.NOT_FOUND;
         }
-        return s;
+        return Pair.of(status, payload);
     }
 
     public TagEntity deleteTag(int tagId) {
