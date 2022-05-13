@@ -3,8 +3,8 @@ package com.cdcone.recipy;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.cdcone.recipy.dto.RecipeDtoAdd;
-import com.cdcone.recipy.dto.SignUpDto;
+import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
+import com.cdcone.recipy.dtoRequest.SignUpDto;
 import com.cdcone.recipy.entity.RoleEntity;
 import com.cdcone.recipy.repository.RoleDao;
 import com.cdcone.recipy.service.UserService;
@@ -64,8 +64,7 @@ public class RecipyApplication {
 					"Air, es batu, teh, gula",
 					"Silahkan klik link videonya",
 					"https://www.youtube.com/watch?v=biwLHUoPdPA&ab_channel=SajianSedap",
-					false,
-					null));
+					false));
 
 			recipeService.addViewer(1L);
 

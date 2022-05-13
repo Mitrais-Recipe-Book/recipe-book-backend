@@ -6,7 +6,9 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.cdcone.recipy.dto.*;
+import com.cdcone.recipy.dtoAccess.RecipeDtoList;
+import com.cdcone.recipy.dtoAccess.UserRecipeDto;
+import com.cdcone.recipy.dtoRequest.*;
 import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.repository.RecipeRepository;
@@ -29,7 +31,7 @@ public class RecipeService {
     private final TagService tagService;
 
 
-    public void add(RecipeDtoAdd dto) {
+    public RecipeEntity add(RecipeDtoAdd dto) {
         Set<TagEntity> tagEntities = new HashSet<TagEntity>();
 
         for (Integer id : dto.getTagIds()) {
@@ -46,9 +48,8 @@ public class RecipeService {
                 dto.getContent(),
                 dto.getVideoURL(),
                 0,
-                dto.isDraft(),
-                dto.getBannerImage());
-        recipeRepository.save(recipe);
+                dto.isDraft());
+        return recipeRepository.save(recipe);
     }
 
 

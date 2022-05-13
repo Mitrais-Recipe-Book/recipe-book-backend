@@ -91,8 +91,7 @@ public class RecipeEntity {
             String content,
             String videoURL,
             int views,
-            boolean isDraft,
-            byte[] bannerImage) {
+            boolean isDraft) {
         this.user = userEntity;
         this.tags = tags;
         this.title = title;
@@ -103,6 +102,5 @@ public class RecipeEntity {
         this.videoURL = videoURL;
         this.views = views;
         this.isDraft = isDraft;
-        this.bannerImage = bannerImage;
     }
 }

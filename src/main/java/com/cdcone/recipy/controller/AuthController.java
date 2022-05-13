@@ -1,8 +1,8 @@
 package com.cdcone.recipy.controller;
 
-import com.cdcone.recipy.dto.SignInDto;
-import com.cdcone.recipy.dto.SignUpDto;
-import com.cdcone.recipy.dto.UserDto;
+import com.cdcone.recipy.dtoAccess.UserDto;
+import com.cdcone.recipy.dtoRequest.SignInDto;
+import com.cdcone.recipy.dtoRequest.SignUpDto;
 import com.cdcone.recipy.entity.UserEntity;
 import com.cdcone.recipy.response.CommonResponse;
 import com.cdcone.recipy.service.AuthService;

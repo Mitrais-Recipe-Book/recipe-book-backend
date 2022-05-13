@@ -1,4 +1,4 @@
-package com.cdcone.recipy.dto;
+package com.cdcone.recipy.dtoRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,4 +8,4 @@ import lombok.Data;
 public class EditTagDto {
     private int tagId;
     private String tagReplace;
-}
+} 

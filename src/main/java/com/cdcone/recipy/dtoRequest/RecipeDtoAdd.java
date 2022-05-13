@@ -1,8 +1,7 @@
-package com.cdcone.recipy.dto;
+package com.cdcone.recipy.dtoRequest;
 
 import java.util.Set;
 
-import javax.persistence.Lob;
 import javax.validation.constraints.NotEmpty;
 
 import lombok.AllArgsConstructor;
@@ -21,6 +20,4 @@ public class RecipeDtoAdd {
     private String content;
     private String videoURL;
     private boolean isDraft;
-    @Lob
-    private byte[] bannerImage;
 }
