@@ -24,7 +24,7 @@ public interface UserDao extends JpaRepository<UserEntity, Long> {
             "WHERE u.username = :username")
     PhotoDto getProfilePhoto(@PathParam("username") String username);
 
-    @Query("SELECT NEW com.cdcone.recipy.dtoAccess.UserDto(u.id, u.email, u.username, u.fullName) FROM UserEntity u")
+    @Query("SELECT NEW com.cdcone.recipy.dtoAccess.UserDto(u.id, u.email, u.username, u.fullName, u.roles) FROM UserEntity u")
     Page<UserDto> findAllPaged(Pageable pageable);
 
     @Query("SELECT NEW com.cdcone.recipy.dtoAccess.UserDetailDto" +
