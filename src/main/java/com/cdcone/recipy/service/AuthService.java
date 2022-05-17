@@ -20,6 +20,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
     public Optional<String> auth(SignInDto signInDto) {
+
         String token;
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInDto.getUsername(), signInDto.getPassword()));

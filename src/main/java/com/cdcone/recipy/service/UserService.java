@@ -112,4 +112,20 @@ public class UserService implements UserDetailsService {
         Pageable pageable = PageRequest.of(page, 10);
         return userDao.findAllPaged(pageable);
     }
+
+    public void addFollow(long userId, long creatorId){
+        UserEntity user = userDao.findById(userId).get();
+        UserEntity creator = userDao.findById(creatorId).get();
+
+        user.addFollow(creator);
+        userDao.save(user);
+    }
+
+    public void removeFollow(long userId, long creatorId){
+        UserEntity user = userDao.findById(userId).get();
+        UserEntity creator = userDao.findById(creatorId).get();
+
+        user.removeFollow(creator);
+        userDao.save(user);
+    }
 }
