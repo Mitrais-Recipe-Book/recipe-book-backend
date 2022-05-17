@@ -9,11 +9,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -38,7 +39,11 @@ public class AuthService {
                             principal.getId(),
                             principal.getEmail(),
                             principal.getUsername(),
-                            principal.getFullName()
+                            principal.getFullName(),
+                            principal.getAuthorities()
+                                    .stream()
+                                    .map(GrantedAuthority::getAuthority)
+                                    .collect(Collectors.toSet())
                     )
             );
         } catch (AuthenticationException e) {
