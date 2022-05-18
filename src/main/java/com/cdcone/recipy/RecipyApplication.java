@@ -49,6 +49,12 @@ public class RecipyApplication {
 					"123456",
 					"User 1"));
 
+			userService.addUser(new SignUpDto(
+					"user2@gmail.com",
+					"user2",
+					"123456",
+					"User 2"));
+
 			// Tag data
 			tagService.saveTag("Breakfast");
 			tagService.saveTag("Light Meal");
@@ -58,7 +64,7 @@ public class RecipyApplication {
 			tags.add(1);
 			recipeService.add(new RecipeDtoAdd(
 					1L,
-					tags, 
+					tags,
 					"Es teh",
 					"Enak diminum pada saat buka puasa",
 					"Air, es batu, teh, gula",

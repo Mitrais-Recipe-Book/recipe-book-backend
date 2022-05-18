@@ -119,4 +119,16 @@ public class UserService implements UserDetailsService {
         Pageable pageable = PageRequest.of(page, 10);
         return userDao.findAllPaged(pageable);
     }
+
+    public void addFollow(long userId, long creatorId) throws Exception{
+        if (userId == creatorId){
+            throw new Exception("Cannot follow yourself");
+        }
+
+        UserEntity user = userDao.findById(userId).get();
+        UserEntity creator = userDao.findById(creatorId).get();
+
+        user.addFollow(creator);
+        userDao.save(user);
+    }
 }

@@ -81,4 +81,14 @@ public class UserController {
         PaginatedDto<UserRecipeDto> byUserId = recipeService.getByUsername(username, page);
         return ResponseEntity.ok(new CommonResponse(byUserId));
     }
+
+    @PostMapping("/follow")
+    public ResponseEntity<CommonResponse> followCreator(@RequestBody FollowUserDto dto){
+        try{
+            userService.addFollow(dto.getUserId(), dto.getCreatorId());
+            return ResponseEntity.ok(new CommonResponse("Follow succeed"));
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(new CommonResponse(e.getMessage()));
+        }
+    }
 }

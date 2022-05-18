@@ -1,5 +1,6 @@
 package com.cdcone.recipy.entity;
 
+import lombok.Builder;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -49,4 +50,16 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "user")
     private Set<RecipeEntity> recipes;
+
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name = "creator_id", referencedColumnName = "id")
+    )
+    private Set<UserEntity> follows;
+
+    public void addFollow(UserEntity creator){
+        follows.add(creator);
+    }
 }
