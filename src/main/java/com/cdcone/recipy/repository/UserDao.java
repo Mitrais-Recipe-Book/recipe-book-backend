@@ -2,7 +2,6 @@ package com.cdcone.recipy.repository;
 
 import com.cdcone.recipy.dtoAccess.PhotoDto;
 import com.cdcone.recipy.dtoAccess.UserDetailDto;
-import com.cdcone.recipy.dtoAccess.UserDto;
 import com.cdcone.recipy.entity.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
