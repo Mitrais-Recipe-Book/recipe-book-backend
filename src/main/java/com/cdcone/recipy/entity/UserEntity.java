@@ -62,8 +62,4 @@ public class UserEntity {
     public void addFollow(UserEntity creator){
         follows.add(creator);
     }
-
-    public void removeFollow(UserEntity creator){
-        follows.remove(creator);
-    }
 }

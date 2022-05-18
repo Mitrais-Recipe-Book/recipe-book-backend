@@ -113,19 +113,15 @@ public class UserService implements UserDetailsService {
         return userDao.findAllPaged(pageable);
     }
 
-    public void addFollow(long userId, long creatorId){
+    public void addFollow(long userId, long creatorId) throws Exception{
+        if (userId == creatorId){
+            throw new Exception("Cannot follow yourself");
+        }
+
         UserEntity user = userDao.findById(userId).get();
         UserEntity creator = userDao.findById(creatorId).get();
 
         user.addFollow(creator);
-        userDao.save(user);
-    }
-
-    public void removeFollow(long userId, long creatorId){
-        UserEntity user = userDao.findById(userId).get();
-        UserEntity creator = userDao.findById(creatorId).get();
-
-        user.removeFollow(creator);
         userDao.save(user);
     }
 }
