@@ -58,8 +58,4 @@ public class UserEntity {
         inverseJoinColumns = @JoinColumn(name = "creator_id", referencedColumnName = "id")
     )
     private Set<UserEntity> follows;
-
-    public void addFollow(UserEntity creator){
-        follows.add(creator);
-    }
 }

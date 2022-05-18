@@ -91,4 +91,14 @@ public class UserController {
             return ResponseEntity.badRequest().body(new CommonResponse(e.getMessage()));
         }
     }
+
+    @DeleteMapping("/unfollow")
+    public ResponseEntity<CommonResponse> unfollowCreator(@RequestBody FollowUserDto dto){
+        try{
+            userService.unFollow(dto.getUserId(), dto.getCreatorId());
+            return ResponseEntity.ok(new CommonResponse("Unfollow succeed"));
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(new CommonResponse(e.getMessage()));
+        }
+    }
 }

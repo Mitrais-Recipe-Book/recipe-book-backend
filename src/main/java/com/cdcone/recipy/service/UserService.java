@@ -128,7 +128,33 @@ public class UserService implements UserDetailsService {
         UserEntity user = userDao.findById(userId).get();
         UserEntity creator = userDao.findById(creatorId).get();
 
-        user.addFollow(creator);
+        Set<UserEntity> follows = user.getFollows();
+
+        if (follows.contains(creator)){
+            throw new Exception("You already follow this creator");
+        }
+
+        follows.add(creator);
+        user.setFollows(follows);
+        userDao.save(user);
+    }
+
+    public void unFollow(long userId, long creatorId) throws Exception{
+        if (userId == creatorId){
+            throw new Exception("Cannot follow yourself");
+        }
+
+        UserEntity user = userDao.findById(userId).get();
+        UserEntity creator = userDao.findById(creatorId).get();
+        
+        Set<UserEntity> follows = user.getFollows();
+
+        if (!follows.contains(creator)){
+            throw new Exception("You didn't follow this creator");
+        }
+
+        follows.remove(creator);
+        user.setFollows(follows);
         userDao.save(user);
     }
 }
