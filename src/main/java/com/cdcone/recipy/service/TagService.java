@@ -35,8 +35,9 @@ public class TagService {
 
     public Pair<HttpStatus, Map<String, String>> editTag(int old, String tag) {
         Optional<TagEntity> byName = tagDao.findById(old);
-        HttpStatus status;
+        HttpStatus status = HttpStatus.BAD_REQUEST;
         Map<String, String> payload = new HashMap<>();
+        payload.put("input", tag);
         if (byName.isPresent()) {
             TagEntity toBeEdited = byName.get();
             String oldName = toBeEdited.getName();
@@ -48,20 +49,16 @@ public class TagService {
                     tagDao.save(toBeEdited);
                     payload.put("msg", "success: data updated");
                     payload.put("new", toBeEdited.getName());
+                    payload.remove("input");
                     status = HttpStatus.OK;
                 } else {
                     payload.put("msg", "error: tag must be different");
-                    payload.put("input", tag);
-                    status = HttpStatus.BAD_REQUEST;
                 }
             } catch (DataIntegrityViolationException e) {
-                payload.put("msg", "error: tag already exist");
-                payload.put("input", tag);
-                status = HttpStatus.BAD_REQUEST;
+                payload.put("msg", "error: tag already exists");
             }
         } else {
             payload.put("msg", "error: tag not found");
-            payload.put("input", tag);
             status = HttpStatus.NOT_FOUND;
         }
         return Pair.of(status, payload);

@@ -75,7 +75,7 @@ public class UserService implements UserDetailsService {
                     createdUser = userDao.save(user);
                     msg = "Success";
                 } catch (Exception e) {
-                    msg = "Failed to create user. Username or email is already exist";
+                    msg = "Failed to create user. Username or email is already exists";
                 }
             } else {
                 msg = "Role not found";
