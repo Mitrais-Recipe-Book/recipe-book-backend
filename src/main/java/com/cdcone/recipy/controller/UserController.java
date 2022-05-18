@@ -1,5 +1,6 @@
 package com.cdcone.recipy.controller;
 
+import com.cdcone.recipy.dtoAccess.FollowingListDto;
 import com.cdcone.recipy.dtoAccess.PhotoDto;
 import com.cdcone.recipy.dtoAccess.UserDetailDto;
 import com.cdcone.recipy.dtoAccess.UserDto;
@@ -9,7 +10,6 @@ import com.cdcone.recipy.response.CommonResponse;
 import com.cdcone.recipy.service.RecipeService;
 import com.cdcone.recipy.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -97,6 +98,16 @@ public class UserController {
         try{
             userService.unFollow(dto.getUserId(), dto.getCreatorId());
             return ResponseEntity.ok(new CommonResponse("Unfollow succeed"));
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(new CommonResponse(e.getMessage()));
+        }
+    }
+
+    @GetMapping("{id}/follow-list")
+    public ResponseEntity<CommonResponse> getFollowList(@RequestParam long userId){
+        try{
+            List<FollowingListDto> list = userService.getFollowList(userId);
+            return ResponseEntity.ok(new CommonResponse("succeed", list));
         } catch (Exception e){
             return ResponseEntity.badRequest().body(new CommonResponse(e.getMessage()));
         }

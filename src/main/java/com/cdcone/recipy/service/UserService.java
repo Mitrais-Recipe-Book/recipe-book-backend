@@ -1,5 +1,6 @@
 package com.cdcone.recipy.service;
 
+import com.cdcone.recipy.dtoAccess.FollowingListDto;
 import com.cdcone.recipy.dtoAccess.PhotoDto;
 import com.cdcone.recipy.dtoAccess.UserDetailDto;
 import com.cdcone.recipy.dtoAccess.UserDto;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -53,8 +55,7 @@ public class UserService implements UserDetailsService {
                 userEntity.getPassword(),
                 userEntity.getEmail(),
                 userEntity.getFullName(),
-                authorities
-        );
+                authorities);
     }
 
     public Pair<Optional<UserEntity>, String> addUser(SignUpDto signUpDto) {
@@ -85,7 +86,7 @@ public class UserService implements UserDetailsService {
         return Pair.of(Optional.ofNullable(createdUser), msg);
     }
 
-    public UserEntity getById(long id){
+    public UserEntity getById(long id) {
         return userDao.getById(id);
     }
 
@@ -126,8 +127,8 @@ public class UserService implements UserDetailsService {
         return new PaginatedDto<>(userDtoList, allPaged.getNumber(), allPaged.getTotalPages());
     }
 
-    public void addFollow(long userId, long creatorId) throws Exception{
-        if (userId == creatorId){
+    public void addFollow(long userId, long creatorId) throws Exception {
+        if (userId == creatorId) {
             throw new Exception("Cannot follow yourself");
         }
 
@@ -136,7 +137,7 @@ public class UserService implements UserDetailsService {
 
         Set<UserEntity> follows = user.getFollows();
 
-        if (follows.contains(creator)){
+        if (follows.contains(creator)) {
             throw new Exception("You already follow this creator");
         }
 
@@ -145,22 +146,29 @@ public class UserService implements UserDetailsService {
         userDao.save(user);
     }
 
-    public void unFollow(long userId, long creatorId) throws Exception{
-        if (userId == creatorId){
+    public void unFollow(long userId, long creatorId) throws Exception {
+        if (userId == creatorId) {
             throw new Exception("Cannot follow yourself");
         }
 
         UserEntity user = userDao.findById(userId).get();
         UserEntity creator = userDao.findById(creatorId).get();
-        
+
         Set<UserEntity> follows = user.getFollows();
 
-        if (!follows.contains(creator)){
+        if (!follows.contains(creator)) {
             throw new Exception("You didn't follow this creator");
         }
 
         follows.remove(creator);
         user.setFollows(follows);
         userDao.save(user);
+    }
+
+    public List<FollowingListDto> getFollowList(long userId) {
+        List<UserEntity> entities = new ArrayList<>(userDao.findById(userId).get().getFollows());
+        return entities.stream()
+                .map(entity -> new FollowingListDto(entity.getUsername(), entity.getFullName()))
+                .collect(Collectors.toList());
     }
 }
