@@ -38,7 +38,7 @@ public class TagController {
             String msg = "success: data saved";
             HttpStatus status = HttpStatus.OK;
             if (savedTag == null) {
-                msg = "error: tag already exist";
+                msg = "error: tag already exists";
                 status = HttpStatus.BAD_REQUEST;
             }
             return ResponseEntity.status(status).body(new CommonResponse(msg, savedTag));
