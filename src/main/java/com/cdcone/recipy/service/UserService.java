@@ -3,6 +3,7 @@ package com.cdcone.recipy.service;
 import com.cdcone.recipy.dtoAccess.PhotoDto;
 import com.cdcone.recipy.dtoAccess.UserDetailDto;
 import com.cdcone.recipy.dtoAccess.UserDto;
+import com.cdcone.recipy.dtoRequest.PaginatedDto;
 import com.cdcone.recipy.dtoRequest.SignUpDto;
 import com.cdcone.recipy.entity.RoleEntity;
 import com.cdcone.recipy.entity.UserEntity;
@@ -115,9 +116,14 @@ public class UserService implements UserDetailsService {
         return Pair.of(uploadedPhoto, msg);
     }
 
-    public Page<UserDto> getAllUsers(int page) {
+    public PaginatedDto<UserDto> getAllUsers(int page) {
         Pageable pageable = PageRequest.of(page, 10);
-        return userDao.findAllPaged(pageable);
+        Page<UserEntity> allPaged = userDao.findAllPaged(pageable);
+        List<UserDto> userDtoList = allPaged.getContent()
+                .stream()
+                .map(UserDto::toDto)
+                .collect(Collectors.toList());
+        return new PaginatedDto<>(userDtoList, allPaged.getNumber(), allPaged.getTotalPages());
     }
 
     public void addFollow(long userId, long creatorId) throws Exception{
