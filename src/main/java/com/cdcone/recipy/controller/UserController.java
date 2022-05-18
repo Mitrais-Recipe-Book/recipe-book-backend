@@ -72,8 +72,8 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<CommonResponse> getAllUsers(@RequestParam(defaultValue = "0") Integer page) {
-        Page<UserDto> allUsers = userService.getAllUsers(page);
-        return ResponseEntity.ok(new CommonResponse(new PaginatedDto<>(allUsers.getContent(), allUsers.getNumber(), allUsers.getTotalPages())));
+        PaginatedDto<UserDto> allUsers = userService.getAllUsers(page);
+        return ResponseEntity.ok(new CommonResponse(allUsers));
     }
 
     @GetMapping("{username}/recipes")
