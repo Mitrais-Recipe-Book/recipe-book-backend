@@ -8,13 +8,13 @@ import com.cdcone.recipy.entity.RoleEntity;
 import com.cdcone.recipy.entity.UserEntity;
 import com.cdcone.recipy.repository.RoleDao;
 import com.cdcone.recipy.repository.UserDao;
+import com.cdcone.recipy.util.CustomUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -36,7 +36,7 @@ public class UserService implements UserDetailsService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public CustomUser loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<UserEntity> byUsername = userDao.findByUsername(username);
         if (byUsername.isEmpty()) {
             throw new UsernameNotFoundException("Username not found");
@@ -46,7 +46,14 @@ public class UserService implements UserDetailsService {
                 .stream()
                 .map(it -> new SimpleGrantedAuthority(it.getName()))
                 .collect(Collectors.toList());
-        return new org.springframework.security.core.userdetails.User(userEntity.getUsername(), userEntity.getPassword(), authorities);
+        return new CustomUser(
+                userEntity.getId(),
+                userEntity.getUsername(),
+                userEntity.getPassword(),
+                userEntity.getEmail(),
+                userEntity.getFullName(),
+                authorities
+        );
     }
 
     public Pair<Optional<UserEntity>, String> addUser(SignUpDto signUpDto) {

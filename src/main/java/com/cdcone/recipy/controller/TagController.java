@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin("*")
@@ -40,7 +41,7 @@ public class TagController {
                 msg = "error: tag already exist";
                 status = HttpStatus.BAD_REQUEST;
             }
-            return ResponseEntity.status(status).body(new CommonResponse(msg, tagName));
+            return ResponseEntity.status(status).body(new CommonResponse(msg, savedTag));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
         }
@@ -49,12 +50,11 @@ public class TagController {
     @PutMapping("")
     public ResponseEntity<CommonResponse> editTag(@RequestBody EditTagDto dto) {
         try {
-            String editTag = tagService.editTag(dto.getTagId(), dto.getTagReplace());
-            HttpStatus status = HttpStatus.OK;
-            if (editTag == null) {
-                status = HttpStatus.BAD_REQUEST;
-            }
-            return ResponseEntity.status(status).body(new CommonResponse(editTag, dto.getTagReplace()));
+            Pair<HttpStatus, Map<String, String>> editTag = tagService.editTag(dto.getTagId(), dto.getTagReplace());
+            Map<String, String> payload = editTag.getSecond();
+            String msg = payload.get("msg");
+            payload.remove("msg");
+            return ResponseEntity.status(editTag.getFirst()).body(new CommonResponse(msg, payload));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new CommonResponse(e.toString()));
         }

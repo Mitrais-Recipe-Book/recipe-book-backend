@@ -4,6 +4,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import com.cdcone.recipy.dtoAccess.PhotoDto;
+import com.cdcone.recipy.dtoAccess.RecipeDetailDto;
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
 import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
@@ -121,5 +122,19 @@ public class RecipeController {
             msg = "error: recipe not found";
         }
         return ResponseEntity.status(status).body(new CommonResponse(msg, recipeDtoList));
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<CommonResponse> getById(@PathVariable(name = "id") long recipeId) {
+        RecipeEntity byId = recipeService.getById(recipeId);
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        String msg = "Recipe not found";
+        RecipeDetailDto payload = null;
+        if (byId != null) {
+            status = HttpStatus.OK;
+            msg = "Success";
+            payload = RecipeDetailDto.toDto(byId);
+        }
+        return ResponseEntity.status(status).body(new CommonResponse(msg, payload));
     }
 }

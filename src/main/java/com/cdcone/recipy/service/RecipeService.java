@@ -84,7 +84,7 @@ public class RecipeService {
 
 
     public RecipeEntity getById(Long recipeId) {
-        return recipeRepository.findById(recipeId).get();
+        return recipeRepository.findById(recipeId).orElse(null);
     }
 
 
