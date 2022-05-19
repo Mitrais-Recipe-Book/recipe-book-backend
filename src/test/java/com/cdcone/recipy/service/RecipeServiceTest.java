@@ -3,6 +3,7 @@ package com.cdcone.recipy.service;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,6 +13,7 @@ import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
 import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.repository.RecipeRepository;
 
+import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -66,5 +68,21 @@ public class RecipeServiceTest {
         Page<RecipeDtoList> result = recipeService.getPublishedRecipes(dto);
         
         assertEquals(recipeDtoAdd.getTitle(), result.getContent().get(0).getRecipeName());
+    }
+
+    @Test
+    @Order(3)
+    void addViewerAndPopularRecipe(){
+        recipeService.addViewer(2L);
+        recipeService.addViewer(2L);
+        RecipeDtoList entity = (RecipeDtoList) new ArrayList<>(recipeService.getPopularRecipes(1)).get(0);
+        
+        assertEquals(recipeDtoAdd.getTitle(), entity.getRecipeName());
+    }
+
+    @Test
+    @Order(4)
+    void getDiscoverRecipes(){
+        
     }
 }
