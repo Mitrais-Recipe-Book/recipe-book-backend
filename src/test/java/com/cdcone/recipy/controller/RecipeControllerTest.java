@@ -7,6 +7,7 @@ import com.cdcone.recipy.dtoAccess.RecipeDtoList;
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
 import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
 import com.cdcone.recipy.response.CommonResponse;
+import com.cdcone.recipy.service.RecipeService;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -27,6 +28,9 @@ import org.springframework.test.context.TestPropertySource;
 public class RecipeControllerTest {
     @Autowired
     private RecipeController recipeController;
+
+    @Autowired
+    private RecipeService recipeService;
 
     private static RecipeDtoAdd recipeDtoAdd;
 
@@ -66,7 +70,7 @@ public class RecipeControllerTest {
     public void getNewlyPublishedRecipes() {
         Page<RecipeDtoList> result = (Page<RecipeDtoList>) recipeController
                 .getPublishedRecipes(new RecipeSearchDto("", "", new HashSet<>(), 0)).getBody().getPayload();
-                
-        Assertions.assertEquals(2, result.getContent().size());
+
+        Assertions.assertEquals(recipeService.totalRecipes(), result.getContent().size());
     }
 }

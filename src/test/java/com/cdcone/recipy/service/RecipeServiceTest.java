@@ -22,10 +22,12 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import org.springframework.test.context.TestPropertySource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@TestPropertySource("classpath:application-test.properties")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RecipeServiceTest {
     @Autowired
@@ -83,6 +85,15 @@ public class RecipeServiceTest {
     @Test
     @Order(4)
     void getDiscoverRecipes(){
-        
+        RecipeDtoList entity = (RecipeDtoList) new ArrayList<>(recipeService.getDiscoverRecipes(1)).get(0);
+
+        assertEquals(recipeDtoAdd.getTitle(), entity.getRecipeName());
+    }
+
+    @Test
+    @Order(5)
+    void getById(){
+        RecipeEntity entity = recipeService.getById(1L);
+        assertEquals(1L, entity.getId());
     }
 }
