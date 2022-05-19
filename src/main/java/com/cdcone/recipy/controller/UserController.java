@@ -111,6 +111,5 @@ public class UserController {
         } catch (Exception e){
             return ResponseEntity.badRequest().body(new CommonResponse(e.getMessage()));
         }
-        
     }
 }

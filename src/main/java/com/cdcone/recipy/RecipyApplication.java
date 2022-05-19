@@ -25,7 +25,7 @@ public class RecipyApplication {
 		SpringApplication.run(RecipyApplication.class, args);
 	}
 
-	@Bean
+//	@Bean
 	CommandLineRunner run(
 			RecipeService recipeService,
 			UserService userService,
