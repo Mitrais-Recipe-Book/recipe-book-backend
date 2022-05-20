@@ -35,9 +35,9 @@ public class RecipeController {
             Long entityId = recipeService.add(dto).getId();            
             return ResponseEntity.ok(new CommonResponse("success: data saved", entityId));
         } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
+            return ResponseEntity.badRequest().body(new CommonResponse(e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new CommonResponse(e.getCause().toString()));
+            return ResponseEntity.internalServerError().body(new CommonResponse(e.getMessage()));
         }
     }
 

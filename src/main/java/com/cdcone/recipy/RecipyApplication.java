@@ -74,6 +74,36 @@ public class RecipyApplication {
 
 			recipeService.addViewer(1L);
 
+			recipeService.add(new RecipeDtoAdd(
+					1L,
+					tags,
+					"ddd2",
+					"Enak diminum pada saat buka puasa",
+					"Air, es batu, teh, gula",
+					"Silahkan klik link videonya",
+					"https://www.youtube.com/watch?v=biwLHUoPdPA&ab_channel=SajianSedap",
+					false));
+
+			recipeService.add(new RecipeDtoAdd(
+					1L,
+					tags,
+					"asd3",
+					"Enak diminum pada saat buka puasa",
+					"Air, es batu, teh, gula",
+					"Silahkan klik link videonya",
+					"https://www.youtube.com/watch?v=biwLHUoPdPA&ab_channel=SajianSedap",
+					false));
+
+			recipeService.add(new RecipeDtoAdd(
+					1L,
+					tags,
+					"asdg4",
+					"Enak diminum pada saat buka puasa",
+					"Air, es batu, teh, gula",
+					"Silahkan klik link videonya",
+					"https://www.youtube.com/watch?v=biwLHUoPdPA&ab_channel=SajianSedap",
+					false));
+
 			System.out.println("\n\n---Feeding data complete---\n\n");
 		};
 	}
