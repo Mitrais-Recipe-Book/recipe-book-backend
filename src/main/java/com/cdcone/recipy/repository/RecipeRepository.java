@@ -24,10 +24,16 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
                         "JOIN recipe.user user " +
                         "LEFT JOIN recipe.tags tag " +
                         "WHERE recipe.isDraft = FALSE " +
+                        "AND (LOWER(user.fullName) LIKE LOWER(CONCAT('%', :authorName, '%')) " +
+                        "OR LOWER(user.username) LIKE LOWER(CONCAT('%', :authorName, '%'))) " +
                         "AND LOWER(recipe.title) LIKE LOWER(CONCAT('%', :titleName, '%')) " +
+<<<<<<< HEAD
+                        "AND tag.id IN :tagId ")
+=======
                         "AND tag.id IN :tagId " + 
                         "AND LOWER(user.fullName) LIKE LOWER(CONCAT('%', :authorName, '%')) " +
                         "OR LOWER(user.username) LIKE LOWER(CONCAT('%', :authorName, '%')) ")
+>>>>>>> 603fb5f34f6dcab50e0d19ed42de7596575d3dfc
         public Page<RecipeDtoList> getPublishedRecipes(
                         @PathParam("titleName") String titleName,
                         @PathParam("authorName") String authorName,
@@ -42,14 +48,14 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
         public Set<RecipeDtoList> getPopularRecipes();
 
         @Query(value = "SELECT " +
-                "r.id, r.title, r.overview, u.full_name, r.views " +
-                "FROM recipes r JOIN users u ON u.username = :username", nativeQuery = true)
+                        "r.id, r.title, r.overview, u.full_name, r.views " +
+                        "FROM recipes r JOIN users u ON u.username = :username", nativeQuery = true)
         Page<Object[]> findByUsername(@Param("username") String username, Pageable pageable);
 
         @Query("SELECT NEW com.cdcone.recipy.dtoAccess.RecipeDtoList " +
-        "(r.title, r.overview, r.views, r.user.fullName) " +
-        "FROM RecipeEntity r "+
-        "WHERE r.isDraft = FALSE "+
-        "ORDER BY r.id DESC")
+                        "(r.title, r.overview, r.views, r.user.fullName) " +
+                        "FROM RecipeEntity r " +
+                        "WHERE r.isDraft = FALSE " +
+                        "ORDER BY r.id DESC")
         public Set<RecipeDtoList> getDiscoverRecipes();
 }
