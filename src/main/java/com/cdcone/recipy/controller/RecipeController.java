@@ -68,8 +68,8 @@ public class RecipeController {
         }
     }
 
-    @PutMapping(value = "{recipe}/photo", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse> saveRecipePhoto(@PathVariable Long recipeId,
+    @PutMapping(value = "/{recipe}/photo", consumes = "multipart/form-data")
+    public ResponseEntity<CommonResponse> saveRecipePhoto(@PathVariable(name = "recipe") Long recipeId,
             @RequestParam("photo") MultipartFile photo) {
         Pair<Boolean, String> savedPhoto = recipeService.saveRecipePhoto(photo, recipeId);
         HttpStatus status = HttpStatus.BAD_REQUEST;
