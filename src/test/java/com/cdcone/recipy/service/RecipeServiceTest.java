@@ -1,20 +1,21 @@
 package com.cdcone.recipy.service;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
+import com.cdcone.recipy.dtoAccess.UserRecipeDto;
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
 import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
 import com.cdcone.recipy.entity.RecipeEntity;
-import com.cdcone.recipy.repository.RecipeRepository;
 
-import org.assertj.core.util.Arrays;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -23,8 +24,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.multipart.MultipartFile;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 @SpringBootTest
 @TestPropertySource("classpath:application-test.properties")
@@ -68,23 +71,23 @@ public class RecipeServiceTest {
     void getPublishedRecipes() {
         RecipeSearchDto dto = new RecipeSearchDto("Dugan", "", new HashSet<>(), 0);
         Page<RecipeDtoList> result = recipeService.getPublishedRecipes(dto);
-        
+
         assertEquals(recipeDtoAdd.getTitle(), result.getContent().get(0).getRecipeName());
     }
 
     @Test
     @Order(3)
-    void addViewerAndPopularRecipe(){
+    void addViewerAndPopularRecipe() {
         recipeService.addViewer(2L);
         recipeService.addViewer(2L);
         RecipeDtoList entity = (RecipeDtoList) new ArrayList<>(recipeService.getPopularRecipes(1)).get(0);
-        
+
         assertEquals(recipeDtoAdd.getTitle(), entity.getRecipeName());
     }
 
     @Test
     @Order(4)
-    void getDiscoverRecipes(){
+    void getDiscoverRecipes() {
         RecipeDtoList entity = (RecipeDtoList) new ArrayList<>(recipeService.getDiscoverRecipes(1)).get(0);
 
         assertEquals(recipeDtoAdd.getTitle(), entity.getRecipeName());
@@ -92,10 +95,32 @@ public class RecipeServiceTest {
 
     @Test
     @Order(5)
-    void getById(){
+    void getById() {
         RecipeEntity entity = recipeService.getById(1L);
         assertEquals(1L, entity.getId());
     }
 
-    
+    @Test
+    @Order(6)
+    void getByUsername() {
+        UserRecipeDto recipe = recipeService.getByUsername("user1", 0).getData().get(0);
+        assertEquals("Es teh", recipe.getTitle());
+    }
+
+    @Test
+    @Order(7)
+    @Disabled
+    // Any idea to test multipart file?
+    void saveRecipePhoto() {
+        MultipartFile photo = mock(MultipartFile.class);
+        recipeService.saveRecipePhoto(photo, 1L);
+        assertEquals(photo, recipeService.getById(1L).getBannerImage());
+    }
+
+    @Test
+    @AfterAll
+    void deleteRecipe() {
+        recipeService.deleteRecipe(recipeService.totalRecipes());
+        assertEquals(initSize, recipeService.totalRecipes());
+    }
 }
