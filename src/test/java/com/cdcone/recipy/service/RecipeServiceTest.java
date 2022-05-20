@@ -57,9 +57,12 @@ public class RecipeServiceTest {
 
     @Test
     @Order(1)
-    void add() {
+    void addAndTotalRecipes() {
+        RecipeSearchDto dto = new RecipeSearchDto("", "", new HashSet<>(), 0);
         initSize = (int) recipeService.totalRecipes();
+        System.out.println("PRINT: " + recipeService.getPublishedRecipes(dto).getContent());
         recipeService.add(recipeDtoAdd);
+        System.out.println("PRINT: " + recipeService.getPublishedRecipes(dto).getContent());
         assertEquals(initSize + 1, recipeService.totalRecipes());
     }
 
@@ -68,6 +71,8 @@ public class RecipeServiceTest {
     void getPublishedRecipes() {
         RecipeSearchDto dto = new RecipeSearchDto("Es Dugan", "", new HashSet<>(), 0);
         Page<RecipeDtoList> result = recipeService.getPublishedRecipes(dto);
+
+        System.out.println("PRINT: " + result.getContent());
         
         assertEquals(recipeDtoAdd.getTitle(), result.getContent().get(0).getRecipeName());
     }
@@ -96,4 +101,6 @@ public class RecipeServiceTest {
         RecipeEntity entity = recipeService.getById(1L);
         assertEquals(1L, entity.getId());
     }
+
+    
 }
