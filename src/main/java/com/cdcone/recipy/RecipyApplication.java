@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication()
 public class RecipyApplication {
-	public static boolean generateDummyData = false;
+	public static boolean generateDummyData = true;
 
 	public static void main(String[] args) {
 		SpringApplication.run(RecipyApplication.class, args);
