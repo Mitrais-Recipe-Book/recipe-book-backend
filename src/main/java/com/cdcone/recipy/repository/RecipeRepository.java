@@ -25,9 +25,9 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
                         "LEFT JOIN recipe.tags tag " +
                         "WHERE recipe.isDraft = FALSE " +
                         "AND LOWER(recipe.title) LIKE LOWER(CONCAT('%', :titleName, '%')) " +
+                        "AND tag.id IN :tagId " + 
                         "AND LOWER(user.fullName) LIKE LOWER(CONCAT('%', :authorName, '%')) " +
-                        "AND LOWER(user.username) LIKE LOWER(CONCAT('%', :authorName, '%')) " + 
-                        "AND tag.id IN :tagId ")
+                        "OR LOWER(user.username) LIKE LOWER(CONCAT('%', :authorName, '%')) ")
         public Page<RecipeDtoList> getPublishedRecipes(
                         @PathParam("titleName") String titleName,
                         @PathParam("authorName") String authorName,

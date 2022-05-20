@@ -19,13 +19,13 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication()
 public class RecipyApplication {
-	public static boolean generateDummyData = true;
+	public static boolean generateDummyData = false;
 
 	public static void main(String[] args) {
 		SpringApplication.run(RecipyApplication.class, args);
 	}
 
-//	@Bean
+	@Bean
 	CommandLineRunner run(
 			RecipeService recipeService,
 			UserService userService,
