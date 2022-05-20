@@ -17,7 +17,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.context.annotation.Bean;
 
-@SpringBootApplication
+@SpringBootApplication()
 public class RecipyApplication {
 	public static boolean generateDummyData = true;
 

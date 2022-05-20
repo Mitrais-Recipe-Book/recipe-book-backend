@@ -18,7 +18,7 @@ import org.springframework.stereotype.Repository;
 public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
 
         // this is jpa, not sql
-        @Query("SELECT new com.cdcone.recipy.dtoAccess.RecipeDtoList " +
+        @Query("SELECT DISTINCT new com.cdcone.recipy.dtoAccess.RecipeDtoList " +
                         "(recipe.title, recipe.overview, recipe.views, user.fullName) " +
                         "FROM RecipeEntity recipe " +
                         "JOIN recipe.user user " +
@@ -26,6 +26,7 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
                         "WHERE recipe.isDraft = FALSE " +
                         "AND LOWER(recipe.title) LIKE LOWER(CONCAT('%', :titleName, '%')) " +
                         "AND LOWER(user.fullName) LIKE LOWER(CONCAT('%', :authorName, '%')) " +
+                        "AND LOWER(user.username) LIKE LOWER(CONCAT('%', :authorName, '%')) " + 
                         "AND tag.id IN :tagId ")
         public Page<RecipeDtoList> getPublishedRecipes(
                         @PathParam("titleName") String titleName,

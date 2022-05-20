@@ -1,14 +1,19 @@
 package com.cdcone.recipy.service;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
 import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
+import com.cdcone.recipy.entity.RecipeEntity;
+import com.cdcone.recipy.repository.RecipeRepository;
 
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -16,9 +21,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.test.context.TestPropertySource;
 
-@SpringBootTest()
+import static org.junit.jupiter.api.Assertions.*;
+
+@SpringBootTest
+@TestPropertySource("classpath:application-test.properties")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RecipeServiceTest {
     @Autowired
@@ -28,79 +37,63 @@ public class RecipeServiceTest {
     private static int initSize;
 
     @BeforeAll
-    public static void init() {
+    public static void setup() {
+        init();
+    }
+
+    private static void init() {
         Set<Integer> tags = new HashSet<Integer>();
-			tags.add(1);
-			tags.add(2);
-        recipeDtoAdd = new RecipeDtoAdd(
-                1L,
-                tags,
-                "title",
+        tags.add(1);
+        tags.add(2);
+
+        recipeDtoAdd = new RecipeDtoAdd(1L,
+                tags, "Es Dugan",
                 "overview",
                 "ingredients",
                 "content",
-                "videoURL",
-                true);
+                "URL",
+                false);
     }
 
     @Test
     @Order(1)
-    public void addData() {
+    void add() {
         initSize = (int) recipeService.totalRecipes();
         recipeService.add(recipeDtoAdd);
-        Assertions.assertEquals(initSize + 1, recipeService.totalRecipes());
+        assertEquals(initSize + 1, recipeService.totalRecipes());
     }
 
     @Test
     @Order(2)
-    public void cantAddDuplicateData() {
-        try {
-            recipeService.add(recipeDtoAdd);
-        } catch (DataIntegrityViolationException e) {
-            e.printStackTrace();
-        }
-
-        Assertions.assertEquals(initSize + 1, recipeService.totalRecipes());
+    void getPublishedRecipes() {
+        RecipeSearchDto dto = new RecipeSearchDto("Es Dugan", "", new HashSet<>(), 0);
+        Page<RecipeDtoList> result = recipeService.getPublishedRecipes(dto);
+        
+        assertEquals(recipeDtoAdd.getTitle(), result.getContent().get(0).getRecipeName());
     }
 
     @Test
     @Order(3)
-    public void getNewlyPublishedRecipes() {
-        RecipeDtoList result = recipeService.getPublishedRecipes(new RecipeSearchDto("", "", null, 0))
-                .getContent().get((int) recipeService.totalRecipes() - 1);
-
-        Assertions.assertEquals(initSize + 1, recipeService.totalRecipes());
-        Assertions.assertEquals(recipeDtoAdd.getTitle(), result.getRecipeName());
-        Assertions.assertEquals(recipeDtoAdd.getOverview(), result.getDescription());
+    void addViewerAndPopularRecipe(){
+        recipeService.addViewer(2L);
+        recipeService.addViewer(2L);
+        RecipeDtoList entity = (RecipeDtoList) new ArrayList<>(recipeService.getPopularRecipes(1)).get(0);
+        
+        assertEquals(recipeDtoAdd.getTitle(), entity.getRecipeName());
     }
 
     @Test
     @Order(4)
-    public void addView() {
-        recipeService.addViewer(2L);
+    void getDiscoverRecipes(){
+        RecipeDtoList entity = (RecipeDtoList) new ArrayList<>(recipeService.getDiscoverRecipes(1)).get(0);
 
-        RecipeDtoList result = recipeService.getPublishedRecipes(new RecipeSearchDto("", "", null, 0))
-                .getContent().get((int) recipeService.totalRecipes() - 1);
-
-        Assertions.assertEquals(1, result.getRecipeViews());
+        assertEquals(recipeDtoAdd.getTitle(), entity.getRecipeName());
     }
 
     @Test
     @Order(5)
-    public void cantAddView() {
-        try {
-            recipeService.addViewer(3L);
-        } catch (NoSuchElementException e) {
-            Assertions.assertTrue(e.getMessage().contains("No value"));
-        }
-    }
-
-    @Test
-    @Order(6)
-    public void getPopularRecipe(){
-        recipeService.addViewer(2L);
-        RecipeDtoList result = recipeService.getPopularRecipes(1).stream().findAny().get();
-
-        Assertions.assertEquals(recipeDtoAdd.getTitle(), result.getRecipeName());
+    void getById(){
+        RecipeEntity entity = recipeService.getById(1L);
+        assertEquals(1L, entity.getId());
     }
 }

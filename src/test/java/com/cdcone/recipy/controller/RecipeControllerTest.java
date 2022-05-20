@@ -7,6 +7,7 @@ import com.cdcone.recipy.dtoAccess.RecipeDtoList;
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
 import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
 import com.cdcone.recipy.response.CommonResponse;
+import com.cdcone.recipy.service.RecipeService;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -19,12 +20,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
+@TestPropertySource("classpath:application-test.properties")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RecipeControllerTest {
     @Autowired
     private RecipeController recipeController;
+
+    @Autowired
+    private RecipeService recipeService;
 
     private static RecipeDtoAdd recipeDtoAdd;
 
@@ -36,12 +42,12 @@ public class RecipeControllerTest {
         recipeDtoAdd = new RecipeDtoAdd(
                 1L,
                 tags,
-                "title",
+                "title2",
                 "overview",
                 "ingredients",
                 "content",
                 "videoURL",
-                true);
+                false);
     }
 
     @Test
@@ -60,10 +66,11 @@ public class RecipeControllerTest {
 
     @Test
     @Order(3)
+    @SuppressWarnings("unchecked")
     public void getNewlyPublishedRecipes() {
         Page<RecipeDtoList> result = (Page<RecipeDtoList>) recipeController
-                .getPublishedRecipes(new RecipeSearchDto("", "", null, 0)).getBody().getPayload();
-                
-        Assertions.assertEquals(2, result.getContent().size());
+                .getPublishedRecipes(new RecipeSearchDto("", "", new HashSet<>(), 0)).getBody().getPayload();
+
+        Assertions.assertEquals(recipeService.totalRecipes(), result.getContent().size());
     }
 }

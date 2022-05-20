@@ -89,9 +89,8 @@
 					</excludes>
 					<mainClass>com.cdcone.recipy.RecipyApplication</mainClass>
 				</configuration>
-			</plugin>
+			</plugin>			
 		</plugins>
 		<finalName>recipy</finalName>
 	</build>
-
 </project>
