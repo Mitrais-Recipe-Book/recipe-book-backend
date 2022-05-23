@@ -13,8 +13,10 @@ import com.cdcone.recipy.repository.UserDao;
 import com.cdcone.recipy.util.CustomUser;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -35,9 +37,7 @@ import java.util.Set;
 import static org.mockito.Mockito.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-@SpringBootTest
-@TestPropertySource("classpath:application-test.properties")
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+
 class UserServiceTest {
 
     private static final UserDao userDao = mock(UserDao.class);
@@ -124,7 +124,7 @@ class UserServiceTest {
         when(userDao.findByUsername("user")).thenReturn(Optional.of(mockUser));
         when(mockUser.getId()).thenReturn(11L);
         MultipartFile mockPhoto = mock(MultipartFile.class);
-        when(mockPhoto.getBytes()).thenReturn(new byte[] {10});
+        when(mockPhoto.getBytes()).thenReturn(new byte[] { 10 });
         when(mockPhoto.getContentType()).thenReturn("PNG");
 
         Pair<Boolean, String> saveProfilePhoto = userService
@@ -145,8 +145,7 @@ class UserServiceTest {
 
     @Test
     void testFailToAddFollowIfUserIdAndCreatorIdAreSame() {
-        Exception failed = assertThrows(Exception.class, () ->
-                userService.addFollow(1L, 1L));
+        Exception failed = assertThrows(Exception.class, () -> userService.addFollow(1L, 1L));
         assertEquals("Cannot follow yourself", failed.getMessage());
     }
 
@@ -241,7 +240,7 @@ class UserServiceTest {
 
     @Test
     void testSuccessGetUserPhoto() {
-        byte[] photo = new byte[] {80};
+        byte[] photo = new byte[] { 80 };
         PhotoDto mockPhoto = new PhotoDto("PNG", photo);
         when(userDao.getProfilePhoto("user")).thenReturn(mockPhoto);
         PhotoDto userPhoto = userService.getUserPhoto("user");
