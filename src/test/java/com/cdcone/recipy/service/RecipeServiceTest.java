@@ -35,6 +35,7 @@ public class RecipeServiceTest {
 
     private static RecipeDtoAdd recipeDtoAdd;
     private static int initSize;
+    private static RecipeEntity entityTest;
 
     @BeforeAll
     public static void setup() {
@@ -59,7 +60,7 @@ public class RecipeServiceTest {
     @Order(1)
     void addAndTotalRecipes() {
         initSize = (int) recipeService.totalRecipes();
-        recipeService.add(recipeDtoAdd);
+        entityTest = recipeService.add(recipeDtoAdd);
         assertEquals(initSize + 1, recipeService.totalRecipes());
     }
 
@@ -75,8 +76,8 @@ public class RecipeServiceTest {
     @Test
     @Order(3)
     void addViewerAndPopularRecipe() {
-        recipeService.addViewer(2L);
-        recipeService.addViewer(2L);
+        recipeService.addViewer(entityTest.getId());
+        recipeService.addViewer(entityTest.getId());
         RecipeDtoList entity = (RecipeDtoList) new ArrayList<>(recipeService.getPopularRecipes(1)).get(0);
 
         assertEquals(recipeDtoAdd.getTitle(), entity.getRecipeName());
@@ -115,7 +116,7 @@ public class RecipeServiceTest {
     }
 
     @Test
-    @AfterAll
+    @Order(100)
     void deleteRecipe() {
         recipeService.deleteRecipe(recipeService.totalRecipes());
         assertEquals(initSize, recipeService.totalRecipes());
