@@ -15,7 +15,9 @@ import com.cdcone.recipy.service.RecipeService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.util.Pair;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,7 +34,7 @@ public class RecipeController {
     @PostMapping("/add")
     public ResponseEntity<CommonResponse> add(@RequestBody RecipeDtoAdd dto) {
         try {
-            Long entityId = recipeService.add(dto).getId();            
+            Long entityId = recipeService.add(dto).getId();
             return ResponseEntity.ok(new CommonResponse("success: data saved", entityId));
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.badRequest().body(new CommonResponse(e.getMessage()));
@@ -51,20 +53,20 @@ public class RecipeController {
         }
     }
 
-    @GetMapping("image/{id}")
-    public ResponseEntity<CommonResponse> getRecipeImage(@PathVariable(name = "id") Long recipeId) {
+    @GetMapping("{id}/photo")
+    public ResponseEntity<byte[]> getRecipeImage(@PathVariable(name = "id") Long recipeId) {
         try {
             RecipeEntity entity = recipeService.getById(recipeId);
             PhotoDto photoDto = new PhotoDto(entity.getBannerImageType(), entity.getBannerImage());
-            
-            CommonResponse response = new CommonResponse("filename:\\profile-" + entity.getTitle(),
-                    photoDto);
-            return ResponseEntity.ok(response);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + entity.getTitle() + "/banner photo")
+                    .contentType(MediaType.valueOf(photoDto.getType()))
+                    .body(photoDto.getPhoto());
         } catch (NoSuchElementException e) {
-            return ResponseEntity.badRequest()
-                    .body(new CommonResponse("failed: recipe with id: (" + recipeId + ") not found"));
+            return ResponseEntity.notFound().build();
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new CommonResponse(e.getCause().toString()));
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -76,7 +78,7 @@ public class RecipeController {
         if (savedPhoto.getFirst()) {
             status = HttpStatus.OK;
         }
-        return ResponseEntity.status(status).body(new CommonResponse( savedPhoto.getSecond()));
+        return ResponseEntity.status(status).body(new CommonResponse(savedPhoto.getSecond()));
     }
 
     @PutMapping("/addview")
