@@ -29,7 +29,7 @@ import lombok.NoArgsConstructor;
 @Entity()
 @Table(name = "recipes",
     uniqueConstraints = {
-        @UniqueConstraint(name = "recipe_title_unique", columnNames = "title")
+        @UniqueConstraint(name = "recipe_title_unique", columnNames = "title_lower_variant")
 })
 public class RecipeEntity {
     @Id
@@ -37,8 +37,11 @@ public class RecipeEntity {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title")
     private String title;
+
+    @Column(name="title_lower_variant", nullable = false)
+    private String titleLowerVariant;
 
     @Column(name = "overview", columnDefinition = "TEXT")
     private String overview;
@@ -84,7 +87,7 @@ public class RecipeEntity {
     public RecipeEntity(
             UserEntity userEntity,
             Set<TagEntity> tags,
-            String title,
+            String titleLowerVairant,
             String overview,
             LocalDate dateCreated,
             String ingredients,
@@ -94,7 +97,7 @@ public class RecipeEntity {
             boolean isDraft) {
         this.user = userEntity;
         this.tags = tags;
-        this.title = title;
+        this.titleLowerVariant =  titleLowerVairant;
         this.overview = overview;
         this.dateCreated = dateCreated;
         this.ingredients = ingredients;
