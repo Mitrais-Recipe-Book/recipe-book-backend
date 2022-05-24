@@ -41,7 +41,7 @@ public class RecipeService {
         RecipeEntity recipe = new RecipeEntity(
                 userService.getById(dto.getUserId()),
                 tagEntities,
-                dto.getTitle(),
+                dto.getTitle().toLowerCase(),
                 dto.getOverview(),
                 LocalDate.now(),
                 dto.getIngredients(),
@@ -49,6 +49,7 @@ public class RecipeService {
                 dto.getVideoURL(),
                 0,
                 dto.isDraft());
+        recipe.setTitle(dto.getTitle());
         return recipeRepository.save(recipe);        
     }
 

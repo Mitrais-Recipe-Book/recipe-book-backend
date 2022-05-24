@@ -1,12 +1,8 @@
 package com.cdcone.recipy.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -14,8 +10,6 @@ import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
-
-import javax.sound.midi.Receiver;
 
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
