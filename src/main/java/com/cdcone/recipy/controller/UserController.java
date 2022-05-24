@@ -108,4 +108,10 @@ public class UserController {
             return ResponseEntity.badRequest().body(new CommonResponse(e.getMessage()));
         }
     }
+
+    @GetMapping("{id}/followers")
+    public ResponseEntity<CommonResponse> getFollowerList(@PathVariable(name = "id") long userId) {
+        List<FollowerDto> followerList = userService.getFollowerList(userId);
+        return ResponseEntity.ok(new CommonResponse("success", followerList));
+    }
 }
