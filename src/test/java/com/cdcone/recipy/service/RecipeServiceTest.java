@@ -121,7 +121,7 @@ public class RecipeServiceTest {
         assertEquals(mockResult, recipeService.getDiscoverRecipes(1));
     }
 
-    @Test
+    @Test()
     @Order(2)
     void getById() {
         RecipeEntity mockResult = mock(RecipeEntity.class);

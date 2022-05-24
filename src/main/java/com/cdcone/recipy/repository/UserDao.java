@@ -1,7 +1,7 @@
 package com.cdcone.recipy.repository;
 
 import com.cdcone.recipy.dtoAccess.PhotoDto;
-import com.cdcone.recipy.dtoAccess.UserDetailDto;
+import com.cdcone.recipy.dtoAccess.UserProfile;
 import com.cdcone.recipy.entity.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,8 +26,8 @@ public interface UserDao extends JpaRepository<UserEntity, Long> {
     @Query("SELECT u FROM UserEntity u")
     Page<UserEntity> findAllPaged(Pageable pageable);
 
-    @Query("SELECT NEW com.cdcone.recipy.dtoAccess.UserDetailDto" +
-            "(u.id, u.username, u.fullName, SIZE(u.recipes), 0, 0) FROM UserEntity u " +
-            "WHERE u.username = :username")
-    Optional<UserDetailDto> findDetailByUsername(@Param("username") String username);
+    @Query("SELECT NEW com.cdcone.recipy.dtoAccess.UserProfile " +
+            "(u.id, u.username, u.fullName, SIZE(u.recipes), 0, 0) " +
+            "FROM UserEntity u WHERE u.username = :username")
+    Optional<UserProfile> findDetailByUsername(@Param("username") String username);
 }
