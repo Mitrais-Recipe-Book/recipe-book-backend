@@ -102,16 +102,12 @@ public class RecipeService {
 
     public PaginatedDto<UserRecipeDto> getByUsername(String userName, int page) {
         Pageable pageable = PageRequest.of(page, 5);
-        Page<Object[]> byUserId = recipeRepository.findByUsername(userName, pageable);
-        List<UserRecipeDto> result = new ArrayList<>();
-
+        Page<UserRecipeDto> byUserId = recipeRepository.findByUsername(userName, pageable);
         byUserId.getContent().forEach(it -> {
-            BigInteger id = (BigInteger) it[0];
-            Set<TagEntity> tags = tagService.getByRecipeId(id.longValue());
-            result.add(new UserRecipeDto(id.longValue(), (String) it[1], (String) it[2], (String) it[3], (Integer) it[4], tags));
+            Set<TagEntity> tags = tagService.getByRecipeId(it.getId());
+            it.setTags(tags);
         });
-        
-        return new PaginatedDto<>(result, byUserId.getNumber(), byUserId.getTotalPages());
+        return new PaginatedDto<>(byUserId.getContent(), byUserId.getNumber(), byUserId.getTotalPages());
     }
 
 

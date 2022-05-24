@@ -5,6 +5,7 @@ import java.util.Set;
 import javax.websocket.server.PathParam;
 
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
+import com.cdcone.recipy.dtoAccess.UserRecipeDto;
 import com.cdcone.recipy.entity.RecipeEntity;
 
 import org.springframework.data.domain.Page;
@@ -41,10 +42,10 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
                         "ORDER BY recipe.views DESC ")
         public Set<RecipeDtoList> getPopularRecipes();
 
-        @Query(value = "SELECT " +
-                        "r.id, r.title, r.overview, u.full_name, r.views " +
-                        "FROM recipes r JOIN users u ON u.username = :username", nativeQuery = true)
-        Page<Object[]> findByUsername(@Param("username") String username, Pageable pageable);
+        @Query(value = "SELECT NEW com.cdcone.recipy.dtoAccess.UserRecipeDto" +
+                        "(r.id, r.title, r.overview, r.user.fullName, r.views) " +
+                        "FROM RecipeEntity r WHERE r.user.username = :username")
+        Page<UserRecipeDto> findByUsername(@Param("username") String username, Pageable pageable);
 
         @Query("SELECT NEW com.cdcone.recipy.dtoAccess.RecipeDtoList " +
                         "(r.title, r.overview, r.views, r.user.fullName) " +
