@@ -1,10 +1,6 @@
 package com.cdcone.recipy.controller;
 
-import com.cdcone.recipy.dtoAccess.FollowingListDto;
-import com.cdcone.recipy.dtoAccess.PhotoDto;
-import com.cdcone.recipy.dtoAccess.UserDetailDto;
-import com.cdcone.recipy.dtoAccess.UserDto;
-import com.cdcone.recipy.dtoAccess.UserRecipeDto;
+import com.cdcone.recipy.dtoAccess.*;
 import com.cdcone.recipy.dtoRequest.*;
 import com.cdcone.recipy.response.CommonResponse;
 import com.cdcone.recipy.service.RecipeService;
@@ -33,9 +29,9 @@ public class UserController {
     @GetMapping("{username}")
     public ResponseEntity<CommonResponse> getByUsername(@PathVariable String username) {
         try {
-            Optional<UserDetailDto> byUsername = userService.findByUsername(username);
+            Optional<UserProfile> byUsername = userService.findByUsername(username);
             HttpStatus status = HttpStatus.NOT_FOUND;
-            UserDetailDto userDto = null;
+            UserProfile userDto = null;
             String msg = "User not found.";
             if (byUsername.isPresent()) {
                 status = HttpStatus.OK;

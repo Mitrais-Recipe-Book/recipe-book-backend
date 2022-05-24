@@ -1,9 +1,6 @@
 package com.cdcone.recipy.service;
 
-import com.cdcone.recipy.dtoAccess.FollowingListDto;
-import com.cdcone.recipy.dtoAccess.PhotoDto;
-import com.cdcone.recipy.dtoAccess.UserDetailDto;
-import com.cdcone.recipy.dtoAccess.UserDto;
+import com.cdcone.recipy.dtoAccess.*;
 import com.cdcone.recipy.dtoRequest.PaginatedDto;
 import com.cdcone.recipy.dtoRequest.SignUpDto;
 import com.cdcone.recipy.entity.RoleEntity;
@@ -12,10 +9,7 @@ import com.cdcone.recipy.repository.RoleDao;
 import com.cdcone.recipy.repository.UserDao;
 import com.cdcone.recipy.util.CustomUser;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -24,7 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -35,9 +28,7 @@ import java.util.Set;
 import static org.mockito.Mockito.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-@SpringBootTest
-@TestPropertySource("classpath:application-test.properties")
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+
 class UserServiceTest {
 
     private static final UserDao userDao = mock(UserDao.class);
@@ -231,12 +222,13 @@ class UserServiceTest {
 
     @Test
     void testSuccessFindUserByUsername() {
-        UserDetailDto mockUser = new UserDetailDto(4L, "mockuser", "Mocked User", 2, 1, 1);
+        UserProfile mockUser = mock(UserProfile.class);
         when(userDao.findDetailByUsername("mockuser")).thenReturn(Optional.of(mockUser));
+        when(mockUser.getUsername()).thenReturn("mockuser");
 
-        Optional<UserDetailDto> findMockUser = userService.findByUsername("mockuser");
-
+        Optional<UserProfile> findMockUser = userService.findByUsername("mockuser");
         assertTrue(findMockUser.isPresent());
+        assertEquals("mockuser", findMockUser.get().getUsername());
     }
 
     @Test

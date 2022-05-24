@@ -1,9 +1,6 @@
 package com.cdcone.recipy.service;
 
-import com.cdcone.recipy.dtoAccess.FollowingListDto;
-import com.cdcone.recipy.dtoAccess.PhotoDto;
-import com.cdcone.recipy.dtoAccess.UserDetailDto;
-import com.cdcone.recipy.dtoAccess.UserDto;
+import com.cdcone.recipy.dtoAccess.*;
 import com.cdcone.recipy.dtoRequest.PaginatedDto;
 import com.cdcone.recipy.dtoRequest.SignUpDto;
 import com.cdcone.recipy.entity.RoleEntity;
@@ -90,8 +87,13 @@ public class UserService implements UserDetailsService {
         return userDao.getById(id);
     }
 
-    public Optional<UserDetailDto> findByUsername(String username) {
-        return userDao.findDetailByUsername(username);
+    public Optional<UserProfile> findByUsername(String username) {
+        Optional<UserProfile> userProfile = userDao.findDetailByUsername(username);
+        userProfile.ifPresent(it -> {
+            Set<RoleEntity> roles = roleDao.findByUserId(it.getId());
+            it.setRoles(roles);
+        });
+        return userProfile;
     }
 
     public PhotoDto getUserPhoto(String username) {
