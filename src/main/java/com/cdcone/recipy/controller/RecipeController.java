@@ -52,7 +52,7 @@ public class RecipeController {
     }
 
     @GetMapping("image/{id}")
-    public ResponseEntity<CommonResponse> getRecipeImage(Long recipeId) {
+    public ResponseEntity<CommonResponse> getRecipeImage(@PathVariable(name = "id") Long recipeId) {
         try {
             RecipeEntity entity = recipeService.getById(recipeId);
             PhotoDto photoDto = new PhotoDto(entity.getBannerImageType(), entity.getBannerImage());
