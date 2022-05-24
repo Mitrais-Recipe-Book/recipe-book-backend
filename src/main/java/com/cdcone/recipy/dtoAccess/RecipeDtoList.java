@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class RecipeDtoList {
+    private Long id;
     private String recipeName;
     private String description;
     private int recipeViews;
@@ -12,7 +13,8 @@ public class RecipeDtoList {
     private int authorFollower;
 
 
-    public RecipeDtoList(String recipeName, String description, int recipeViews, String author) {
+    public RecipeDtoList(Long id, String recipeName, String description, int recipeViews, String author) {
+        this.id = id;
         this.recipeName = recipeName;
         this.description = description;
         this.recipeViews = recipeViews;
