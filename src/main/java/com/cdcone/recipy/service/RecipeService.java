@@ -1,7 +1,6 @@
 package com.cdcone.recipy.service;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -139,6 +138,7 @@ public class RecipeService {
             RecipeEntity toBeDeleted = byId.get();
             recipeRepository.delete(toBeDeleted);
             deleted = new RecipeDtoList(
+                toBeDeleted.getId(),
                 toBeDeleted.getTitle(), 
             toBeDeleted.getOverview(), 
             toBeDeleted.getViews(), 
