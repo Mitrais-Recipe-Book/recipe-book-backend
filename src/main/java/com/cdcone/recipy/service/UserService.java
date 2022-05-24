@@ -173,4 +173,8 @@ public class UserService implements UserDetailsService {
                 .map(entity -> new FollowingListDto(entity.getUsername(), entity.getFullName()))
                 .collect(Collectors.toList());
     }
+
+    public List<FollowerDto> getFollowerList(long userId) {
+        return userDao.getFollowersById(userId);
+    }
 }

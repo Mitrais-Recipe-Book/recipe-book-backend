@@ -239,4 +239,53 @@ class UserServiceTest {
         assertEquals("PNG", userPhoto.getType());
         assertEquals(photo, userPhoto.getPhoto());
     }
+
+    @Test
+    void testSuccessAddFollow() throws Exception{
+        when(userDao.findById(2L)).thenReturn(Optional.of(creator));
+        when(userDao.findById(1L)).thenReturn(Optional.of(follower1));
+        when(creator.getFollows()).thenReturn(Set.of());
+
+        userService.addFollow(1L, 2L); //
+
+        verify(follower1).setFollows(anySet());
+        verify(userDao).save(follower1);
+    }
+
+    @Test
+    void testFailUnfollowIfNotFollowing(){
+        when(userDao.findById(2L)).thenReturn(Optional.of(creator));
+        when(userDao.findById(1L)).thenReturn(Optional.of(follower1));
+        when(creator.getFollows()).thenReturn(Set.of());
+
+        Exception exception = assertThrows(Exception.class,
+                () -> userService.unFollow(1L, 2L)); // exception
+
+        assertEquals("You didn't follow this creator", exception.getMessage());
+    }
+
+    @Test
+    void testSuccessUnfollow() throws Exception{
+        UserEntity mockFollower = mock(UserEntity.class);
+        when(userDao.findById(2L)).thenReturn(Optional.of(creator));
+        when(userDao.findById(1L)).thenReturn(Optional.of(mockFollower));
+        when(creator.getFollows()).thenReturn(Set.of(mockFollower));
+
+        userService.addFollow(1L, 2L); //
+
+        verify(mockFollower).setFollows(anySet());
+        verify(userDao).save(mockFollower);
+    }
+
+    @Test
+    void testSuccessGetFollowers() {
+        FollowerDto mockUser = mock(FollowerDto.class);
+        when(mockUser.getId()).thenReturn(22L);
+        when(mockUser.getUsername()).thenReturn("mockuser");
+        when(userDao.getFollowersById(22L)).thenReturn(List.of(mockUser));
+
+        List<FollowerDto> followerList = userService.getFollowerList(22L);
+        assertEquals(1, followerList.size());
+        assertEquals("mockuser", followerList.get(0).getUsername());
+    }
 }
