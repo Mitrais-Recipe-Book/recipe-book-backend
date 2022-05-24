@@ -13,14 +13,17 @@ public class UserRecipeDto {
     private final String overview;
     private final String authorName;
     private final int viewCount;
-    private final Set<TagEntity> tags;
+    private Set<TagEntity> tags;
 
-    public UserRecipeDto(long id, String title, String overview, String authorName, int viewCount, Set<TagEntity> tags) {
+    public UserRecipeDto(long id, String title, String overview, String authorName, int viewCount) {
         this.id = id;
         this.title = title;
         this.overview = overview;
         this.authorName = authorName;
         this.viewCount = viewCount;
+    }
+
+    public void setTags(Set<TagEntity> tags) {
         this.tags = tags;
     }
 }
