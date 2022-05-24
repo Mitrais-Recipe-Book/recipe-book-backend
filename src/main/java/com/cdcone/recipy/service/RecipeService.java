@@ -138,7 +138,12 @@ public class RecipeService {
         if (byId.isPresent()) {
             RecipeEntity toBeDeleted = byId.get();
             recipeRepository.delete(toBeDeleted);
-            deleted = new RecipeDtoList(toBeDeleted.getTitle(), toBeDeleted.getOverview(), toBeDeleted.getViews(), toBeDeleted.getUser().getFullName());
+            deleted = new RecipeDtoList( 
+                toBeDeleted.getId(),
+                toBeDeleted.getTitle(), 
+            toBeDeleted.getOverview(), 
+            toBeDeleted.getViews(), 
+            toBeDeleted.getUser().getFullName());
         }
         return deleted;
     }
