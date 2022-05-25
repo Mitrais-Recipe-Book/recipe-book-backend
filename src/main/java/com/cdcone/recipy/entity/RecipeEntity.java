@@ -87,6 +87,7 @@ public class RecipeEntity {
     public RecipeEntity(
             UserEntity userEntity,
             Set<TagEntity> tags,
+            String title,
             String titleLowerVairant,
             String overview,
             LocalDate dateCreated,
@@ -97,6 +98,7 @@ public class RecipeEntity {
             boolean isDraft) {
         this.user = userEntity;
         this.tags = tags;
+        this.title = title;
         this.titleLowerVariant =  titleLowerVairant;
         this.overview = overview;
         this.dateCreated = dateCreated;
