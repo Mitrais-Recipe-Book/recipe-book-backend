@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
 import com.cdcone.recipy.dtoAccess.UserRecipeDto;
 import com.cdcone.recipy.dtoRequest.*;
@@ -12,8 +13,6 @@ import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.repository.RecipeRepository;
 
-import org.hibernate.loader.plan.build.internal.returns.SimpleEntityIdentifierDescriptionImpl;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -58,7 +57,7 @@ public class RecipeService {
             recipeRepository.save(recipe);
 
             return Pair.of(recipe, "succees: data saved");
-        } catch (Exception e) {
+        } catch (Exception e) {    
             return Pair.of(new RecipeEntity(), "failed: cannot save duplicate");
         }
     }
