@@ -13,19 +13,22 @@ public class UserProfile {
     private final String fullName;
     private final int totalRecipes;
     private final int recipeLikes;
-    private final int followers;
+    private Long followers;
     private Set<RoleEntity> roles;
 
-    public UserProfile(long id, String username, String fullName, int totalRecipes, int recipeLikes, int followers) {
+    public UserProfile(long id, String username, String fullName, int totalRecipes, int recipeLikes) {
         this.id = id;
         this.username = username;
         this.fullName = fullName;
         this.totalRecipes = totalRecipes;
         this.recipeLikes = recipeLikes;
-        this.followers = followers;
     }
 
     public void setRoles(Set<RoleEntity> roles) {
         this.roles = roles;
+    }
+
+    public void setFollowers(Long followers) {
+        this.followers = followers;
     }
 }
