@@ -55,19 +55,18 @@ public class RecipeController {
 
     @GetMapping("{id}/photo")
     public ResponseEntity<byte[]> getRecipeImage(@PathVariable(name = "id") Long recipeId) {
-        try {
-            RecipeEntity entity = recipeService.getById(recipeId);
-            PhotoDto photoDto = new PhotoDto(entity.getBannerImageType(), entity.getBannerImage());
+        RecipeEntity entity = recipeService.getById(recipeId);
+        PhotoDto photoDto = new PhotoDto(entity.getBannerImageType(), entity.getBannerImage());
 
+        if (photoDto != null && photoDto.getPhoto() != null) {
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + entity.getTitle() + "/banner photo")
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=" + entity.getTitle() + "/banner photo")
                     .contentType(MediaType.valueOf(photoDto.getType()))
                     .body(photoDto.getPhoto());
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
         }
+
+        return ResponseEntity.notFound().build();
     }
 
     @PutMapping(value = "/{recipe}/photo", consumes = "multipart/form-data")
