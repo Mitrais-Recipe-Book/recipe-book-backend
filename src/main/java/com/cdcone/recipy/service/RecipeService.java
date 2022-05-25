@@ -5,6 +5,10 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+<<<<<<< HEAD
+import javax.validation.ConstraintViolationException;
+=======
+>>>>>>> 2721635855c99fc797ab241d0ee7adf5a0395118
 
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
 import com.cdcone.recipy.dtoAccess.UserRecipeDto;
@@ -13,6 +17,10 @@ import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.repository.RecipeRepository;
 
+<<<<<<< HEAD
+import org.springframework.dao.DataIntegrityViolationException;
+=======
+>>>>>>> 2721635855c99fc797ab241d0ee7adf5a0395118
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,12 +41,15 @@ public class RecipeService {
     public Pair<RecipeEntity, String> add(RecipeDtoAdd dto) {
         Set<TagEntity> tagEntities = new HashSet<TagEntity>();
 
-        System.out.println("PRINT: 1");
-
         for (Integer id : dto.getTagIds()) {
-            tagEntities.add(tagService.getById(id));
+            Pair<TagEntity, String> tag = tagService.getById(id);
+
+            if (tag.getFirst().getName() == null) {
+                return Pair.of(new RecipeEntity(), tag.getSecond());
+            }
+
+            tagEntities.add(tag.getFirst());
         }
-        System.out.println("PRINT: 2");
 
         try {
             RecipeEntity recipe = new RecipeEntity(
@@ -57,8 +68,13 @@ public class RecipeService {
             recipeRepository.save(recipe);
 
             return Pair.of(recipe, "succees: data saved");
-        } catch (Exception e) {    
-            return Pair.of(new RecipeEntity(), "failed: cannot save duplicate");
+        } catch (Exception e) {
+            
+            if (e instanceof DataIntegrityViolationException) {
+                return Pair.of(new RecipeEntity(), "failed: cannot save duplicate");
+            }
+
+            return Pair.of(new RecipeEntity(), "failed: unknown error, contact backend team");
         }
     }
 

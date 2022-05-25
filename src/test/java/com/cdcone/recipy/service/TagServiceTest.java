@@ -72,7 +72,7 @@ class TagServiceTest {
     void testSuccessGetTagById() {
         when(tagDao.findById(1)).thenReturn(Optional.of(tag1));
 
-        TagEntity byId = tagService.getById(1);
+        TagEntity byId = tagService.getById(1).getFirst();
         verify(tagDao).findById(1);
         assertEquals("breakfast", byId.getName());
     }
