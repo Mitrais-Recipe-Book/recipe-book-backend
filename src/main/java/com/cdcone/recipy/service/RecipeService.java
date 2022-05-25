@@ -12,6 +12,8 @@ import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.repository.RecipeRepository;
 
+import org.hibernate.loader.plan.build.internal.returns.SimpleEntityIdentifierDescriptionImpl;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,29 +31,37 @@ public class RecipeService {
     private final UserService userService;
     private final TagService tagService;
 
-
-    public RecipeEntity add(RecipeDtoAdd dto) {
+    public Pair<RecipeEntity, String> add(RecipeDtoAdd dto) {
         Set<TagEntity> tagEntities = new HashSet<TagEntity>();
+
+        System.out.println("PRINT: 1");
 
         for (Integer id : dto.getTagIds()) {
             tagEntities.add(tagService.getById(id));
         }
+        System.out.println("PRINT: 2");
 
-        RecipeEntity recipe = new RecipeEntity(
-                userService.getById(dto.getUserId()),
-                tagEntities,
-                dto.getTitle().toLowerCase(),
-                dto.getOverview(),
-                LocalDate.now(),
-                dto.getIngredients(),
-                dto.getContent(),
-                dto.getVideoURL(),
-                0,
-                dto.isDraft());
-        recipe.setTitle(dto.getTitle());
-        return recipeRepository.save(recipe);        
+        try {
+            RecipeEntity recipe = new RecipeEntity(
+                    userService.getById(dto.getUserId()),
+                    tagEntities,
+                    dto.getTitle(),
+                    dto.getTitle().toLowerCase(),
+                    dto.getOverview(),
+                    LocalDate.now(),
+                    dto.getIngredients(),
+                    dto.getContent(),
+                    dto.getVideoURL(),
+                    0,
+                    dto.isDraft());
+
+            recipeRepository.save(recipe);
+
+            return Pair.of(recipe, "succees: data saved");
+        } catch (Exception e) {
+            return Pair.of(new RecipeEntity(), "failed: cannot save duplicate");
+        }
     }
-
 
     public Page<RecipeDtoList> getPublishedRecipes(RecipeSearchDto dto) {
         if (dto.getTagId().isEmpty()) {
@@ -66,14 +76,12 @@ public class RecipeService {
         return recipeRepository.getPublishedRecipes(dto.getTitle(), dto.getAuthor(), dto.getTagId(), pageable);
     }
 
-
     public Set<RecipeDtoList> getPopularRecipes(int limit) {
         return recipeRepository.getPopularRecipes()
                 .stream()
                 .limit(limit)
                 .collect(Collectors.toSet());
     }
-
 
     public Set<RecipeDtoList> getDiscoverRecipes(int limit) {
         return recipeRepository.getDiscoverRecipes()
@@ -82,11 +90,9 @@ public class RecipeService {
                 .collect(Collectors.toSet());
     }
 
-
     public RecipeEntity getById(Long recipeId) {
         return recipeRepository.findById(recipeId).orElse(null);
     }
-
 
     public void addViewer(Long id) {
         RecipeEntity entity = recipeRepository.findById(id).get();
@@ -94,11 +100,9 @@ public class RecipeService {
         recipeRepository.save(entity);
     }
 
-
     public long totalRecipes() {
         return recipeRepository.count();
     }
-
 
     public PaginatedDto<UserRecipeDto> getByUsername(String userName, int page) {
         Pageable pageable = PageRequest.of(page, 5);
@@ -110,8 +114,7 @@ public class RecipeService {
         return new PaginatedDto<>(byUserId.getContent(), byUserId.getNumber(), byUserId.getTotalPages());
     }
 
-
-    public Pair<Boolean, String> saveRecipePhoto(MultipartFile photo, Long recipeId){
+    public Pair<Boolean, String> saveRecipePhoto(MultipartFile photo, Long recipeId) {
         Optional<RecipeEntity> entity = recipeRepository.findById(recipeId);
         String msg = "User not found.";
         boolean uploadedPhoto = false;
@@ -130,7 +133,6 @@ public class RecipeService {
         return Pair.of(uploadedPhoto, msg);
     }
 
-
     public RecipeDtoList deleteRecipe(long recipeId) {
         Optional<RecipeEntity> byId = recipeRepository.findById(recipeId);
         RecipeDtoList deleted = null;
@@ -138,11 +140,11 @@ public class RecipeService {
             RecipeEntity toBeDeleted = byId.get();
             recipeRepository.delete(toBeDeleted);
             deleted = new RecipeDtoList(
-                toBeDeleted.getId(),
-                toBeDeleted.getTitle(), 
-            toBeDeleted.getOverview(), 
-            toBeDeleted.getViews(), 
-            toBeDeleted.getUser().getFullName());
+                    toBeDeleted.getId(),
+                    toBeDeleted.getTitle(),
+                    toBeDeleted.getOverview(),
+                    toBeDeleted.getViews(),
+                    toBeDeleted.getUser().getFullName());
         }
         return deleted;
     }

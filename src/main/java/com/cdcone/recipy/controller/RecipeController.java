@@ -33,13 +33,12 @@ public class RecipeController {
 
     @PostMapping("/add")
     public ResponseEntity<CommonResponse> add(@RequestBody RecipeDtoAdd dto) {
-        try {
-            Long entityId = recipeService.add(dto).getId();
-            return ResponseEntity.ok(new CommonResponse("success: data saved", entityId));
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.badRequest().body(new CommonResponse(e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new CommonResponse(e.getMessage()));
+        Pair<RecipeEntity,String> result = recipeService.add(dto);
+
+        if (result.getFirst().getId() != 0){
+            return ResponseEntity.ok().body(new CommonResponse(result.getSecond(), result.getFirst().getId()));
+        } else {
+            return ResponseEntity.badRequest().body(new CommonResponse(result.getSecond()));
         }
     }
 
@@ -49,13 +48,20 @@ public class RecipeController {
             Page<RecipeDtoList> result = recipeService.getPublishedRecipes(dto);
             return ResponseEntity.ok(new CommonResponse("success: data retrieved", result));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new CommonResponse(e.getCause().toString()));
+            return ResponseEntity.internalServerError()
+                    .body(new CommonResponse("failed: unknown error, contact backend team"));
         }
     }
 
     @GetMapping("{id}/photo")
-    public ResponseEntity<byte[]> getRecipeImage(@PathVariable(name = "id") Long recipeId) {
+    public ResponseEntity<Object> getRecipeImage(@PathVariable(name = "id") Long recipeId) {
         RecipeEntity entity = recipeService.getById(recipeId);
+
+        if (entity == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new CommonResponse("failed: recipe with id " + recipeId + " not found"));
+        }
+
         PhotoDto photoDto = new PhotoDto(entity.getBannerImageType(), entity.getBannerImage());
 
         if (photoDto != null && photoDto.getPhoto() != null) {
@@ -66,17 +72,21 @@ public class RecipeController {
                     .body(photoDto.getPhoto());
         }
 
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new CommonResponse("failed: image with recipe " + recipeId + " not found"));
     }
 
     @PutMapping(value = "/{recipe}/photo", consumes = "multipart/form-data")
     public ResponseEntity<CommonResponse> saveRecipePhoto(@PathVariable(name = "recipe") Long recipeId,
             @RequestParam("photo") MultipartFile photo) {
+
         Pair<Boolean, String> savedPhoto = recipeService.saveRecipePhoto(photo, recipeId);
         HttpStatus status = HttpStatus.BAD_REQUEST;
+
         if (savedPhoto.getFirst()) {
             status = HttpStatus.OK;
         }
+
         return ResponseEntity.status(status).body(new CommonResponse(savedPhoto.getSecond()));
     }
 

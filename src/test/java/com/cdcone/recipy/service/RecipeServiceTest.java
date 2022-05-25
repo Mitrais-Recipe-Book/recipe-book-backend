@@ -28,6 +28,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.mockito.Mockito;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.util.Pair;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RecipeServiceTest {
@@ -49,17 +50,19 @@ public class RecipeServiceTest {
     @Test
     void addRecipes() {
         RecipeEntity mockRecipe = mock(RecipeEntity.class);
+        Pair<RecipeEntity, String> result = Pair.of(mockRecipe, "succees");
 
-        when(recipeService.add(ADD_RECIPE_DTO)).thenReturn(mockRecipe);
+        when(recipeService.add(ADD_RECIPE_DTO)).thenReturn(result);
 
         assertEquals(mockRecipe, recipeService.add(ADD_RECIPE_DTO));
     }
 
     @Test
     void failAddRecipes() {
-        RecipeEntity mockRecipe = mock(RecipeEntity.class);
+        RecipeEntity mockRecipe = mock(RecipeEntity.class);        
+        Pair<RecipeEntity, String> result = Pair.of(mockRecipe, "succees");
 
-        when(recipeService.add(ADD_RECIPE_DTO)).thenReturn(mockRecipe);
+        when(recipeService.add(ADD_RECIPE_DTO)).thenReturn(result);
         when(RECIPE_REPOSITORY.save(any())).thenThrow(DataIntegrityViolationException.class);
 
         int x = 0;
