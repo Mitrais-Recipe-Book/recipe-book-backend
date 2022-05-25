@@ -1,5 +1,4 @@
 package com.cdcone.recipy;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,6 +19,7 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication()
 public class RecipyApplication {
 	public static boolean generateDummyData = false;
+
 
 	public static void main(String[] args) {
 		SpringApplication.run(RecipyApplication.class, args);
