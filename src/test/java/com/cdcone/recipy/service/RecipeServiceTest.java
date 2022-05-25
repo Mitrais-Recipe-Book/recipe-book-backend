@@ -7,11 +7,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
+import com.cdcone.recipy.dtoAccess.UserRecipeDto;
+import com.cdcone.recipy.dtoRequest.PaginatedDto;
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
 import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
 import com.cdcone.recipy.entity.RecipeEntity;
@@ -151,5 +154,28 @@ public class RecipeServiceTest {
 
         service.addViewer(1L);
         verify(service).addViewer(1L);
+    }
+
+    @Test
+    void failAddViewer() {
+        RecipeService service = Mockito.spy(recipeService);
+        Mockito.doThrow(NoSuchElementException.class).when(service).addViewer(10L);
+
+        int x = 0;
+        try {
+            service.addViewer(10L);
+            verify(service).addViewer(10L);
+        } catch (Exception e) {
+            x = 1;
+        }
+        assertEquals(1, x);
+    }
+
+    @Test
+    void totalRecipes() {
+        when(recipeService.totalRecipes()).thenReturn(1L);
+
+        long n = recipeService.totalRecipes();
+        assertEquals(1, n);
     }
 }
