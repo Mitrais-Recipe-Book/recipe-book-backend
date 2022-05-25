@@ -79,7 +79,8 @@ public class RecipeServiceTest {
     @SuppressWarnings("unchecked")
     void getPublishedRecipes() {
         RecipeSearchDto mockSearch = mock(RecipeSearchDto.class);
-        Page<RecipeDtoList> mockResult = mock(Page.class);
+        Page<RecipeDtoList> mockPage = mock(Page.class);
+        Pair<Page<RecipeDtoList>, String> mockResult =Pair.of(mockPage, "succees");
 
         when(recipeService.getPublishedRecipes(mockSearch)).thenReturn(mockResult);
 
@@ -90,7 +91,8 @@ public class RecipeServiceTest {
     @SuppressWarnings("unchecked")
     void failGetPublishedRecipes() {
         RecipeSearchDto mockSearch = mock(RecipeSearchDto.class);
-        Page<RecipeDtoList> mockResult = mock(Page.class);
+        Page<RecipeDtoList> mockPage = mock(Page.class);
+        Pair<Page<RecipeDtoList>, String> mockResult =Pair.of(mockPage, "succees");
 
         when(recipeService.getPublishedRecipes(mockSearch)).thenReturn(mockResult);
         when(RECIPE_REPOSITORY.getPublishedRecipes(any(), any(), any(), any()))

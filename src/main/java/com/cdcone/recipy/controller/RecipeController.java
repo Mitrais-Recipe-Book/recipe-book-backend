@@ -44,13 +44,21 @@ public class RecipeController {
 
     @GetMapping("/search")
     public ResponseEntity<CommonResponse> getPublishedRecipes(RecipeSearchDto dto) {
-        try {
-            Page<RecipeDtoList> result = recipeService.getPublishedRecipes(dto);
-            return ResponseEntity.ok(new CommonResponse("success: data retrieved", result));
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError()
-                    .body(new CommonResponse("failed: unknown error, contact backend team"));
+        // try {
+        //     Page<RecipeDtoList> result = recipeService.getPublishedRecipes(dto);
+        //     return ResponseEntity.ok(new CommonResponse("success: data retrieved", result));
+        // } catch (Exception e) {
+        //     return ResponseEntity.internalServerError()
+        //             .body(new CommonResponse("failed: unknown error, contact backend team"));
+        // }
+
+        Pair<Page<RecipeDtoList>, String> result = recipeService.getPublishedRecipes(dto);
+
+        if (result.getFirst().hasContent()){
+            return ResponseEntity.ok().body(new CommonResponse(result.getSecond(), result.getFirst()));
         }
+
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getSecond()));
     }
 
     @GetMapping("{id}/photo")

@@ -16,6 +16,7 @@ import com.cdcone.recipy.repository.RecipeRepository;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -63,7 +64,7 @@ public class RecipeService {
 
             return Pair.of(recipe, "succees: data saved");
         } catch (Exception e) {
-            
+
             if (e instanceof DataIntegrityViolationException) {
                 return Pair.of(new RecipeEntity(), "failed: cannot save duplicate");
             }
@@ -72,8 +73,8 @@ public class RecipeService {
         }
     }
 
-    public Page<RecipeDtoList> getPublishedRecipes(RecipeSearchDto dto) {
-        if (dto.getTagId().isEmpty()) {
+    public Pair<Page<RecipeDtoList>, String> getPublishedRecipes(RecipeSearchDto dto) {
+        if (dto.getTagId() == null || dto.getTagId().isEmpty()) {
             Set<Integer> allTags = tagService.getAllTags()
                     .stream()
                     .map(n -> n.getId())
@@ -81,8 +82,21 @@ public class RecipeService {
             dto.setTagId(allTags);
         }
 
-        Pageable pageable = PageRequest.of(dto.getPage(), 10, Sort.by("views").descending());
-        return recipeRepository.getPublishedRecipes(dto.getTitle(), dto.getAuthor(), dto.getTagId(), pageable);
+        try {
+            Pageable pageable = PageRequest.of(dto.getPage(), 10, Sort.by("views").descending());
+            Page<RecipeDtoList> result = recipeRepository.getPublishedRecipes(dto.getTitle(), dto.getAuthor(),
+                    dto.getTagId(), pageable);
+            return Pair.of(result, "success: data retrieved");
+
+        } catch (Exception e) {
+            List<RecipeDtoList> list = new ArrayList<>();
+
+            if (e instanceof IllegalArgumentException) {
+                return Pair.of(new PageImpl<>(list), "failed: page index must not be less than zero");
+            }
+
+            return Pair.of(new PageImpl<>(list), "failed: unknown error, contact backend team");
+        }
     }
 
     public Set<RecipeDtoList> getPopularRecipes(int limit) {
