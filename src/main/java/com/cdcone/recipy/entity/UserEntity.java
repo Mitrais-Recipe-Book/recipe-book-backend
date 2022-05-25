@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.hibernate.annotations.Type;
 
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -48,7 +49,7 @@ public class UserEntity {
     private Set<RoleEntity> roles;
 
     @OneToMany(mappedBy = "user")
-    private Set<RecipeEntity> recipes;
+    private List<RecipeEntity> recipes;
 
 
     @ManyToMany(fetch = FetchType.EAGER)
