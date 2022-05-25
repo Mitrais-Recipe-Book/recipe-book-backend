@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.persistence.PersistenceException;
 
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
 import com.cdcone.recipy.dtoAccess.UserRecipeDto;
@@ -34,9 +33,12 @@ public class RecipeService {
     public Pair<RecipeEntity, String> add(RecipeDtoAdd dto) {
         Set<TagEntity> tagEntities = new HashSet<TagEntity>();
 
+        System.out.println("PRINT: 1");
+
         for (Integer id : dto.getTagIds()) {
             tagEntities.add(tagService.getById(id));
         }
+        System.out.println("PRINT: 2");
 
         try {
             RecipeEntity recipe = new RecipeEntity(
