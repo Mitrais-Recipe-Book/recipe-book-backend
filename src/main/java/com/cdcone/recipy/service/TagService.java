@@ -29,8 +29,12 @@ public class TagService {
         }
     }
 
-    public TagEntity getById(int id) {
-        return tagDao.findById(id).get();
+    public Pair<TagEntity, String> getById(int id) {
+        try {
+            return Pair.of(tagDao.findById(id).get(), "success: data retrieved");
+        } catch (NoSuchElementException e) {
+            return Pair.of(new TagEntity(), "failed: tag with id " + id + " not found");
+        }
     }
 
     public Pair<HttpStatus, Map<String, String>> editTag(int old, String tag) {

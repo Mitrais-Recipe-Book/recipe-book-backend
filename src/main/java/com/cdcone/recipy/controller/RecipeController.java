@@ -33,13 +33,13 @@ public class RecipeController {
 
     @PostMapping("/add")
     public ResponseEntity<CommonResponse> add(@RequestBody RecipeDtoAdd dto) {
-        Pair<RecipeEntity,String> result = recipeService.add(dto);
+        Pair<RecipeEntity, String> result = recipeService.add(dto);
 
-        if (result.getFirst().getId() == null){
+        if (result.getFirst().getId() != null) {
             return ResponseEntity.ok().body(new CommonResponse(result.getSecond(), result.getFirst().getId()));
-        } else {
-            return ResponseEntity.badRequest().body(new CommonResponse(result.getSecond()));
         }
+
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getSecond()));
     }
 
     @GetMapping("/search")
