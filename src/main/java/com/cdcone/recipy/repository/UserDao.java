@@ -30,7 +30,7 @@ public interface UserDao extends JpaRepository<UserEntity, Long> {
     Page<UserEntity> findAllPaged(Pageable pageable);
 
     @Query("SELECT NEW com.cdcone.recipy.dtoAccess.UserProfile " +
-            "(u.id, u.username, u.fullName, SIZE(u.recipes), 0, 0) " +
+            "(u.id, u.username, u.fullName, SIZE(u.recipes), 0) " +
             "FROM UserEntity u WHERE u.username = :username")
     Optional<UserProfile> findDetailByUsername(@Param("username") String username);
 
@@ -38,4 +38,8 @@ public interface UserDao extends JpaRepository<UserEntity, Long> {
             "FROM users_follows uf JOIN users u ON uf.user_id = u.id " +
             "WHERE uf.creator_id = :user_id", nativeQuery = true)
     List<FollowerDto> getFollowersById(@Param("user_id") Long id);
+
+    @Query(value = "SELECT COUNT(uf) from users_follows uf " +
+            "WHERE uf.creator_id = :id", nativeQuery = true)
+    Long getFollowerCountById(@Param("id") Long id);
 }

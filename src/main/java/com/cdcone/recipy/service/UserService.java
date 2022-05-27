@@ -91,7 +91,9 @@ public class UserService implements UserDetailsService {
         Optional<UserProfile> userProfile = userDao.findDetailByUsername(username);
         userProfile.ifPresent(it -> {
             Set<RoleEntity> roles = roleDao.findByUserId(it.getId());
+            Long followerCount = userDao.getFollowerCountById(it.getId());
             it.setRoles(roles);
+            it.setFollowers(followerCount);
         });
         return userProfile;
     }
