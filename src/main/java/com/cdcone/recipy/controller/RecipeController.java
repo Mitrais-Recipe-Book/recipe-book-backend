@@ -49,7 +49,7 @@ public class RecipeController {
         // RecipeDtoAdd dto1 = new RecipeDtoAdd(1L, tag, "Tes", "tes", "tes", "tes", "tes", true);
 
         return ResponseEntity.ok()
-                .body(new CommonResponse("under construction, data with id " + recipeId + " received", dto));
+                .body(new CommonResponse("under construction, recipe with id " + recipeId + " received", dto));
     }
 
     @GetMapping("/search")
