@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import javax.validation.ConstraintViolationException;
 
+import com.cdcone.recipy.dtoAccess.PhotoDto;
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
 import com.cdcone.recipy.dtoAccess.UserRecipeDto;
 import com.cdcone.recipy.dtoRequest.*;
@@ -97,6 +98,22 @@ public class RecipeService {
 
             return Pair.of(new PageImpl<>(list), "failed: unknown error, contact backend team");
         }
+    }
+
+    public Pair<RecipeEntity, String> getRecipeImage(Long recipeId) {
+        RecipeEntity entity = getById(recipeId);
+
+        if (entity == null) {
+            return Pair.of(new RecipeEntity(),
+                    "failed: recipe with id " + recipeId + " not found");
+        }
+
+        if (entity.getBannerImage() == null) {
+            return Pair.of(new RecipeEntity(),
+                    "failed: cannot find image with recipe id " + recipeId);
+        }
+
+        return Pair.of(entity, "success: image found");
     }
 
     public Set<RecipeDtoList> getPopularRecipes(int limit) {
