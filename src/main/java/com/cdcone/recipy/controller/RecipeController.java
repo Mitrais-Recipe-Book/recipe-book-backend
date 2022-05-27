@@ -44,17 +44,9 @@ public class RecipeController {
 
     @GetMapping("/search")
     public ResponseEntity<CommonResponse> getPublishedRecipes(RecipeSearchDto dto) {
-        // try {
-        //     Page<RecipeDtoList> result = recipeService.getPublishedRecipes(dto);
-        //     return ResponseEntity.ok(new CommonResponse("success: data retrieved", result));
-        // } catch (Exception e) {
-        //     return ResponseEntity.internalServerError()
-        //             .body(new CommonResponse("failed: unknown error, contact backend team"));
-        // }
-
         Pair<Page<RecipeDtoList>, String> result = recipeService.getPublishedRecipes(dto);
 
-        if (result.getFirst().hasContent()){
+        if (result.getFirst().hasContent()) {
             return ResponseEntity.ok().body(new CommonResponse(result.getSecond(), result.getFirst()));
         }
 
@@ -63,25 +55,17 @@ public class RecipeController {
 
     @GetMapping("{id}/photo")
     public ResponseEntity<Object> getRecipeImage(@PathVariable(name = "id") Long recipeId) {
-        RecipeEntity entity = recipeService.getById(recipeId);
+        Pair<RecipeEntity, String> result = recipeService.getRecipeImage(recipeId);
 
-        if (entity == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new CommonResponse("failed: recipe with id " + recipeId + " not found"));
-        }
-
-        PhotoDto photoDto = new PhotoDto(entity.getBannerImageType(), entity.getBannerImage());
-
-        if (photoDto != null && photoDto.getPhoto() != null) {
+        if (result.getFirst().getId() != null) {
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment; filename=" + entity.getTitle() + "/banner photo")
-                    .contentType(MediaType.valueOf(photoDto.getType()))
-                    .body(photoDto.getPhoto());
+                            "attachment; filename=" + result.getFirst().getTitle() + "/banner-photo")
+                    .contentType(MediaType.valueOf(result.getFirst().getBannerImageType()))
+                    .body(result.getFirst().getBannerImage());
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new CommonResponse("failed: image with recipe " + recipeId + " not found"));
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getSecond()));
     }
 
     @PutMapping(value = "/{recipe}/photo", consumes = "multipart/form-data")
