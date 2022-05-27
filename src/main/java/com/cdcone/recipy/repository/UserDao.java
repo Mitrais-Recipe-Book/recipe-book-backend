@@ -34,8 +34,9 @@ public interface UserDao extends JpaRepository<UserEntity, Long> {
             "FROM UserEntity u WHERE u.username = :username")
     Optional<UserProfile> findDetailByUsername(@Param("username") String username);
 
-    @Query(value = "SELECT u.id AS id, u.username AS username " +
-            "FROM users_follows uf JOIN users u ON uf.user_id = u.id " +
+    @Query(value = "SELECT u.id AS id, u.username AS username, " +
+            "u.full_name AS fullName FROM users_follows uf " +
+            "JOIN users u ON uf.user_id = u.id " +
             "WHERE uf.creator_id = :user_id", nativeQuery = true)
     List<FollowerDto> getFollowersById(@Param("user_id") Long id);
 
