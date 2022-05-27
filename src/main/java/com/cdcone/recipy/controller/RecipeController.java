@@ -35,18 +35,28 @@ public class RecipeController {
     public ResponseEntity<CommonResponse> add(@RequestBody RecipeDtoAdd dto) {
         Pair<RecipeEntity, String> result = recipeService.add(dto);
 
-        if (result.getFirst().getId() != null) {
+        if (result.getSecond().charAt(0) == 's') {
             return ResponseEntity.ok().body(new CommonResponse(result.getSecond(), result.getFirst().getId()));
         }
 
         return ResponseEntity.badRequest().body(new CommonResponse(result.getSecond()));
+    }
+    
+    @PutMapping("{id}/edit")
+    public ResponseEntity<CommonResponse> edit(@PathVariable(name = "id") Long recipeId,
+            @RequestBody RecipeDtoAdd dto) {
+        // Set<Integer> tag = new HashSet<>();
+        // RecipeDtoAdd dto1 = new RecipeDtoAdd(1L, tag, "Tes", "tes", "tes", "tes", "tes", true);
+
+        return ResponseEntity.ok()
+                .body(new CommonResponse("under construction, data with id " + recipeId + " received", dto));
     }
 
     @GetMapping("/search")
     public ResponseEntity<CommonResponse> getPublishedRecipes(RecipeSearchDto dto) {
         Pair<Page<RecipeDtoList>, String> result = recipeService.getPublishedRecipes(dto);
 
-        if (result.getFirst().hasContent()) {
+        if (result.getSecond().charAt(0) == 's') {
             return ResponseEntity.ok().body(new CommonResponse(result.getSecond(), result.getFirst()));
         }
 
@@ -57,7 +67,7 @@ public class RecipeController {
     public ResponseEntity<Object> getRecipeImage(@PathVariable(name = "id") Long recipeId) {
         Pair<RecipeEntity, String> result = recipeService.getRecipeImage(recipeId);
 
-        if (result.getFirst().getId() != null) {
+        if (result.getSecond().charAt(0) == 's') {
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION,
                             "attachment; filename=" + result.getFirst().getTitle() + "/banner-photo")
