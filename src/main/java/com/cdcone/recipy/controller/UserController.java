@@ -28,20 +28,16 @@ public class UserController {
 
     @GetMapping("{username}")
     public ResponseEntity<CommonResponse> getByUsername(@PathVariable String username) {
-        try {
-            Optional<UserProfile> byUsername = userService.findByUsername(username);
-            HttpStatus status = HttpStatus.NOT_FOUND;
-            UserProfile userDto = null;
-            String msg = "User not found.";
-            if (byUsername.isPresent()) {
-                status = HttpStatus.OK;
-                userDto = byUsername.get();
-                msg = "success: data retrieved";
-            }
-            return ResponseEntity.status(status).body(new CommonResponse(msg, userDto));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
+        Optional<UserProfile> byUsername = userService.findByUsername(username);
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        UserProfile userDto = null;
+        String msg = "User not found.";
+        if (byUsername.isPresent()) {
+            status = HttpStatus.OK;
+            userDto = byUsername.get();
+            msg = "success: data retrieved";
         }
+        return ResponseEntity.status(status).body(new CommonResponse(msg, userDto));
     }
 
     @GetMapping("{username}/photo")
@@ -113,5 +109,13 @@ public class UserController {
     public ResponseEntity<CommonResponse> getFollowerList(@PathVariable(name = "id") long userId) {
         List<FollowerDto> followerList = userService.getFollowerList(userId);
         return ResponseEntity.ok(new CommonResponse("success", followerList));
+    }
+
+    @GetMapping("{user_id}/is-following")
+    public ResponseEntity<CommonResponse> isFollowing(
+            @PathVariable("user_id") Long userId,
+            @RequestParam("creator_id") Long creatorId) {
+        Boolean isFollowing = userService.isFollowing(creatorId, userId);
+        return ResponseEntity.ok(new CommonResponse("success", isFollowing));
     }
 }

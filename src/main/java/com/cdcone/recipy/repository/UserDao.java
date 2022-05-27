@@ -42,4 +42,8 @@ public interface UserDao extends JpaRepository<UserEntity, Long> {
     @Query(value = "SELECT COUNT(uf) from users_follows uf " +
             "WHERE uf.creator_id = :id", nativeQuery = true)
     Long getFollowerCountById(@Param("id") Long id);
+
+    @Query(value = "SELECT EXISTS(SELECT uf FROM users_follows uf " +
+            "WHERE uf.creator_id = :creator_id AND uf.user_id = :user_id)", nativeQuery = true)
+    Boolean isFollowing(@Param("creator_id") Long creatorId, @Param("user_id") Long userId);
 }
