@@ -27,11 +27,11 @@ public class AuthController {
 
     @PostMapping("sign-up")
     public ResponseEntity<CommonResponse> signUp(@RequestBody SignUpDto signUpDto) {
-        Pair<Optional<UserEntity>, String> signUpUser = userService.addUser(signUpDto);
+        Pair<Optional<UserDto>, String> signUpUser = userService.addUser(signUpDto);
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         UserDto userDto = null;
         if (signUpUser.getFirst().isPresent()) {
-            userDto = UserDto.toDto(signUpUser.getFirst().get());
+            userDto = signUpUser.getFirst().get();
             httpStatus = HttpStatus.OK;
         }
         return ResponseEntity.status(httpStatus).body(new CommonResponse(signUpUser.getSecond(), userDto));

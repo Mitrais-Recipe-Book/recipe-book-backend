@@ -9,6 +9,7 @@ import com.cdcone.recipy.repository.RoleDao;
 import com.cdcone.recipy.repository.UserDao;
 import com.cdcone.recipy.util.CustomUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -55,12 +56,12 @@ public class UserService implements UserDetailsService {
                 authorities);
     }
 
-    public Pair<Optional<UserEntity>, String> addUser(SignUpDto signUpDto) {
+    public Pair<Optional<UserDto>, String> addUser(SignUpDto signUpDto) {
         String msg;
-        UserEntity createdUser = null;
+        UserDto createdUser = null;
 
-        if (signUpDto.getPassword().length() < 6) {
-            msg = "Password must be equal or more than 6 characters";
+        if (signUpDto.getPassword().length() < 8) {
+            msg = "Password must be equal or more than 8 characters";
         } else {
             Optional<RoleEntity> userRole = roleDao.findByName("User");
             if (userRole.isPresent()) {
@@ -71,13 +72,13 @@ public class UserService implements UserDetailsService {
                     user.setPassword(passwordEncoder.encode(signUpDto.getPassword()));
                     user.setRoles(Set.of(userRole.get()));
                     user.setFullName(signUpDto.getFullName());
-                    createdUser = userDao.save(user);
+                    createdUser = UserDto.toDto(userDao.save(user));
                     msg = "Success";
-                } catch (Exception e) {
+                } catch (DataIntegrityViolationException e) {
                     msg = "Failed to create user. Username or email is already exists";
                 }
             } else {
-                msg = "Role not found";
+                msg = "Role User not found";
             }
         }
         return Pair.of(Optional.ofNullable(createdUser), msg);
