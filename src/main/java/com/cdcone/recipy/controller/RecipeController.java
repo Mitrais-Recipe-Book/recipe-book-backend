@@ -45,8 +45,6 @@ public class RecipeController {
     @PutMapping("{id}/edit")
     public ResponseEntity<CommonResponse> edit(@PathVariable(name = "id") Long recipeId,
             @RequestBody RecipeDtoAdd dto) {
-        // Set<Integer> tag = new HashSet<>();
-        // RecipeDtoAdd dto1 = new RecipeDtoAdd(1L, tag, "Tes", "tes", "tes", "tes", "tes", true);
 
         return ResponseEntity.ok()
                 .body(new CommonResponse("under construction, recipe with id " + recipeId + " received", dto));
