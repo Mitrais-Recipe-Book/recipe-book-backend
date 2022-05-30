@@ -126,16 +126,21 @@ public class RecipeService {
             Pageable pageable = PageRequest.of(dto.getPage(), 10, Sort.by("views").descending());
             Page<RecipeDtoList> result = recipeRepository.getPublishedRecipes(dto.getTitle(), dto.getAuthor(),
                     dto.getTagId(), pageable);
+
+            result.getContent().stream()
+                    .forEach(i -> i.setAuthorFollower(
+                            userService.getFollowerCountById(
+                                    getById(
+                                            i.getId()).getFirst().getUser().getId())));
+
             return Pair.of(result, "success: data retrieved");
 
         } catch (Exception e) {
-            List<RecipeDtoList> list = new ArrayList<>();
-
             if (e instanceof IllegalArgumentException) {
-                return Pair.of(new PageImpl<>(list), "failed: page index must not be less than zero");
+                return Pair.of(new PageImpl<>(new ArrayList<>()), "failed: page index must not be less than zero");
             }
 
-            return Pair.of(new PageImpl<>(list), "failed: unknown error, contact backend team");
+            return Pair.of(new PageImpl<>(new ArrayList<>()), "failed: unknown error, contact backend team");
         }
     }
 
@@ -155,17 +160,31 @@ public class RecipeService {
     }
 
     public Set<RecipeDtoList> getPopularRecipes(int limit) {
-        return recipeRepository.getPopularRecipes()
+        Set<RecipeDtoList> list = recipeRepository.getPopularRecipes()
                 .stream()
                 .limit(limit)
                 .collect(Collectors.toSet());
+
+        list.stream().forEach(i -> i.setAuthorFollower(
+                userService.getFollowerCountById(
+                        getById(
+                                i.getId()).getFirst().getUser().getId())));
+
+        return list;
     }
 
     public Set<RecipeDtoList> getDiscoverRecipes(int limit) {
-        return recipeRepository.getDiscoverRecipes()
+        Set<RecipeDtoList> list = recipeRepository.getPopularRecipes()
                 .stream()
                 .limit(limit)
                 .collect(Collectors.toSet());
+
+        list.stream().forEach(i -> i.setAuthorFollower(
+                userService.getFollowerCountById(
+                        getById(
+                                i.getId()).getFirst().getUser().getId())));
+
+        return list;
     }
 
     public Pair<RecipeEntity, String> getById(Long recipeId) {
@@ -212,11 +231,11 @@ public class RecipeService {
 
             return "success: image updated";
         } catch (Exception e) {
-            if (e instanceof IOException){
+            if (e instanceof IOException) {
                 return "failed: image not updated";
             }
 
-            return  "failed: unknown error, contact backend team";
+            return "failed: unknown error, contact backend team";
         }
     }
 
@@ -226,12 +245,14 @@ public class RecipeService {
         if (byId.isPresent()) {
             RecipeEntity toBeDeleted = byId.get();
             recipeRepository.delete(toBeDeleted);
+            Long followerCount = userService.getFollowerCountById(toBeDeleted.getId());
             deleted = new RecipeDtoList(
                     toBeDeleted.getId(),
                     toBeDeleted.getTitle(),
                     toBeDeleted.getOverview(),
                     toBeDeleted.getViews(),
                     toBeDeleted.getUser().getFullName());
+            deleted.setAuthorFollower(followerCount);
         }
         return deleted;
     }

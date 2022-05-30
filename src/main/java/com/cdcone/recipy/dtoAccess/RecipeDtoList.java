@@ -1,6 +1,5 @@
 package com.cdcone.recipy.dtoAccess;
 
-
 import lombok.Data;
 
 @Data
@@ -10,16 +9,13 @@ public class RecipeDtoList {
     private String description;
     private int recipeViews;
     private String author;
-    private int authorFollower;
+    private Long authorFollower;
 
-
-    public RecipeDtoList(Long id, String recipeName, String description, int recipeViews, String author) {
-        this.id = id;
+    public RecipeDtoList(Long recipeId, String recipeName, String description, int recipeViews, String author) {
+        this.id = recipeId;
         this.recipeName = recipeName;
         this.description = description;
         this.recipeViews = recipeViews;
         this.author = author;
-        authorFollower = -1;
     }
-
 }
