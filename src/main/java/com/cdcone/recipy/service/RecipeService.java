@@ -31,7 +31,7 @@ public class RecipeService {
     private final UserService userService;
     private final TagService tagService;
 
-    private Pair<Set<TagEntity>, String> findMultipleTags(Set<Integer> idTags){
+    private Pair<Set<TagEntity>, String> findMultipleTags(Set<Integer> idTags) {
         Set<TagEntity> tagEntities = new HashSet<TagEntity>();
         for (Integer id : idTags) {
             Pair<TagEntity, String> tag = tagService.getById(id);
@@ -47,8 +47,8 @@ public class RecipeService {
 
     public Pair<RecipeEntity, String> add(RecipeDtoAdd dto) {
         Pair<Set<TagEntity>, String> tagEntities = findMultipleTags(dto.getTagIds());
-        
-        if (tagEntities.getSecond().charAt(0) != 's'){
+
+        if (tagEntities.getSecond().charAt(0) != 's') {
             return Pair.of(new RecipeEntity(), tagEntities.getSecond());
         }
 
@@ -81,15 +81,15 @@ public class RecipeService {
 
     public String edit(Long recipeId, RecipeDtoAdd dto) {
         Pair<Set<TagEntity>, String> tagEntities = findMultipleTags(dto.getTagIds());
-        
-        if (tagEntities.getSecond().charAt(0) != 's'){
+
+        if (tagEntities.getSecond().charAt(0) != 's') {
             return tagEntities.getSecond();
         }
 
         try {
             Pair<RecipeEntity, String> recipe = getById(recipeId);
 
-            if (recipe.getSecond().charAt(0) != 's'){
+            if (recipe.getSecond().charAt(0) != 's') {
                 return recipe.getSecond();
             }
 
@@ -171,7 +171,7 @@ public class RecipeService {
     public Pair<RecipeEntity, String> getById(Long recipeId) {
         RecipeEntity result = recipeRepository.findById(recipeId).orElse(null);
 
-        if (result == null){
+        if (result == null) {
             return Pair.of(new RecipeEntity(), "failed: cannot find recipe with id " + recipeId);
         }
 
@@ -198,23 +198,26 @@ public class RecipeService {
         return new PaginatedDto<>(byUserId.getContent(), byUserId.getNumber(), byUserId.getTotalPages());
     }
 
-    public Pair<Boolean, String> saveRecipePhoto(MultipartFile photo, Long recipeId) {
-        Optional<RecipeEntity> entity = recipeRepository.findById(recipeId);
-        String msg = "User not found.";
-        boolean uploadedPhoto = false;
-        if (entity.isPresent()) {
-            try {
-                RecipeEntity recipe = entity.get();
-                recipe.setBannerImage(photo.getBytes());
-                recipe.setBannerImageType(photo.getContentType());
-                recipeRepository.save(recipe);
-                msg = "Success";
-                uploadedPhoto = true;
-            } catch (IOException e) {
-                msg = "Failed to save profile photo.";
-            }
+    public String saveRecipePhoto(MultipartFile photo, Long recipeId) {
+        Pair<RecipeEntity, String> recipe = getById(recipeId);
+
+        if (recipe.getSecond().charAt(0) != 's') {
+            return recipe.getSecond();
         }
-        return Pair.of(uploadedPhoto, msg);
+
+        try {
+            recipe.getFirst().setBannerImage(photo.getBytes());
+            recipe.getFirst().setBannerImageType(photo.getContentType());
+            recipeRepository.save(recipe.getFirst());
+
+            return "success: image updated";
+        } catch (Exception e) {
+            if (e instanceof IOException){
+                return "failed: image not updated";
+            }
+
+            return  "failed: unknown error, contact backend team";
+        }
     }
 
     public RecipeDtoList deleteRecipe(long recipeId) {

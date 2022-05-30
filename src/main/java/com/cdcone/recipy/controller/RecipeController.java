@@ -44,7 +44,12 @@ public class RecipeController {
     public ResponseEntity<CommonResponse> edit(@PathVariable(name = "id") Long recipeId,
             @RequestBody RecipeDtoAdd dto) {
         String result = recipeService.edit(recipeId, dto);
-        return ResponseEntity.ok().body(new CommonResponse(result));
+
+        if (result.charAt(0) == 's') {
+            return ResponseEntity.ok().body(new CommonResponse(result));
+        }
+        
+        return ResponseEntity.badRequest().body(new CommonResponse(result));
     }
 
     @GetMapping("/search")
@@ -77,14 +82,13 @@ public class RecipeController {
     public ResponseEntity<CommonResponse> saveRecipePhoto(@PathVariable(name = "recipe") Long recipeId,
             @RequestParam("photo") MultipartFile photo) {
 
-        Pair<Boolean, String> savedPhoto = recipeService.saveRecipePhoto(photo, recipeId);
-        HttpStatus status = HttpStatus.BAD_REQUEST;
+        String result = recipeService.saveRecipePhoto(photo, recipeId);
 
-        if (savedPhoto.getFirst()) {
-            status = HttpStatus.OK;
+        if (result.charAt(0) == 's') {
+            return ResponseEntity.ok().body(new CommonResponse(result));
         }
 
-        return ResponseEntity.status(status).body(new CommonResponse(savedPhoto.getSecond()));
+        return ResponseEntity.badRequest().body(new CommonResponse(result));
     }
 
     @PutMapping("/addview")
