@@ -127,11 +127,10 @@ public class RecipeService {
             Page<RecipeDtoList> result = recipeRepository.getPublishedRecipes(dto.getTitle(), dto.getAuthor(),
                     dto.getTagId(), pageable);
 
-            result.getContent().stream()
-                    .forEach(i -> i.setAuthorFollower(
-                            userService.getFollowerCountById(
-                                    getById(
-                                            i.getId()).getFirst().getUser().getId())));
+            result.getContent().forEach(i -> i.setAuthorFollower(
+                    userService.getFollowerCountById(
+                            getById(
+                                    i.getId()).getFirst().getUser().getId())));
 
             return Pair.of(result, "success: data retrieved");
 
@@ -163,12 +162,14 @@ public class RecipeService {
         Set<RecipeDtoList> list = recipeRepository.getPopularRecipes()
                 .stream()
                 .limit(limit)
+                .map(i -> {
+                    i.setAuthorFollower(
+                            userService.getFollowerCountById(
+                                    getById(
+                                            i.getId()).getFirst().getUser().getId()));
+                    return i;
+                })
                 .collect(Collectors.toSet());
-
-        list.stream().forEach(i -> i.setAuthorFollower(
-                userService.getFollowerCountById(
-                        getById(
-                                i.getId()).getFirst().getUser().getId())));
 
         return list;
     }
@@ -177,12 +178,14 @@ public class RecipeService {
         Set<RecipeDtoList> list = recipeRepository.getPopularRecipes()
                 .stream()
                 .limit(limit)
+                .map(i -> {
+                    i.setAuthorFollower(
+                            userService.getFollowerCountById(
+                                    getById(
+                                            i.getId()).getFirst().getUser().getId()));
+                    return i;
+                })
                 .collect(Collectors.toSet());
-
-        list.stream().forEach(i -> i.setAuthorFollower(
-                userService.getFollowerCountById(
-                        getById(
-                                i.getId()).getFirst().getUser().getId())));
 
         return list;
     }
