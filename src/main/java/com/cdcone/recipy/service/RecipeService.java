@@ -128,9 +128,9 @@ public class RecipeService {
                     dto.getTagId(), pageable);
 
             result.getContent().forEach(i -> i.setAuthorFollower(
-                            userService.getFollowerCountById(
-                                    getById(
-                                            i.getId()).getFirst().getUser().getId())));
+                    userService.getFollowerCountById(
+                            getById(
+                                    i.getId()).getFirst().getUser().getId())));
 
             return Pair.of(result, "success: data retrieved");
 
@@ -162,10 +162,13 @@ public class RecipeService {
         Set<RecipeDtoList> list = recipeRepository.getPopularRecipes()
                 .stream()
                 .limit(limit)
-                .peek(i -> i.setAuthorFollower(
-                        userService.getFollowerCountById(
-                                getById(
-                                        i.getId()).getFirst().getUser().getId())))
+                .map(i -> {
+                    i.setAuthorFollower(
+                            userService.getFollowerCountById(
+                                    getById(
+                                            i.getId()).getFirst().getUser().getId()));
+                    return i;
+                })
                 .collect(Collectors.toSet());
 
         return list;
@@ -175,10 +178,13 @@ public class RecipeService {
         Set<RecipeDtoList> list = recipeRepository.getPopularRecipes()
                 .stream()
                 .limit(limit)
-                .peek(i -> i.setAuthorFollower(
-                        userService.getFollowerCountById(
-                                getById(
-                                        i.getId()).getFirst().getUser().getId())))
+                .map(i -> {
+                    i.setAuthorFollower(
+                            userService.getFollowerCountById(
+                                    getById(
+                                            i.getId()).getFirst().getUser().getId()));
+                    return i;
+                })
                 .collect(Collectors.toSet());
 
         return list;
