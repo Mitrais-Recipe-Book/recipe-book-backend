@@ -134,15 +134,14 @@ public class RecipeController {
 
     @GetMapping("{id}")
     public ResponseEntity<CommonResponse> getById(@PathVariable(name = "id") long recipeId) {
-        RecipeEntity byId = recipeService.getById(recipeId);
-        HttpStatus status = HttpStatus.NOT_FOUND;
-        String msg = "Recipe not found";
-        RecipeDetailDto payload = null;
-        if (byId != null) {
-            status = HttpStatus.OK;
-            msg = "Success";
-            payload = RecipeDetailDto.toDto(byId);
+        Pair<RecipeEntity, String> result = recipeService.getById(recipeId);
+
+        RecipeDetailDto dto = new RecipeDetailDto(result.getFirst());
+
+        if (result.getSecond().charAt(0) == 's') {
+            return ResponseEntity.ok().body(new CommonResponse(result.getSecond(), dto));
         }
-        return ResponseEntity.status(status).body(new CommonResponse(msg, payload));
+
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getSecond()));
     }
 }
