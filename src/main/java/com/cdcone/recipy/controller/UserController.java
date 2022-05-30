@@ -60,7 +60,7 @@ public class UserController {
         if (savedPhoto.getFirst()) {
             status = HttpStatus.OK;
         }
-        return ResponseEntity.status(status).body(new CommonResponse( savedPhoto.getSecond()));
+        return ResponseEntity.status(status).body(new CommonResponse(savedPhoto.getSecond()));
     }
 
     @GetMapping
@@ -70,37 +70,38 @@ public class UserController {
     }
 
     @GetMapping("{username}/recipes")
-    public ResponseEntity<CommonResponse> getRecipesByUsername(@PathVariable(name = "username") String username, @RequestParam(defaultValue = "0") int page) {
+    public ResponseEntity<CommonResponse> getRecipesByUsername(@PathVariable(name = "username") String username,
+            @RequestParam(defaultValue = "0") int page) {
         PaginatedDto<UserRecipeDto> byUserId = recipeService.getByUsername(username, page);
         return ResponseEntity.ok(new CommonResponse(byUserId));
     }
 
     @PostMapping("/follow")
-    public ResponseEntity<CommonResponse> followCreator(@RequestBody FollowUserDto dto){
-        try{
+    public ResponseEntity<CommonResponse> followCreator(@RequestBody FollowUserDto dto) {
+        try {
             userService.addFollow(dto.getUserId(), dto.getCreatorId());
             return ResponseEntity.ok(new CommonResponse("Follow succeed"));
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(new CommonResponse(e.getMessage()));
         }
     }
 
     @DeleteMapping("/unfollow")
-    public ResponseEntity<CommonResponse> unfollowCreator(@RequestBody FollowUserDto dto){
-        try{
+    public ResponseEntity<CommonResponse> unfollowCreator(@RequestBody FollowUserDto dto) {
+        try {
             userService.unFollow(dto.getUserId(), dto.getCreatorId());
             return ResponseEntity.ok(new CommonResponse("Unfollow succeed"));
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(new CommonResponse(e.getMessage()));
         }
     }
 
     @GetMapping("{id}/follow-list")
-    public ResponseEntity<CommonResponse> getFollowList(@RequestParam long userId){
-        try{
+    public ResponseEntity<CommonResponse> getFollowList(@PathVariable(name = "id") long userId) {
+        try {
             List<FollowingListDto> list = userService.getFollowList(userId);
             return ResponseEntity.ok(new CommonResponse("succeed", list));
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(new CommonResponse(e.getMessage()));
         }
     }
