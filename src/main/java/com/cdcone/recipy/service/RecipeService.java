@@ -31,23 +31,31 @@ public class RecipeService {
     private final UserService userService;
     private final TagService tagService;
 
-    public Pair<RecipeEntity, String> add(RecipeDtoAdd dto) {
+    private Pair<Set<TagEntity>, String> findMultipleTags(Set<Integer> idTags){
         Set<TagEntity> tagEntities = new HashSet<TagEntity>();
-
-        for (Integer id : dto.getTagIds()) {
+        for (Integer id : idTags) {
             Pair<TagEntity, String> tag = tagService.getById(id);
 
             if (tag.getFirst().getName() == null) {
-                return Pair.of(new RecipeEntity(), tag.getSecond());
+                return Pair.of(new HashSet<>(), tag.getSecond());
             }
 
             tagEntities.add(tag.getFirst());
+        }
+        return Pair.of(tagEntities, "success: data retrieved");
+    }
+
+    public Pair<RecipeEntity, String> add(RecipeDtoAdd dto) {
+        Pair<Set<TagEntity>, String> tagEntities = findMultipleTags(dto.getTagIds());
+        
+        if (tagEntities.getSecond().charAt(0) != 's'){
+            return Pair.of(new RecipeEntity(), tagEntities.getSecond());
         }
 
         try {
             RecipeEntity recipe = new RecipeEntity(
                     userService.getById(dto.getUserId()),
-                    tagEntities,
+                    tagEntities.getFirst(),
                     dto.getTitle(),
                     dto.getTitle().toLowerCase(),
                     dto.getOverview(),
@@ -72,30 +80,28 @@ public class RecipeService {
     }
 
     public String edit(Long recipeId, RecipeDtoAdd dto) {
-        Set<TagEntity> tagEntities = new HashSet<TagEntity>();
-
-        for (Integer id : dto.getTagIds()) {
-            Pair<TagEntity, String> tag = tagService.getById(id);
-
-            if (tag.getFirst().getName() == null) {
-                return tag.getSecond();
-            }
-
-            tagEntities.add(tag.getFirst());
+        Pair<Set<TagEntity>, String> tagEntities = findMultipleTags(dto.getTagIds());
+        
+        if (tagEntities.getSecond().charAt(0) != 's'){
+            return tagEntities.getSecond();
         }
 
         try {
-            RecipeEntity recipe = getById(recipeId);
+            Pair<RecipeEntity, String> recipe = getById(recipeId);
 
-            recipe.setTitle(dto.getTitle());
-            recipe.setTags(tagEntities);
-            recipe.setOverview(dto.getOverview());
-            recipe.setIngredients(dto.getIngredients());
-            recipe.setContent(dto.getContent());
-            recipe.setVideoURL(dto.getVideoURL());
-            recipe.setDraft(dto.isDraft());
+            if (recipe.getSecond().charAt(0) != 's'){
+                return recipe.getSecond();
+            }
 
-            recipeRepository.save(recipe);
+            recipe.getFirst().setTitle(dto.getTitle());
+            recipe.getFirst().setTags(tagEntities.getFirst());
+            recipe.getFirst().setOverview(dto.getOverview());
+            recipe.getFirst().setIngredients(dto.getIngredients());
+            recipe.getFirst().setContent(dto.getContent());
+            recipe.getFirst().setVideoURL(dto.getVideoURL());
+            recipe.getFirst().setDraft(dto.isDraft());
+
+            recipeRepository.save(recipe.getFirst());
 
             return "success: data updated";
         } catch (Exception e) {
@@ -134,19 +140,18 @@ public class RecipeService {
     }
 
     public Pair<RecipeEntity, String> getRecipeImage(Long recipeId) {
-        RecipeEntity entity = getById(recipeId);
+        Pair<RecipeEntity, String> entity = getById(recipeId);
 
-        if (entity == null) {
-            return Pair.of(new RecipeEntity(),
-                    "failed: recipe with id " + recipeId + " not found");
+        if (entity.getSecond().charAt(0) != 's') {
+            return entity;
         }
 
-        if (entity.getBannerImage() == null) {
+        if (entity.getFirst().getBannerImage() == null) {
             return Pair.of(new RecipeEntity(),
                     "failed: cannot find image with recipe id " + recipeId);
         }
 
-        return Pair.of(entity, "success: image found");
+        return Pair.of(entity.getFirst(), "success: image found");
     }
 
     public Set<RecipeDtoList> getPopularRecipes(int limit) {
@@ -163,8 +168,14 @@ public class RecipeService {
                 .collect(Collectors.toSet());
     }
 
-    public RecipeEntity getById(Long recipeId) {
-        return recipeRepository.findById(recipeId).orElse(null);
+    public Pair<RecipeEntity, String> getById(Long recipeId) {
+        RecipeEntity result = recipeRepository.findById(recipeId).orElse(null);
+
+        if (result == null){
+            return Pair.of(new RecipeEntity(), "failed: cannot find recipe with id " + recipeId);
+        }
+
+        return Pair.of(result, "success: data retrieved");
     }
 
     public void addViewer(Long id) {

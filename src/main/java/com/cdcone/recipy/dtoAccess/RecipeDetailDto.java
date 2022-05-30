@@ -5,13 +5,13 @@ import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.entity.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
 
 @Getter
-@AllArgsConstructor
 public class RecipeDetailDto {
     Long id;
     String title;
@@ -24,23 +24,21 @@ public class RecipeDetailDto {
     Map<String, Object> author;
     Set<TagEntity> tags;
 
-    public static RecipeDetailDto toDto(RecipeEntity recipe) {
+    public RecipeDetailDto(RecipeEntity recipe) {
         UserEntity author = recipe.getUser();
-        return new RecipeDetailDto(
-                recipe.getId(),
-                recipe.getTitle(),
-                recipe.getOverview(),
-                recipe.getDateCreated(),
-                recipe.getIngredients(),
-                recipe.getContent(),
-                recipe.getVideoURL(),
-                recipe.getViews(),
-                Map.of(
-                        "id", author.getId(),
-                        "username", author.getUsername(),
-                        "name", author.getFullName()
-                ),
-                recipe.getTags()
-        );
+
+        this.id = recipe.getId();
+        this.title = recipe.getTitle();
+        this.overview = recipe.getOverview();
+        this.dateCreated = recipe.getDateCreated();
+        this.ingredients = recipe.getIngredients();
+        this.content = recipe.getContent();
+        this.videoUrl = recipe.getVideoURL();
+        this.views = recipe.getViews();
+        this.author = Map.of(
+                "id", author.getId(),
+                "username", author.getUsername(),
+                "name", author.getFullName());
+        this.tags = recipe.getTags();
     }
 }
