@@ -127,8 +127,7 @@ public class RecipeService {
             Page<RecipeDtoList> result = recipeRepository.getPublishedRecipes(dto.getTitle(), dto.getAuthor(),
                     dto.getTagId(), pageable);
 
-            result.getContent().stream()
-                    .forEach(i -> i.setAuthorFollower(
+            result.getContent().forEach(i -> i.setAuthorFollower(
                             userService.getFollowerCountById(
                                     getById(
                                             i.getId()).getFirst().getUser().getId())));
@@ -163,12 +162,11 @@ public class RecipeService {
         Set<RecipeDtoList> list = recipeRepository.getPopularRecipes()
                 .stream()
                 .limit(limit)
+                .peek(i -> i.setAuthorFollower(
+                        userService.getFollowerCountById(
+                                getById(
+                                        i.getId()).getFirst().getUser().getId())))
                 .collect(Collectors.toSet());
-
-        list.stream().forEach(i -> i.setAuthorFollower(
-                userService.getFollowerCountById(
-                        getById(
-                                i.getId()).getFirst().getUser().getId())));
 
         return list;
     }
@@ -177,12 +175,11 @@ public class RecipeService {
         Set<RecipeDtoList> list = recipeRepository.getPopularRecipes()
                 .stream()
                 .limit(limit)
+                .peek(i -> i.setAuthorFollower(
+                        userService.getFollowerCountById(
+                                getById(
+                                        i.getId()).getFirst().getUser().getId())))
                 .collect(Collectors.toSet());
-
-        list.stream().forEach(i -> i.setAuthorFollower(
-                userService.getFollowerCountById(
-                        getById(
-                                i.getId()).getFirst().getUser().getId())));
 
         return list;
     }
