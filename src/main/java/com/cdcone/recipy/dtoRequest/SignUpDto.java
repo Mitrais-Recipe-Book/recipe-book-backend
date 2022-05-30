@@ -11,4 +11,9 @@ public class SignUpDto {
     private String username;
     private String password;
     private String fullName;
+
+    public Boolean isBlank() {
+        return email.isBlank() || username.isBlank() ||
+                password.isBlank() || fullName.isBlank();
+    }
 }
