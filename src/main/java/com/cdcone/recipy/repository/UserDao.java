@@ -1,7 +1,6 @@
 package com.cdcone.recipy.repository;
 
 import com.cdcone.recipy.dtoAccess.FollowerDto;
-import com.cdcone.recipy.dtoAccess.FollowingListDto;
 import com.cdcone.recipy.dtoAccess.PhotoDto;
 import com.cdcone.recipy.dtoAccess.UserProfile;
 import com.cdcone.recipy.entity.UserEntity;

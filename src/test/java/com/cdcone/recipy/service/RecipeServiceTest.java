@@ -7,14 +7,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
-import com.cdcone.recipy.dtoAccess.UserRecipeDto;
-import com.cdcone.recipy.dtoRequest.PaginatedDto;
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
 import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
 import com.cdcone.recipy.entity.RecipeEntity;

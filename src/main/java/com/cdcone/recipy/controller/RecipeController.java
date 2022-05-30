@@ -3,7 +3,6 @@ package com.cdcone.recipy.controller;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import com.cdcone.recipy.dtoAccess.PhotoDto;
 import com.cdcone.recipy.dtoAccess.RecipeDetailDto;
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
@@ -12,7 +11,6 @@ import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.response.CommonResponse;
 import com.cdcone.recipy.service.RecipeService;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpHeaders;
