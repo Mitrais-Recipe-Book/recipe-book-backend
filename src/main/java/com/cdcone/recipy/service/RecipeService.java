@@ -31,23 +31,31 @@ public class RecipeService {
     private final UserService userService;
     private final TagService tagService;
 
-    public Pair<RecipeEntity, String> add(RecipeDtoAdd dto) {
+    private Pair<Set<TagEntity>, String> findMultipleTags(Set<Integer> idTags){
         Set<TagEntity> tagEntities = new HashSet<TagEntity>();
-
-        for (Integer id : dto.getTagIds()) {
+        for (Integer id : idTags) {
             Pair<TagEntity, String> tag = tagService.getById(id);
 
             if (tag.getFirst().getName() == null) {
-                return Pair.of(new RecipeEntity(), tag.getSecond());
+                return Pair.of(new HashSet<>(), tag.getSecond());
             }
 
             tagEntities.add(tag.getFirst());
+        }
+        return Pair.of(tagEntities, "success: data retrieved");
+    }
+
+    public Pair<RecipeEntity, String> add(RecipeDtoAdd dto) {
+        Pair<Set<TagEntity>, String> tagEntities = findMultipleTags(dto.getTagIds());
+        
+        if (tagEntities.getSecond().charAt(0) != 's'){
+            return Pair.of(new RecipeEntity(), tagEntities.getSecond());
         }
 
         try {
             RecipeEntity recipe = new RecipeEntity(
                     userService.getById(dto.getUserId()),
-                    tagEntities,
+                    tagEntities.getFirst(),
                     dto.getTitle(),
                     dto.getTitle().toLowerCase(),
                     dto.getOverview(),
@@ -72,23 +80,17 @@ public class RecipeService {
     }
 
     public String edit(Long recipeId, RecipeDtoAdd dto) {
-        Set<TagEntity> tagEntities = new HashSet<TagEntity>();
-
-        for (Integer id : dto.getTagIds()) {
-            Pair<TagEntity, String> tag = tagService.getById(id);
-
-            if (tag.getFirst().getName() == null) {
-                return tag.getSecond();
-            }
-
-            tagEntities.add(tag.getFirst());
+        Pair<Set<TagEntity>, String> tagEntities = findMultipleTags(dto.getTagIds());
+        
+        if (tagEntities.getSecond().charAt(0) != 's'){
+            return tagEntities.getSecond();
         }
 
         try {
             RecipeEntity recipe = getById(recipeId);
 
             recipe.setTitle(dto.getTitle());
-            recipe.setTags(tagEntities);
+            recipe.setTags(tagEntities.getFirst());
             recipe.setOverview(dto.getOverview());
             recipe.setIngredients(dto.getIngredients());
             recipe.setContent(dto.getContent());
