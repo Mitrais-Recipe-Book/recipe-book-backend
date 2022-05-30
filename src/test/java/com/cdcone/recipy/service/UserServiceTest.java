@@ -54,18 +54,22 @@ class UserServiceTest {
 
     @Test
     void testSuccessAddUser() {
+        UserEntity mockUser = mock(UserEntity.class);
         when(signUpDto.getPassword()).thenReturn("password");
         when(roleDao.findByName("User")).thenReturn(Optional.of(userRole));
-        Pair<Optional<UserEntity>, String> addUserSuccess = userService.addUser(signUpDto);
+        when(userDao.save(any(UserEntity.class))).thenReturn(mockUser);
+        Pair<Optional<UserDto>, String> addUserSuccess = userService.addUser(signUpDto);
         verify(userDao).save(any(UserEntity.class));
         assertEquals("Success", addUserSuccess.getSecond());
     }
 
     @Test
     void testFailToAddUserIfPasswordLessThanSixCharacters() {
+        UserEntity mockUser = mock(UserEntity.class);
         when(signUpDto.getPassword()).thenReturn("s");
-        Pair<Optional<UserEntity>, String> addUserFailed = userService.addUser(signUpDto);
-        assertEquals("Password must be equal or more than 6 characters", addUserFailed.getSecond());
+        when(userDao.save(any(UserEntity.class))).thenReturn(mockUser);
+        Pair<Optional<UserDto>, String> addUserFailed = userService.addUser(signUpDto);
+        assertEquals("Password must be equal or more than 8 characters", addUserFailed.getSecond());
     }
 
     @Test
@@ -73,7 +77,7 @@ class UserServiceTest {
         when(signUpDto.getPassword()).thenReturn("password");
         when(roleDao.findByName("User")).thenReturn(Optional.of(userRole));
         when(userDao.save(any())).thenThrow(DataIntegrityViolationException.class);
-        Pair<Optional<UserEntity>, String> addUserFailed = userService.addUser(signUpDto);
+        Pair<Optional<UserDto>, String> addUserFailed = userService.addUser(signUpDto);
         assertEquals("Failed to create user. Username or email is already exists",
                 addUserFailed.getSecond());
         reset(userDao);
@@ -81,10 +85,12 @@ class UserServiceTest {
 
     @Test
     void testFailToAddUserIfRoleUserIsNotPresent() {
+        UserEntity mockUser = mock(UserEntity.class);
         when(signUpDto.getPassword()).thenReturn("password");
         when(roleDao.findByName("User")).thenReturn(Optional.empty());
-        Pair<Optional<UserEntity>, String> addUserFailed = userService.addUser(signUpDto);
-        assertEquals("Role not found", addUserFailed.getSecond());
+        when(userDao.save(any(UserEntity.class))).thenReturn(mockUser);
+        Pair<Optional<UserDto>, String> addUserFailed = userService.addUser(signUpDto);
+        assertEquals("Role User not found", addUserFailed.getSecond());
     }
 
     @Test
