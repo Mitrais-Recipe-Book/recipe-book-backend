@@ -71,6 +71,42 @@ public class RecipeService {
         }
     }
 
+    public String edit(Long recipeId, RecipeDtoAdd dto) {
+        Set<TagEntity> tagEntities = new HashSet<TagEntity>();
+
+        for (Integer id : dto.getTagIds()) {
+            Pair<TagEntity, String> tag = tagService.getById(id);
+
+            if (tag.getFirst().getName() == null) {
+                return tag.getSecond();
+            }
+
+            tagEntities.add(tag.getFirst());
+        }
+
+        try {
+            RecipeEntity recipe = getById(recipeId);
+
+            recipe.setTitle(dto.getTitle());
+            recipe.setTags(tagEntities);
+            recipe.setOverview(dto.getOverview());
+            recipe.setIngredients(dto.getIngredients());
+            recipe.setContent(dto.getContent());
+            recipe.setVideoURL(dto.getVideoURL());
+            recipe.setDraft(dto.isDraft());
+
+            recipeRepository.save(recipe);
+
+            return "success: data updated";
+        } catch (Exception e) {
+            if (e instanceof DataIntegrityViolationException) {
+                return "failed: cannot save duplicate";
+            }
+
+            return "failed: unknown error, contact backend team";
+        }
+    }
+
     public Pair<Page<RecipeDtoList>, String> getPublishedRecipes(RecipeSearchDto dto) {
         if (dto.getTagId() == null || dto.getTagId().isEmpty()) {
             Set<Integer> allTags = tagService.getAllTags()

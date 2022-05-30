@@ -39,13 +39,12 @@ public class RecipeController {
 
         return ResponseEntity.badRequest().body(new CommonResponse(result.getSecond()));
     }
-    
+
     @PutMapping("{id}/edit")
     public ResponseEntity<CommonResponse> edit(@PathVariable(name = "id") Long recipeId,
             @RequestBody RecipeDtoAdd dto) {
-
-        return ResponseEntity.ok()
-                .body(new CommonResponse("under construction, recipe with id " + recipeId + " received", dto));
+        String result = recipeService.edit(recipeId, dto);
+        return ResponseEntity.ok().body(new CommonResponse(result));
     }
 
     @GetMapping("/search")
