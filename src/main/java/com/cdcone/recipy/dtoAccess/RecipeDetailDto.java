@@ -39,6 +39,6 @@ public class RecipeDetailDto {
                 "id", author.getId(),
                 "username", author.getUsername(),
                 "name", author.getFullName());
-        this.tags = getTags();
+        this.tags = recipe.getTags();
     }
 }
