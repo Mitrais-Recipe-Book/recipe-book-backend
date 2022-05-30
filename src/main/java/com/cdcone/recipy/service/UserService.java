@@ -184,6 +184,10 @@ public class UserService implements UserDetailsService {
         return userDao.getFollowersById(userId);
     }
 
+    public Long getFollowerCountById(long userId){
+        return userDao.getFollowerCountById(userId);
+    }
+
     public Boolean isFollowing(Long creatorId, Long userId) {
         return userDao.isFollowing(creatorId, userId);
     }
