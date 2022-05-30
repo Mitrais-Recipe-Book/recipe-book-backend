@@ -1,7 +1,6 @@
 package com.cdcone.recipy.repository;
 
 import com.cdcone.recipy.dtoAccess.FollowerDto;
-import com.cdcone.recipy.dtoAccess.FollowingListDto;
 import com.cdcone.recipy.dtoAccess.PhotoDto;
 import com.cdcone.recipy.dtoAccess.UserProfile;
 import com.cdcone.recipy.entity.UserEntity;
@@ -15,9 +14,7 @@ import javax.websocket.server.PathParam;
 import java.util.List;
 import java.util.Optional;
 
-public interface UserDao extends JpaRepository<UserEntity, Long> {
-
-        
+public interface UserDao extends JpaRepository<UserEntity, Long> {        
 
     Optional<UserEntity> findByUsername(String username);
 

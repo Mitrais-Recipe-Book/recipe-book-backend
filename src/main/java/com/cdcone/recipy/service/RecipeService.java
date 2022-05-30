@@ -5,9 +5,6 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.validation.ConstraintViolationException;
-
-import com.cdcone.recipy.dtoAccess.PhotoDto;
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
 import com.cdcone.recipy.dtoAccess.UserRecipeDto;
 import com.cdcone.recipy.dtoRequest.*;
@@ -71,6 +68,42 @@ public class RecipeService {
             }
 
             return Pair.of(new RecipeEntity(), "failed: unknown error, contact backend team");
+        }
+    }
+
+    public String edit(Long recipeId, RecipeDtoAdd dto) {
+        Set<TagEntity> tagEntities = new HashSet<TagEntity>();
+
+        for (Integer id : dto.getTagIds()) {
+            Pair<TagEntity, String> tag = tagService.getById(id);
+
+            if (tag.getFirst().getName() == null) {
+                return tag.getSecond();
+            }
+
+            tagEntities.add(tag.getFirst());
+        }
+
+        try {
+            RecipeEntity recipe = getById(recipeId);
+
+            recipe.setTitle(dto.getTitle());
+            recipe.setTags(tagEntities);
+            recipe.setOverview(dto.getOverview());
+            recipe.setIngredients(dto.getIngredients());
+            recipe.setContent(dto.getContent());
+            recipe.setVideoURL(dto.getVideoURL());
+            recipe.setDraft(dto.isDraft());
+
+            recipeRepository.save(recipe);
+
+            return "success: data updated";
+        } catch (Exception e) {
+            if (e instanceof DataIntegrityViolationException) {
+                return "failed: cannot save duplicate";
+            }
+
+            return "failed: unknown error, contact backend team";
         }
     }
 
