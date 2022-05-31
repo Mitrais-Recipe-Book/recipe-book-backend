@@ -1,6 +1,5 @@
 package com.cdcone.recipy.controller;
 
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import com.cdcone.recipy.dtoAccess.RecipeDetailDto;
@@ -48,7 +47,7 @@ public class RecipeController {
         if (result.charAt(0) == 's') {
             return ResponseEntity.ok().body(new CommonResponse(result));
         }
-        
+
         return ResponseEntity.badRequest().body(new CommonResponse(result));
     }
 
@@ -104,12 +103,13 @@ public class RecipeController {
 
     @GetMapping("/popular")
     public ResponseEntity<CommonResponse> getPopularRecipes(int limit) {
-        try {
-            Set<RecipeDtoList> result = recipeService.getPopularRecipes(limit);
-            return ResponseEntity.ok(new CommonResponse("success: data retrieved", result));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
+        Pair<Set<RecipeDtoList>, String> result = recipeService.getPopularRecipes(limit);
+
+        if (result.getSecond().charAt(0) == 's') {
+            return ResponseEntity.ok().body(new CommonResponse(result.getSecond(), result.getFirst()));
         }
+
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getSecond()));
     }
 
     @GetMapping("/discover")

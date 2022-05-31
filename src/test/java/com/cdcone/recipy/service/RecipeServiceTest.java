@@ -56,7 +56,7 @@ public class RecipeServiceTest {
 
     @Test
     void failAddRecipes() {
-        RecipeEntity mockRecipe = mock(RecipeEntity.class);        
+        RecipeEntity mockRecipe = mock(RecipeEntity.class);
         Pair<RecipeEntity, String> result = Pair.of(mockRecipe, "succees");
 
         when(recipeService.add(ADD_RECIPE_DTO)).thenReturn(result);
@@ -77,7 +77,7 @@ public class RecipeServiceTest {
     void getPublishedRecipes() {
         RecipeSearchDto mockSearch = mock(RecipeSearchDto.class);
         Page<RecipeDtoList> mockPage = mock(Page.class);
-        Pair<Page<RecipeDtoList>, String> mockResult =Pair.of(mockPage, "succees");
+        Pair<Page<RecipeDtoList>, String> mockResult = Pair.of(mockPage, "succees");
 
         when(recipeService.getPublishedRecipes(mockSearch)).thenReturn(mockResult);
 
@@ -89,7 +89,7 @@ public class RecipeServiceTest {
     void failGetPublishedRecipes() {
         RecipeSearchDto mockSearch = mock(RecipeSearchDto.class);
         Page<RecipeDtoList> mockPage = mock(Page.class);
-        Pair<Page<RecipeDtoList>, String> mockResult =Pair.of(mockPage, "succees");
+        Pair<Page<RecipeDtoList>, String> mockResult = Pair.of(mockPage, "succees");
 
         when(recipeService.getPublishedRecipes(mockSearch)).thenReturn(mockResult);
         when(RECIPE_REPOSITORY.getPublishedRecipes(any(), any(), any(), any()))
@@ -107,8 +107,8 @@ public class RecipeServiceTest {
     @Test
     void getPopularRecipes() {
         RecipeDtoList mockList = mock(RecipeDtoList.class);
-        Set<RecipeDtoList> mockResult = new HashSet<>();
-        mockResult.add(mockList);
+        Pair<Set<RecipeDtoList>, String> mockResult = Pair.of(new HashSet<>(), mock(String.class));
+        mockResult.getFirst().add(mockList);
 
         when(recipeService.getPopularRecipes(1)).thenReturn(mockResult);
 
