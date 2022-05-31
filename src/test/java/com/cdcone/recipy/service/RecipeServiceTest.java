@@ -118,8 +118,8 @@ public class RecipeServiceTest {
     @Test
     void getDiscoverRecipes() {
         RecipeDtoList mockList = mock(RecipeDtoList.class);
-        Set<RecipeDtoList> mockResult = new HashSet<>();
-        mockResult.add(mockList);
+        Pair<Set<RecipeDtoList>, String> mockResult = Pair.of(new HashSet<>(), mock(String.class));
+        mockResult.getFirst().add(mockList);
 
         when(recipeService.getDiscoverRecipes(1)).thenReturn(mockResult);
 

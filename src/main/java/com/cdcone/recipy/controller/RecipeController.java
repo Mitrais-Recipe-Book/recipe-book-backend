@@ -95,6 +95,7 @@ public class RecipeController {
         String result = recipeService.addViewer(recipeId);
 
         if (result.charAt(0) == 's') {
+            System.out.println("PRINT");
             return ResponseEntity.ok().body(new CommonResponse(result));
         }
 
@@ -114,12 +115,13 @@ public class RecipeController {
 
     @GetMapping("/discover")
     public ResponseEntity<CommonResponse> getDiscoverRecipes(int limit) {
-        try {
-            Set<RecipeDtoList> result = recipeService.getDiscoverRecipes(limit);
-            return ResponseEntity.ok(new CommonResponse("success: data retrieved", result));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
+        Pair<Set<RecipeDtoList>, String> result = recipeService.getDiscoverRecipes(limit);
+
+        if (result.getSecond().charAt(0) == 's') {
+            return ResponseEntity.ok().body(new CommonResponse(result.getSecond(), result.getFirst()));
         }
+
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getSecond()));
     }
 
     @DeleteMapping("{id}")

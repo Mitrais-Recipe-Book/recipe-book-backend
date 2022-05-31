@@ -174,7 +174,7 @@ public class RecipeService {
         return Pair.of(list, "success: data retrieved");
     }
 
-    public Set<RecipeDtoList> getDiscoverRecipes(int limit) {
+    public Pair<Set<RecipeDtoList>, String> getDiscoverRecipes(int limit) {
         Set<RecipeDtoList> list = recipeRepository.getPopularRecipes()
                 .stream()
                 .limit(limit)
@@ -187,7 +187,7 @@ public class RecipeService {
                 })
                 .collect(Collectors.toSet());
 
-        return list;
+        return Pair.of(list, "success: data retrieved");
     }
 
     public Pair<RecipeEntity, String> getById(Long recipeId) {
