@@ -95,6 +95,7 @@ public class RecipeController {
         String result = recipeService.addViewer(recipeId);
 
         if (result.charAt(0) == 's') {
+            System.out.println("PRINT");
             return ResponseEntity.ok().body(new CommonResponse(result));
         }
 
@@ -114,24 +115,24 @@ public class RecipeController {
 
     @GetMapping("/discover")
     public ResponseEntity<CommonResponse> getDiscoverRecipes(int limit) {
-        try {
-            Set<RecipeDtoList> result = recipeService.getDiscoverRecipes(limit);
-            return ResponseEntity.ok(new CommonResponse("success: data retrieved", result));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
+        Pair<Set<RecipeDtoList>, String> result = recipeService.getDiscoverRecipes(limit);
+
+        if (result.getSecond().charAt(0) == 's') {
+            return ResponseEntity.ok().body(new CommonResponse(result.getSecond(), result.getFirst()));
         }
+
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getSecond()));
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<CommonResponse> deleteRecipe(@PathVariable(name = "id") long recipeId) {
-        RecipeDtoList recipeDtoList = recipeService.deleteRecipe(recipeId);
-        HttpStatus status = HttpStatus.OK;
-        String msg = "success: data deleted";
-        if (recipeDtoList == null) {
-            status = HttpStatus.NOT_FOUND;
-            msg = "error: recipe not found";
+        Pair<RecipeDtoList, String> result = recipeService.deleteRecipe(recipeId);
+
+        if (result.getSecond().charAt(0) == 's'){
+            return ResponseEntity.ok().body(new CommonResponse(result.getSecond(), result.getFirst()));
         }
-        return ResponseEntity.status(status).body(new CommonResponse(msg, recipeDtoList));
+
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getSecond()));
     }
 
     @GetMapping("{id}")

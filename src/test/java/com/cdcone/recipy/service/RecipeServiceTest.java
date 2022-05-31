@@ -51,7 +51,7 @@ public class RecipeServiceTest {
 
         when(recipeService.add(ADD_RECIPE_DTO)).thenReturn(result);
 
-        assertEquals(mockRecipe, recipeService.add(ADD_RECIPE_DTO));
+        assertEquals(result, recipeService.add(ADD_RECIPE_DTO));
     }
 
     @Test
@@ -118,8 +118,8 @@ public class RecipeServiceTest {
     @Test
     void getDiscoverRecipes() {
         RecipeDtoList mockList = mock(RecipeDtoList.class);
-        Set<RecipeDtoList> mockResult = new HashSet<>();
-        mockResult.add(mockList);
+        Pair<Set<RecipeDtoList>, String> mockResult = Pair.of(new HashSet<>(), mock(String.class));
+        mockResult.getFirst().add(mockList);
 
         when(recipeService.getDiscoverRecipes(1)).thenReturn(mockResult);
 
@@ -133,7 +133,7 @@ public class RecipeServiceTest {
 
         when(RECIPE_REPOSITORY.findById(1L)).thenReturn(Optional.of(mockResult));
 
-        assertEquals(mockResult, recipeService.getById(1L));
+        assertEquals(mockResult, recipeService.getById(1L).getFirst());
     }
 
     @Test
@@ -151,11 +151,11 @@ public class RecipeServiceTest {
 
     @Test
     void addViewer() {
-        RecipeService service = Mockito.spy(recipeService);
-        Mockito.doNothing().when(service).addViewer(1L);
+        String msg = "success";
 
-        service.addViewer(1L);
-        verify(service).addViewer(1L);
+        when (recipeService.addViewer(1L)).thenReturn(msg);
+
+        assertEquals(msg, recipeService.addViewer(1L));        
     }
 
     @Test
