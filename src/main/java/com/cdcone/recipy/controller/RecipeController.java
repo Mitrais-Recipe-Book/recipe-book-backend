@@ -93,15 +93,13 @@ public class RecipeController {
 
     @PutMapping("/addview")
     public ResponseEntity<CommonResponse> addViewer(Long recipeId) {
-        try {
-            recipeService.addViewer(recipeId);
-            return ResponseEntity.ok(new CommonResponse("success: data updated"));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.badRequest()
-                    .body(new CommonResponse("failed: recipe with id: (" + recipeId + ") not found"));
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new CommonResponse(e.getCause().toString()));
+        String result = recipeService.addViewer(recipeId);
+
+        if (result.charAt(0) == 's') {
+            return ResponseEntity.ok().body(new CommonResponse(result));
         }
+
+        return ResponseEntity.badRequest().body(new CommonResponse(result));
     }
 
     @GetMapping("/popular")

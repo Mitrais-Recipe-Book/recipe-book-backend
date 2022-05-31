@@ -200,10 +200,18 @@ public class RecipeService {
         return Pair.of(result, "success: data retrieved");
     }
 
-    public void addViewer(Long id) {
-        RecipeEntity entity = recipeRepository.findById(id).get();
-        entity.setViews(entity.getViews() + 1);
-        recipeRepository.save(entity);
+    public String addViewer(Long recipeId) {
+        Pair<RecipeEntity, String> recipe = getById(recipeId);
+
+        if (recipe.getSecond().charAt(0) != 's'){
+            return recipe.getSecond();
+        }
+
+        int views = recipe.getFirst().getViews();
+        recipe.getFirst().setViews(views++);
+
+        recipeRepository.save(recipe.getFirst());
+        return "success: data updated";
     }
 
     public long totalRecipes() {
