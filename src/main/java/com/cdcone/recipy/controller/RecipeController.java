@@ -13,7 +13,6 @@ import com.cdcone.recipy.service.RecipeService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -95,7 +94,6 @@ public class RecipeController {
         String result = recipeService.addViewer(recipeId);
 
         if (result.charAt(0) == 's') {
-            System.out.println("PRINT");
             return ResponseEntity.ok().body(new CommonResponse(result));
         }
 
