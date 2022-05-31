@@ -126,14 +126,13 @@ public class RecipeController {
 
     @DeleteMapping("{id}")
     public ResponseEntity<CommonResponse> deleteRecipe(@PathVariable(name = "id") long recipeId) {
-        RecipeDtoList recipeDtoList = recipeService.deleteRecipe(recipeId);
-        HttpStatus status = HttpStatus.OK;
-        String msg = "success: data deleted";
-        if (recipeDtoList == null) {
-            status = HttpStatus.NOT_FOUND;
-            msg = "error: recipe not found";
+        Pair<RecipeDtoList, String> result = recipeService.deleteRecipe(recipeId);
+
+        if (result.getSecond().charAt(0) == 's'){
+            return ResponseEntity.ok().body(new CommonResponse(result.getSecond(), result.getFirst()));
         }
-        return ResponseEntity.status(status).body(new CommonResponse(msg, recipeDtoList));
+
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getSecond()));
     }
 
     @GetMapping("{id}")

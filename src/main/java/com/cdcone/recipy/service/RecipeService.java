@@ -203,7 +203,7 @@ public class RecipeService {
     public String addViewer(Long recipeId) {
         Pair<RecipeEntity, String> recipe = getById(recipeId);
 
-        if (recipe.getSecond().charAt(0) != 's'){
+        if (recipe.getSecond().charAt(0) != 's') {
             return recipe.getSecond();
         }
 
@@ -250,21 +250,20 @@ public class RecipeService {
         }
     }
 
-    public RecipeDtoList deleteRecipe(long recipeId) {
-        Optional<RecipeEntity> byId = recipeRepository.findById(recipeId);
-        RecipeDtoList deleted = null;
-        if (byId.isPresent()) {
-            RecipeEntity toBeDeleted = byId.get();
-            recipeRepository.delete(toBeDeleted);
-            Long followerCount = userService.getFollowerCountById(toBeDeleted.getId());
-            deleted = new RecipeDtoList(
-                    toBeDeleted.getId(),
-                    toBeDeleted.getTitle(),
-                    toBeDeleted.getOverview(),
-                    toBeDeleted.getViews(),
-                    toBeDeleted.getUser().getFullName());
-            deleted.setAuthorFollower(followerCount);
+
+    public Pair<RecipeDtoList, String> deleteRecipe(long recipeId) {
+        Pair<RecipeEntity, String> recipe = getById(recipeId);
+
+        if (recipe.getSecond().charAt(0) != 's') {
+            return Pair.of(new RecipeDtoList(), recipe.getSecond());
         }
-        return deleted;
+
+        RecipeDtoList result = new RecipeDtoList(recipe.getFirst().getId(),
+                recipe.getFirst().getTitle(), recipe.getFirst().getOverview(), recipe.getFirst().getViews(),
+                recipe.getFirst().getUser().getUsername());
+
+        recipeRepository.delete(recipe.getFirst());
+
+        return Pair.of(result, "success: data deleted");
     }
 }

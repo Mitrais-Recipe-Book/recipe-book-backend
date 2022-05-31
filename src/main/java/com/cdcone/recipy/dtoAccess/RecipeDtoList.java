@@ -1,8 +1,10 @@
 package com.cdcone.recipy.dtoAccess;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class RecipeDtoList {
     private Long id;
     private String recipeName;
