@@ -29,13 +29,13 @@ public class RecipeController {
 
     @PostMapping("/add")
     public ResponseEntity<CommonResponse> add(@RequestBody RecipeDtoAdd dto) {
-        Pair<RecipeEntity, String> result = recipeService.add(dto);
+        Pair<String, RecipeEntity> result = recipeService.add(dto);
 
-        if (result.getSecond().charAt(0) == 's') {
-            return ResponseEntity.ok().body(new CommonResponse(result.getSecond(), result.getFirst().getId()));
+        if (result.getFirst().charAt(0) == 's') {
+            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), result.getSecond().getId()));
         }
 
-        return ResponseEntity.badRequest().body(new CommonResponse(result.getSecond()));
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
     }
 
     @PutMapping("{id}/edit")
@@ -52,28 +52,28 @@ public class RecipeController {
 
     @GetMapping("/search")
     public ResponseEntity<CommonResponse> getPublishedRecipes(RecipeSearchDto dto) {
-        Pair<Page<RecipeDtoList>, String> result = recipeService.getPublishedRecipes(dto);
+        Pair<String, Page<RecipeDtoList>> result = recipeService.getPublishedRecipes(dto);
 
-        if (result.getSecond().charAt(0) == 's') {
-            return ResponseEntity.ok().body(new CommonResponse(result.getSecond(), result.getFirst()));
+        if (result.getFirst().charAt(0) == 's') {
+            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), result.getSecond()));
         }
 
-        return ResponseEntity.badRequest().body(new CommonResponse(result.getSecond()));
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
     }
 
     @GetMapping("{id}/photo")
     public ResponseEntity<Object> getRecipeImage(@PathVariable(name = "id") Long recipeId) {
-        Pair<RecipeEntity, String> result = recipeService.getRecipeImage(recipeId);
+        Pair<String, RecipeEntity> result = recipeService.getRecipeImage(recipeId);
 
-        if (result.getSecond().charAt(0) == 's') {
+        if (result.getFirst().charAt(0) == 's') {
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment; filename=" + result.getFirst().getTitle() + "/banner-photo")
-                    .contentType(MediaType.valueOf(result.getFirst().getBannerImageType()))
-                    .body(result.getFirst().getBannerImage());
+                            "attachment; filename=" + result.getSecond().getTitle() + "/banner-photo")
+                    .contentType(MediaType.valueOf(result.getSecond().getBannerImageType()))
+                    .body(result.getSecond().getBannerImage());
         }
 
-        return ResponseEntity.badRequest().body(new CommonResponse(result.getSecond()));
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
     }
 
     @PutMapping(value = "/{recipe}/photo", consumes = "multipart/form-data")
@@ -102,47 +102,47 @@ public class RecipeController {
 
     @GetMapping("/popular")
     public ResponseEntity<CommonResponse> getPopularRecipes(int limit) {
-        Pair<Set<RecipeDtoList>, String> result = recipeService.getPopularRecipes(limit);
+        Pair<String, Set<RecipeDtoList>> result = recipeService.getPopularRecipes(limit);
 
-        if (result.getSecond().charAt(0) == 's') {
-            return ResponseEntity.ok().body(new CommonResponse(result.getSecond(), result.getFirst()));
+        if (result.getFirst().charAt(0) == 's') {
+            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), result.getSecond()));
         }
 
-        return ResponseEntity.badRequest().body(new CommonResponse(result.getSecond()));
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
     }
 
     @GetMapping("/discover")
     public ResponseEntity<CommonResponse> getDiscoverRecipes(int limit) {
-        Pair<Set<RecipeDtoList>, String> result = recipeService.getDiscoverRecipes(limit);
+        Pair<String, Set<RecipeDtoList>> result = recipeService.getDiscoverRecipes(limit);
 
-        if (result.getSecond().charAt(0) == 's') {
-            return ResponseEntity.ok().body(new CommonResponse(result.getSecond(), result.getFirst()));
+        if (result.getFirst().charAt(0) == 's') {
+            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), result.getSecond()));
         }
 
-        return ResponseEntity.badRequest().body(new CommonResponse(result.getSecond()));
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<CommonResponse> deleteRecipe(@PathVariable(name = "id") long recipeId) {
-        Pair<RecipeDtoList, String> result = recipeService.deleteRecipe(recipeId);
+        Pair<String, RecipeDtoList> result = recipeService.deleteRecipe(recipeId);
 
-        if (result.getSecond().charAt(0) == 's'){
-            return ResponseEntity.ok().body(new CommonResponse(result.getSecond(), result.getFirst()));
+        if (result.getFirst().charAt(0) == 's') {
+            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), result.getSecond()));
         }
 
-        return ResponseEntity.badRequest().body(new CommonResponse(result.getSecond()));
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
     }
 
     @GetMapping("{id}")
     public ResponseEntity<CommonResponse> getById(@PathVariable(name = "id") long recipeId) {
-        Pair<RecipeEntity, String> result = recipeService.getById(recipeId);
+        Pair<String, RecipeEntity> result = recipeService.getById(recipeId);
 
-        RecipeDetailDto dto = new RecipeDetailDto(result.getFirst());
+        RecipeDetailDto dto = new RecipeDetailDto(result.getSecond());
 
-        if (result.getSecond().charAt(0) == 's') {
-            return ResponseEntity.ok().body(new CommonResponse(result.getSecond(), dto));
+        if (result.getFirst().charAt(0) == 's') {
+            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), dto));
         }
 
-        return ResponseEntity.badRequest().body(new CommonResponse(result.getSecond()));
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
     }
 }
