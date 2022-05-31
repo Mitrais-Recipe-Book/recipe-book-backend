@@ -57,6 +57,10 @@ public class UserService implements UserDetailsService {
     }
 
     public Pair<Optional<UserDto>, String> addUser(SignUpDto signUpDto) {
+        if (signUpDto.isBlank()) {
+            return Pair.of(Optional.empty(), "Please fill out all required fields.");
+        }
+
         String msg;
         UserDto createdUser = null;
 
