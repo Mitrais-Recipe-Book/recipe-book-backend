@@ -17,7 +17,7 @@ public class RecipeDetailDto {
     LocalDate dateCreated;
     String ingredients;
     String content;
-    String videoUrl;
+    String videoURL;
     int views;
     Map<String, Object> author;
     Set<TagEntity> tags;
@@ -31,7 +31,7 @@ public class RecipeDetailDto {
         this.dateCreated = recipe.getDateCreated();
         this.ingredients = recipe.getIngredients();
         this.content = recipe.getContent();
-        this.videoUrl = recipe.getVideoURL();
+        this.videoURL = recipe.getVideoURL();
         this.views = recipe.getViews();
         this.author = Map.of(
                 "id", author.getId(),
