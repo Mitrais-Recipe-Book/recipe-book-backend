@@ -159,35 +159,53 @@ public class RecipeService {
     }
 
     public Pair<String, Set<RecipeDtoList>> getPopularRecipes(int limit) {
-        Set<RecipeDtoList> list = recipeRepository.getPopularRecipes()
-                .stream()
-                .limit(limit)
-                .map(i -> {
-                    i.setAuthorFollower(
-                            userService.getFollowerCountById(
-                                    getById(
-                                            i.getId()).getSecond().getUser().getId()));
-                    return i;
-                })
-                .collect(Collectors.toSet());
+        try {
+            Set<RecipeDtoList> list = recipeRepository.getPopularRecipes()
+                    .stream()
+                    .limit(limit)
+                    .map(i -> {
+                        i.setAuthorFollower(
+                                userService.getFollowerCountById(
+                                        getById(
+                                                i.getId()).getSecond().getUser().getId()));
+                        return i;
+                    })
+                    .collect(Collectors.toSet());
 
-        return Pair.of("success: data retrieved", list);
+            return Pair.of("success: data retrieved", list);
+        } catch (Exception e) {
+            if (e instanceof IllegalArgumentException) {
+                return Pair.of("failed: limit cannot negative", new HashSet<>());
+            }
+
+            return Pair.of("failed: unknown error, contact backend team", new HashSet<>());
+        }
+
     }
 
     public Pair<String, Set<RecipeDtoList>> getDiscoverRecipes(int limit) {
-        Set<RecipeDtoList> list = recipeRepository.getPopularRecipes()
-                .stream()
-                .limit(limit)
-                .map(i -> {
-                    i.setAuthorFollower(
-                            userService.getFollowerCountById(
-                                    getById(
-                                            i.getId()).getSecond().getUser().getId()));
-                    return i;
-                })
-                .collect(Collectors.toSet());
+        try {
+            Set<RecipeDtoList> list = recipeRepository.getPopularRecipes()
+                    .stream()
+                    .limit(limit)
+                    .map(i -> {
+                        i.setAuthorFollower(
+                                userService.getFollowerCountById(
+                                        getById(
+                                                i.getId()).getSecond().getUser().getId()));
+                        return i;
+                    })
+                    .collect(Collectors.toSet());
 
-        return Pair.of("success: data retrieved", list);
+            return Pair.of("success: data retrieved", list);
+        } catch (Exception e) {
+            
+            if (e instanceof IllegalArgumentException) {
+                return Pair.of("failed: limit cannot negative", new HashSet<>());
+            }
+
+            return Pair.of("failed: unknown error, contact backend team", new HashSet<>());
+        }
     }
 
     public Pair<String, RecipeEntity> getById(Long recipeId) {
@@ -258,9 +276,9 @@ public class RecipeService {
         }
 
         RecipeDtoList result = new RecipeDtoList(recipe.getSecond().getId(),
-                recipe.getSecond().getTitle(), 
+                recipe.getSecond().getTitle(),
                 recipe.getSecond().getOverview(),
-                 recipe.getSecond().getViews(),
+                recipe.getSecond().getViews(),
                 recipe.getSecond().getUser().getUsername());
 
         recipeRepository.delete(recipe.getSecond());

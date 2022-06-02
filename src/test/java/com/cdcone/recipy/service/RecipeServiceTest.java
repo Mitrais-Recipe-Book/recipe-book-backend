@@ -4,8 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import java.util.Optional;
 
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
+import com.cdcone.recipy.dtoAccess.RecipeDtoList;
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
 import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
 import com.cdcone.recipy.entity.RecipeEntity;
@@ -124,5 +128,62 @@ public class RecipeServiceTest {
 
         assertEquals('s',
                 recipeService.getRecipeImage(1L).getFirst().charAt(0));
+    }
+
+    @Test
+    void failedGetRecipeImage() {
+        byte[] photo = null;
+
+        when(RECIPE_REPOSITORY.findById(1L))
+                .thenReturn(Optional.of(RECIPE_ENTITY));
+
+        when(RECIPE_ENTITY.getBannerImage()).thenReturn(photo);
+
+        assertEquals('f',
+                recipeService.getRecipeImage(1L).getFirst().charAt(0));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void getPopularRecipes() {
+        Set<RecipeDtoList> mockList = (Set<RecipeDtoList>) mock(Set.class);
+
+        when(RECIPE_REPOSITORY.getPopularRecipes()).thenReturn(mockList);
+
+        assertEquals('s',
+                recipeService.getPopularRecipes(0).getFirst().charAt(0));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void failedGetPopularRecipesNegativeNumber() {
+        Set<RecipeDtoList> mockList = (Set<RecipeDtoList>) mock(Set.class);
+
+        when(RECIPE_REPOSITORY.getPopularRecipes()).thenReturn(mockList);
+
+        assertEquals('f',
+                recipeService.getPopularRecipes(-1).getFirst().charAt(0));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void getDiscoverRecipes(){
+        Set<RecipeDtoList> mockList = (Set<RecipeDtoList>) mock(Set.class);
+
+        when(RECIPE_REPOSITORY.getDiscoverRecipes()).thenReturn(mockList);
+
+        assertEquals('s',
+                recipeService.getDiscoverRecipes(0).getFirst().charAt(0));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void failedGetDiscoverRecipesNegativeNumber(){
+        Set<RecipeDtoList> mockList = (Set<RecipeDtoList>) mock(Set.class);
+
+        when(RECIPE_REPOSITORY.getDiscoverRecipes()).thenReturn(mockList);
+
+        assertEquals('f',
+                recipeService.getDiscoverRecipes(-1).getFirst().charAt(0));
     }
 }
