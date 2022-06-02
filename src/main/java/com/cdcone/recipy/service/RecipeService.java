@@ -199,7 +199,7 @@ public class RecipeService {
 
             return Pair.of("success: data retrieved", list);
         } catch (Exception e) {
-            
+
             if (e instanceof IllegalArgumentException) {
                 return Pair.of("failed: limit cannot negative", new HashSet<>());
             }
