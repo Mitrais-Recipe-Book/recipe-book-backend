@@ -117,7 +117,7 @@ public class RecipeService {
 
     public Pair<String, Page<RecipeDtoList>> getPublishedRecipes(RecipeSearchDto dto) {
         if (dto.getTagId() == null || dto.getTagId().isEmpty()) {
-            Set<Integer> allTags = tagService.getAllTags()
+            Set<Integer> allTags = tagService.getAllTags().getSecond()
                     .stream()
                     .map(n -> n.getId())
                     .collect(Collectors.toSet());

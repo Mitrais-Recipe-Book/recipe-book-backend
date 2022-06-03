@@ -16,8 +16,8 @@ public class TagService {
 
     private final TagDao tagDao;
 
-    public List<TagEntity> getAllTags() {
-        return tagDao.findAll();
+    public Pair<String, List<TagEntity>> getAllTags() {
+        return Pair.of("success: data retrieved", tagDao.findAll());
     }
 
     public TagEntity saveTag(String name) {
