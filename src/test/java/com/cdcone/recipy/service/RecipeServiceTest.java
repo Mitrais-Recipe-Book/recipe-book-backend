@@ -207,4 +207,9 @@ public class RecipeServiceTest {
 
         assertEquals(1L, recipeService.totalRecipes());
     }
+
+    @Test
+    void saveRecipePhoto(){
+        
+    }
 }
