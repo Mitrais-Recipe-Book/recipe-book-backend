@@ -8,6 +8,7 @@ import com.cdcone.recipy.entity.UserEntity;
 import com.cdcone.recipy.repository.RoleDao;
 import com.cdcone.recipy.repository.UserDao;
 import com.cdcone.recipy.util.CustomUser;
+import com.cdcone.recipy.util.ImageUtil;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -20,6 +21,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -108,6 +110,7 @@ class UserServiceTest {
         when(userDao.findByUsername("user")).thenReturn(Optional.of(mockUser));
         MultipartFile mockPhoto = mock(MultipartFile.class);
         when(mockPhoto.getBytes()).thenThrow(IOException.class);
+        when(mockPhoto.getInputStream()).thenThrow(IOException.class);
         Pair<Boolean, String> failedSavePhoto = userService
                 .saveProfilePhoto(mockPhoto, "user");
         assertFalse(failedSavePhoto.getFirst());
@@ -117,12 +120,14 @@ class UserServiceTest {
 
     @Test
     void testSuccessSavePhoto() throws IOException {
+        byte[] randomImage = ImageUtil.randomImage();
         UserEntity mockUser = mock(UserEntity.class);
         when(userDao.findByUsername("user")).thenReturn(Optional.of(mockUser));
         when(mockUser.getId()).thenReturn(11L);
         MultipartFile mockPhoto = mock(MultipartFile.class);
-        when(mockPhoto.getBytes()).thenReturn(new byte[] { 10 });
-        when(mockPhoto.getContentType()).thenReturn("PNG");
+        when(mockPhoto.getBytes()).thenReturn(randomImage);
+        when(mockPhoto.getContentType()).thenReturn("image/jpeg");
+        when(mockPhoto.getInputStream()).thenReturn(new ByteArrayInputStream(randomImage));
 
         Pair<Boolean, String> saveProfilePhoto = userService
                 .saveProfilePhoto(mockPhoto, "user");

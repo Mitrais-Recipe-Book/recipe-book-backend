@@ -21,6 +21,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -113,17 +116,29 @@ public class UserService implements UserDetailsService {
         boolean uploadedPhoto = false;
         if (byUsername.isPresent()) {
             try {
-                UserEntity user = byUsername.get();
-                user.setProfilePhoto(photo.getBytes());
-                user.setProfilePhotoType(photo.getContentType());
-                userDao.save(user);
-                msg = "Success";
-                uploadedPhoto = true;
+                BufferedImage original = ImageIO.read(photo.getInputStream());
+                if (original != null) {
+                    byte[] resizedPhoto = resizePhoto(original);
+                    UserEntity user = byUsername.get();
+                    user.setProfilePhoto(resizedPhoto);
+                    user.setProfilePhotoType(photo.getContentType());
+                    userDao.save(user);
+                    msg = "Success";
+                    uploadedPhoto = true;
+                } else {
+                    msg = "Uploaded file is not an image";
+                }
             } catch (IOException e) {
                 msg = "Failed to save profile photo.";
             }
         }
         return Pair.of(uploadedPhoto, msg);
+    }
+
+    private byte[] resizePhoto(BufferedImage original) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ImageIO.write(original, "jpg", outputStream);
+        return outputStream.toByteArray();
     }
 
     public PaginatedDto<UserDto> getAllUsers(int page) {
