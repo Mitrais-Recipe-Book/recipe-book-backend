@@ -111,7 +111,7 @@ public class RecipeService {
                 return "failed: cannot save duplicate";
             }
             e.printStackTrace();
-            return "failed: unknown error, contact backend team";
+            return "critical error: unknown cause, contact backend team";
         }
     }
 
@@ -141,7 +141,7 @@ public class RecipeService {
                 return Pair.of("failed: page index must not be less than zero", new PageImpl<>(new ArrayList<>()));
             }
             e.printStackTrace();
-            return Pair.of("failed: unknown error, contact backend team", new PageImpl<>(new ArrayList<>()));
+            return Pair.of("critical error: unknown cause, contact backend team", new PageImpl<>(new ArrayList<>()));
         }
     }
 

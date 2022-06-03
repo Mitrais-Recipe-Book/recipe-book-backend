@@ -14,31 +14,37 @@ import java.util.*;
 @RequiredArgsConstructor
 public class TagService {
 
-    private final TagDao tagDao;
+    private final TagDao tagRepository;
 
     public Pair<String, List<TagEntity>> getAllTags() {
-        return Pair.of("success: data retrieved", tagDao.findAll());
+        return Pair.of("success: data retrieved", tagRepository.findAll());
     }
 
-    public TagEntity saveTag(String name) {
+    public Pair<String, TagEntity> saveTag(String name) {
         try {
             TagEntity newTag = new TagEntity(name.toLowerCase());
-            return tagDao.save(newTag);
-        } catch (DataIntegrityViolationException e) {
-            return null;
+            return Pair.of("success: tag saved", tagRepository.save(newTag));
+        } catch (Exception e) {
+            
+            if (e instanceof DataIntegrityViolationException){
+                return Pair.of("failed: cannot save duplicate", new TagEntity());
+            }
+
+            e.printStackTrace();
+            return Pair.of("critical error: unpredicted cause, contact backend team", new TagEntity());
         }
     }
 
     public Pair<TagEntity, String> getById(int id) {
         try {
-            return Pair.of(tagDao.findById(id).get(), "success: data retrieved");
+            return Pair.of(tagRepository.findById(id).get(), "success: data retrieved");
         } catch (NoSuchElementException e) {
             return Pair.of(new TagEntity(), "failed: tag with id " + id + " not found");
         }
     }
 
     public Pair<HttpStatus, Map<String, String>> editTag(int old, String tag) {
-        Optional<TagEntity> byName = tagDao.findById(old);
+        Optional<TagEntity> byName = tagRepository.findById(old);
         HttpStatus status = HttpStatus.BAD_REQUEST;
         Map<String, String> payload = new HashMap<>();
         payload.put("input", tag);
@@ -50,7 +56,7 @@ public class TagService {
             try {
                 if (!tag.equals(oldName)) {
                     toBeEdited.setName(tag);
-                    tagDao.save(toBeEdited);
+                    tagRepository.save(toBeEdited);
                     payload.put("msg", "success: data updated");
                     payload.put("new", toBeEdited.getName());
                     payload.remove("input");
@@ -69,16 +75,16 @@ public class TagService {
     }
 
     public TagEntity deleteTag(int tagId) {
-        Optional<TagEntity> byId = tagDao.findById(tagId);
+        Optional<TagEntity> byId = tagRepository.findById(tagId);
         if (byId.isPresent()) {
             TagEntity toBeDeleted = byId.get();
-            tagDao.delete(toBeDeleted);
+            tagRepository.delete(toBeDeleted);
             return toBeDeleted;
         }
         return null;
     }
 
     public Set<TagEntity> getByRecipeId(Long recipeId) {
-        return tagDao.findByRecipeId(recipeId);
+        return tagRepository.findByRecipeId(recipeId);
     }
 }
