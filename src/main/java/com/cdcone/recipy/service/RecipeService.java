@@ -78,7 +78,7 @@ public class RecipeService {
             if (e instanceof DataIntegrityViolationException) {
                 return Pair.of("failed: cannot save duplicate", new RecipeEntity());
             }
-
+            e.printStackTrace();
             return Pair.of("failed: unknown error, contact backend team", new RecipeEntity());
         }
     }
@@ -112,7 +112,7 @@ public class RecipeService {
             if (e instanceof DataIntegrityViolationException) {
                 return "failed: cannot save duplicate";
             }
-
+            e.printStackTrace();
             return "failed: unknown error, contact backend team";
         }
     }
@@ -142,7 +142,7 @@ public class RecipeService {
             if (e instanceof IllegalArgumentException) {
                 return Pair.of("failed: page index must not be less than zero", new PageImpl<>(new ArrayList<>()));
             }
-
+            e.printStackTrace();a
             return Pair.of("failed: unknown error, contact backend team", new PageImpl<>(new ArrayList<>()));
         }
     }
@@ -181,7 +181,7 @@ public class RecipeService {
             if (e instanceof IllegalArgumentException) {
                 return Pair.of("failed: limit cannot negative", new HashSet<>());
             }
-
+            e.printStackTrace();
             return Pair.of("failed: unknown error, contact backend team", new HashSet<>());
         }
 
@@ -206,7 +206,7 @@ public class RecipeService {
             if (e instanceof IllegalArgumentException) {
                 return Pair.of("failed: limit cannot negative", new HashSet<>());
             }
-
+            e.printStackTrace();
             return Pair.of("failed: unknown error, contact backend team", new HashSet<>());
         }
     }
