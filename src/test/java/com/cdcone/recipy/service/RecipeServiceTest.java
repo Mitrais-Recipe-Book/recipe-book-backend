@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -167,7 +166,7 @@ public class RecipeServiceTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    void getDiscoverRecipes(){
+    void getDiscoverRecipes() {
         Set<RecipeDtoList> mockList = (Set<RecipeDtoList>) mock(Set.class);
 
         when(RECIPE_REPOSITORY.getDiscoverRecipes()).thenReturn(mockList);
@@ -178,12 +177,39 @@ public class RecipeServiceTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    void failedGetDiscoverRecipesNegativeNumber(){
+    void failedGetDiscoverRecipesNegativeNumber() {
         Set<RecipeDtoList> mockList = (Set<RecipeDtoList>) mock(Set.class);
 
         when(RECIPE_REPOSITORY.getDiscoverRecipes()).thenReturn(mockList);
 
         assertEquals('f',
                 recipeService.getDiscoverRecipes(-1).getFirst().charAt(0));
+    }
+
+    @Test
+    void addViewer() {
+        when(RECIPE_REPOSITORY.findById(1L)).thenReturn(Optional.of(RECIPE_ENTITY));
+
+        assertEquals('s', recipeService.addViewer(1L));
+    }
+
+    @Test
+    void failedAddViewerRecipeNotFound() {
+        when(RECIPE_REPOSITORY.findById(1L)).thenReturn(Optional.empty());
+
+        assertEquals('f',
+                recipeService.addViewer(1L).charAt(0));
+    }
+
+    @Test
+    void getTotalRecipes(){
+        when(RECIPE_REPOSITORY.count()).thenReturn(1L);
+
+        assertEquals(1L, recipeService.totalRecipes());
+    }
+
+    @Test
+    void saveRecipePhoto(){
+        
     }
 }

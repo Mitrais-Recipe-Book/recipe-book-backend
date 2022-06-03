@@ -1,9 +1,12 @@
 package com.cdcone.recipy.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import javax.imageio.ImageIO;
 
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
 import com.cdcone.recipy.dtoAccess.UserRecipeDto;
@@ -12,6 +15,7 @@ import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.repository.RecipeRepository;
 
+import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -74,7 +78,7 @@ public class RecipeService {
             if (e instanceof DataIntegrityViolationException) {
                 return Pair.of("failed: cannot save duplicate", new RecipeEntity());
             }
-
+            e.printStackTrace();
             return Pair.of("failed: unknown error, contact backend team", new RecipeEntity());
         }
     }
@@ -108,7 +112,7 @@ public class RecipeService {
             if (e instanceof DataIntegrityViolationException) {
                 return "failed: cannot save duplicate";
             }
-
+            e.printStackTrace();
             return "failed: unknown error, contact backend team";
         }
     }
@@ -138,7 +142,7 @@ public class RecipeService {
             if (e instanceof IllegalArgumentException) {
                 return Pair.of("failed: page index must not be less than zero", new PageImpl<>(new ArrayList<>()));
             }
-
+            e.printStackTrace();a
             return Pair.of("failed: unknown error, contact backend team", new PageImpl<>(new ArrayList<>()));
         }
     }
@@ -177,7 +181,7 @@ public class RecipeService {
             if (e instanceof IllegalArgumentException) {
                 return Pair.of("failed: limit cannot negative", new HashSet<>());
             }
-
+            e.printStackTrace();
             return Pair.of("failed: unknown error, contact backend team", new HashSet<>());
         }
 
@@ -199,11 +203,10 @@ public class RecipeService {
 
             return Pair.of("success: data retrieved", list);
         } catch (Exception e) {
-            
             if (e instanceof IllegalArgumentException) {
                 return Pair.of("failed: limit cannot negative", new HashSet<>());
             }
-
+            e.printStackTrace();
             return Pair.of("failed: unknown error, contact backend team", new HashSet<>());
         }
     }
@@ -254,6 +257,8 @@ public class RecipeService {
         }
 
         try {
+            ImageIO.read(photo.getInputStream()).toString();
+
             recipe.getSecond().setBannerImage(photo.getBytes());
             recipe.getSecond().setBannerImageType(photo.getContentType());
             recipeRepository.save(recipe.getSecond());
@@ -264,6 +269,15 @@ public class RecipeService {
                 return "failed: image not updated";
             }
 
+            if(e instanceof NullPointerException){
+                return "failed: file is not image";
+            }
+
+            if(e instanceof FileSizeLimitExceededException){
+                return "failed: image size should be less than 1 megabytes";
+            }
+            
+            e.printStackTrace();
             return "failed: unknown error, contact backend team";
         }
     }
