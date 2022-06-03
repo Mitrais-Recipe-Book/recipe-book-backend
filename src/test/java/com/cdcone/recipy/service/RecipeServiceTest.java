@@ -2,15 +2,12 @@ package com.cdcone.recipy.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 import java.util.Set;
 
-import javax.imageio.ImageIO;
 
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
@@ -18,13 +15,11 @@ import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
 import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.entity.UserEntity;
 import com.cdcone.recipy.repository.RecipeRepository;
-import com.jayway.jsonpath.Option;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
-import org.springframework.web.multipart.MultipartFile;
 
 public class RecipeServiceTest {
 
