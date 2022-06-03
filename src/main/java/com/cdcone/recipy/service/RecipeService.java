@@ -77,7 +77,7 @@ public class RecipeService {
                 return Pair.of("failed: cannot save duplicate", new RecipeEntity());
             }
             e.printStackTrace();
-            return Pair.of("failed: unknown error, contact backend team", new RecipeEntity());
+            return Pair.of("critical error: unpredicted cause, contact backend team", new RecipeEntity());
         }
     }
 
@@ -111,7 +111,7 @@ public class RecipeService {
                 return "failed: cannot save duplicate";
             }
             e.printStackTrace();
-            return "critical error: unknown cause, contact backend team";
+            return "critical error: unpredicted cause, contact backend team";
         }
     }
 
@@ -141,7 +141,7 @@ public class RecipeService {
                 return Pair.of("failed: page index must not be less than zero", new PageImpl<>(new ArrayList<>()));
             }
             e.printStackTrace();
-            return Pair.of("critical error: unknown cause, contact backend team", new PageImpl<>(new ArrayList<>()));
+            return Pair.of("critical error: unpredicted cause, contact backend team", new PageImpl<>(new ArrayList<>()));
         }
     }
 
@@ -180,7 +180,7 @@ public class RecipeService {
                 return Pair.of("failed: limit cannot negative", new HashSet<>());
             }
             e.printStackTrace();
-            return Pair.of("failed: unknown error, contact backend team", new HashSet<>());
+            return Pair.of("critical error: unpredicted cause, contact backend team", new HashSet<>());
         }
 
     }
@@ -205,7 +205,7 @@ public class RecipeService {
                 return Pair.of("failed: limit cannot negative", new HashSet<>());
             }
             e.printStackTrace();
-            return Pair.of("failed: unknown error, contact backend team", new HashSet<>());
+            return Pair.of("critical error: unpredicted cause, contact backend team", new HashSet<>());
         }
     }
 
@@ -274,7 +274,7 @@ public class RecipeService {
             }
 
             e.printStackTrace();
-            return "failed: unknown error, contact backend team";
+            return "critical error: unpredicted cause, contact backend team";
         }
     }
 
