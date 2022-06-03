@@ -14,8 +14,6 @@ import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.repository.RecipeRepository;
 
-import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
-import org.apache.tomcat.util.http.fileupload.impl.SizeLimitExceededException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -24,7 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
@@ -80,7 +77,7 @@ public class RecipeService {
                 return Pair.of("failed: cannot save duplicate", new RecipeEntity());
             }
             e.printStackTrace();
-            return Pair.of("failed: unknown error, contact backend team", new RecipeEntity());
+            return Pair.of("critical error: unpredicted cause, contact backend team", new RecipeEntity());
         }
     }
 
@@ -114,13 +111,15 @@ public class RecipeService {
                 return "failed: cannot save duplicate";
             }
             e.printStackTrace();
-            return "failed: unknown error, contact backend team";
+            return "critical error: unpredicted cause, contact backend team";
         }
     }
 
     public Pair<String, Page<RecipeDtoList>> getPublishedRecipes(RecipeSearchDto dto) {
         if (dto.getTagId() == null || dto.getTagId().isEmpty()) {
-            Set<Integer> allTags = tagService.getAllTags()
+            Pair<String, List<TagEntity>> tagResult = tagService.getAllTags();
+
+            Set<Integer> allTags = tagResult.getSecond()
                     .stream()
                     .map(n -> n.getId())
                     .collect(Collectors.toSet());
@@ -144,7 +143,8 @@ public class RecipeService {
                 return Pair.of("failed: page index must not be less than zero", new PageImpl<>(new ArrayList<>()));
             }
             e.printStackTrace();
-            return Pair.of("failed: unknown error, contact backend team", new PageImpl<>(new ArrayList<>()));
+            return Pair.of("critical error: unpredicted cause, contact backend team",
+                    new PageImpl<>(new ArrayList<>()));
         }
     }
 
@@ -183,7 +183,7 @@ public class RecipeService {
                 return Pair.of("failed: limit cannot negative", new HashSet<>());
             }
             e.printStackTrace();
-            return Pair.of("failed: unknown error, contact backend team", new HashSet<>());
+            return Pair.of("critical error: unpredicted cause, contact backend team", new HashSet<>());
         }
 
     }
@@ -208,7 +208,7 @@ public class RecipeService {
                 return Pair.of("failed: limit cannot negative", new HashSet<>());
             }
             e.printStackTrace();
-            return Pair.of("failed: unknown error, contact backend team", new HashSet<>());
+            return Pair.of("critical error: unpredicted cause, contact backend team", new HashSet<>());
         }
     }
 
@@ -258,7 +258,7 @@ public class RecipeService {
         }
 
         try {
-            if (ImageIO.read(photo.getInputStream()) == null){
+            if (ImageIO.read(photo.getInputStream()) == null) {
                 throw new NullPointerException();
             }
 
@@ -277,7 +277,7 @@ public class RecipeService {
             }
 
             e.printStackTrace();
-            return "failed: unknown error, contact backend team";
+            return "critical error: unpredicted cause, contact backend team";
         }
     }
 

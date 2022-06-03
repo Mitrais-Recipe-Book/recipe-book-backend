@@ -34,7 +34,7 @@ class TagServiceTest {
     void testSuccessGetAllTags() {
         when(tagDao.findAll()).thenReturn(List.of(tag1, tag2));
 
-        List<TagEntity> allTags = tagService.getAllTags();
+        List<TagEntity> allTags = tagService.getAllTags().getSecond();
         assertEquals(2, allTags.size());
         assertEquals("breakfast", allTags.get(0).getName());
         assertEquals(1, allTags.get(0).getId());
@@ -47,7 +47,7 @@ class TagServiceTest {
         when(tagDao.save(any(TagEntity.class)))
                 .thenThrow(DataIntegrityViolationException.class);
 
-        TagEntity newTag = tagService.saveTag("breakfast");
+        TagEntity newTag = tagService.saveTag("breakfast").getSecond();
         assertNull(newTag);
     }
 
@@ -56,7 +56,7 @@ class TagServiceTest {
         when(tagDao.save(any(TagEntity.class)))
                 .thenReturn(tag1);
 
-        TagEntity newTag = tagService.saveTag("breakfast");
+        TagEntity newTag = tagService.saveTag("breakfast").getSecond();
         verify(tagDao).save(any(TagEntity.class));
         assertEquals("breakfast", newTag.getName());
         assertEquals(1, newTag.getId());
