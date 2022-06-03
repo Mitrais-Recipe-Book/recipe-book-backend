@@ -5,14 +5,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
 import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
 import com.cdcone.recipy.entity.RecipeEntity;
+import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.entity.UserEntity;
 import com.cdcone.recipy.repository.RecipeRepository;
 
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.util.Pair;
 
 public class RecipeServiceTest {
 
@@ -103,17 +105,29 @@ public class RecipeServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     void getPublishedRecipes() {
+        List<TagEntity> mockTag = mock(List.class);
+        Pair<String, List<TagEntity>> mockService = Pair.of("success:", mockTag);
+
+
         when(RECIPE_REPOSITORY.getPublishedRecipes(any(), any(), any(), any()))
                 .thenReturn(mock(Page.class));
+        when(TAG_SERVICE.getAllTags()).thenReturn(mockService);
 
         assertEquals('s',
                 recipeService.getPublishedRecipes(RECIPE_SEARCH_DTO).getFirst().charAt(0));
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void failedGetPublishedRecipesIllegalPageRequest() {
+        List<TagEntity> mockTag = mock(List.class);
+        Pair<String, List<TagEntity>> mockService = Pair.of("success:", mockTag);
+
+
         when(RECIPE_REPOSITORY.getPublishedRecipes(any(), any(), any(), any()))
                 .thenThrow(IllegalArgumentException.class);
+ 
+        when(TAG_SERVICE.getAllTags()).thenReturn(mockService);
 
         assertEquals('f',
                 recipeService.getPublishedRecipes(RECIPE_SEARCH_DTO).getFirst().charAt(0));
@@ -221,11 +235,11 @@ public class RecipeServiceTest {
     }
 
     @Test
-    void failedDeleteRecipeNotFound(){
+    void failedDeleteRecipeNotFound() {
         when(RECIPE_REPOSITORY.findById(1L)).thenReturn(Optional.empty());
 
         assertEquals('f',
                 recipeService.deleteRecipe(1L).getFirst().charAt(0));
-   
+
     }
 }

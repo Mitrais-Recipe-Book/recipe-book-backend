@@ -117,7 +117,9 @@ public class RecipeService {
 
     public Pair<String, Page<RecipeDtoList>> getPublishedRecipes(RecipeSearchDto dto) {
         if (dto.getTagId() == null || dto.getTagId().isEmpty()) {
-            Set<Integer> allTags = tagService.getAllTags().getSecond()
+            Pair<String, List<TagEntity>> tagResult = tagService.getAllTags();
+
+            Set<Integer> allTags = tagResult.getSecond()
                     .stream()
                     .map(n -> n.getId())
                     .collect(Collectors.toSet());
@@ -141,7 +143,8 @@ public class RecipeService {
                 return Pair.of("failed: page index must not be less than zero", new PageImpl<>(new ArrayList<>()));
             }
             e.printStackTrace();
-            return Pair.of("critical error: unpredicted cause, contact backend team", new PageImpl<>(new ArrayList<>()));
+            return Pair.of("critical error: unpredicted cause, contact backend team",
+                    new PageImpl<>(new ArrayList<>()));
         }
     }
 
@@ -255,7 +258,7 @@ public class RecipeService {
         }
 
         try {
-            if (ImageIO.read(photo.getInputStream()) == null){
+            if (ImageIO.read(photo.getInputStream()) == null) {
                 throw new NullPointerException();
             }
 
