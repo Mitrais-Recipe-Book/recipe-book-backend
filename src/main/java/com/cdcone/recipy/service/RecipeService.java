@@ -1,6 +1,5 @@
 package com.cdcone.recipy.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
@@ -16,6 +15,7 @@ import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.repository.RecipeRepository;
 
 import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
+import org.apache.tomcat.util.http.fileupload.impl.SizeLimitExceededException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -24,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
@@ -142,7 +143,7 @@ public class RecipeService {
             if (e instanceof IllegalArgumentException) {
                 return Pair.of("failed: page index must not be less than zero", new PageImpl<>(new ArrayList<>()));
             }
-            e.printStackTrace();a
+            e.printStackTrace();
             return Pair.of("failed: unknown error, contact backend team", new PageImpl<>(new ArrayList<>()));
         }
     }
@@ -257,7 +258,9 @@ public class RecipeService {
         }
 
         try {
-            ImageIO.read(photo.getInputStream()).toString();
+            if (ImageIO.read(photo.getInputStream()) == null){
+                throw new NullPointerException();
+            }
 
             recipe.getSecond().setBannerImage(photo.getBytes());
             recipe.getSecond().setBannerImageType(photo.getContentType());
@@ -269,14 +272,10 @@ public class RecipeService {
                 return "failed: image not updated";
             }
 
-            if(e instanceof NullPointerException){
+            if (e instanceof NullPointerException) {
                 return "failed: file is not image";
             }
 
-            if(e instanceof FileSizeLimitExceededException){
-                return "failed: image size should be less than 1 megabytes";
-            }
-            
             e.printStackTrace();
             return "failed: unknown error, contact backend team";
         }
