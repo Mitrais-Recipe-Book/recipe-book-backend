@@ -20,7 +20,7 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
 
         // this is jpa, not sql
         @Query("SELECT DISTINCT NEW com.cdcone.recipy.dtoAccess.RecipeDtoList " +
-                        "(recipe.id, recipe.title, recipe.overview, recipe.views, user.fullName) " +
+                        "(recipe.id, recipe.title, recipe.overview, recipe.views, user) " +
                         "FROM RecipeEntity recipe " +
                         "JOIN recipe.user user " +
                         "LEFT JOIN recipe.tags tag " +
@@ -36,7 +36,7 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
                         Pageable pageable);
 
         @Query("SELECT NEW com.cdcone.recipy.dtoAccess.RecipeDtoList " +
-                        "(recipe.id, recipe.title, recipe.overview, recipe.views, user.fullName) " +
+                        "(recipe.id, recipe.title, recipe.overview, recipe.views, user) " +
                         "FROM RecipeEntity recipe JOIN recipe.user user " +
                         "WHERE recipe.isDraft = FALSE " +
                         "ORDER BY recipe.views DESC ")
@@ -48,7 +48,7 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
         Page<UserRecipeDto> findByUsername(@Param("username") String username, Pageable pageable);
 
         @Query("SELECT NEW com.cdcone.recipy.dtoAccess.RecipeDtoList " +
-                        "(recipe.id, recipe.title, recipe.overview, recipe.views, recipe.user.fullName) " +
+                        "(recipe.id, recipe.title, recipe.overview, recipe.views, recipe.user) " +
                         "FROM RecipeEntity recipe " +
                         "WHERE recipe.isDraft = FALSE " +
                         "ORDER BY recipe.id DESC")

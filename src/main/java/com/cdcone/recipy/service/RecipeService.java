@@ -7,11 +7,13 @@ import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
+import com.cdcone.recipy.dtoAccess.AuthorDto;
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
 import com.cdcone.recipy.dtoAccess.UserRecipeDto;
 import com.cdcone.recipy.dtoRequest.*;
 import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.entity.TagEntity;
+import com.cdcone.recipy.entity.UserEntity;
 import com.cdcone.recipy.repository.RecipeRepository;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -131,10 +133,13 @@ public class RecipeService {
             Page<RecipeDtoList> result = recipeRepository.getPublishedRecipes(dto.getTitle(), dto.getAuthor(),
                     dto.getTagId(), pageable);
 
-            result.getContent().forEach(i -> i.setAuthorFollower(
-                    userService.getFollowerCountById(
-                            getById(
-                                    i.getId()).getSecond().getUser().getId())));
+            result.getContent().forEach(i -> {
+                UserEntity user = i.getUser();
+                AuthorDto author = new AuthorDto(user.getUsername(),
+                        user.getFullName(),
+                        userService.getFollowerCountById(user.getId()));
+                i.setAuthor(author);
+            });
 
             return Pair.of("success: data retrieved", result);
 
@@ -169,10 +174,11 @@ public class RecipeService {
                     .stream()
                     .limit(limit)
                     .map(i -> {
-                        i.setAuthorFollower(
-                                userService.getFollowerCountById(
-                                        getById(
-                                                i.getId()).getSecond().getUser().getId()));
+                        UserEntity user = i.getUser();
+                        AuthorDto author = new AuthorDto(user.getUsername(),
+                                user.getFullName(),
+                                userService.getFollowerCountById(user.getId()));
+                        i.setAuthor(author);
                         return i;
                     })
                     .collect(Collectors.toSet());
@@ -194,10 +200,11 @@ public class RecipeService {
                     .stream()
                     .limit(limit)
                     .map(i -> {
-                        i.setAuthorFollower(
-                                userService.getFollowerCountById(
-                                        getById(
-                                                i.getId()).getSecond().getUser().getId()));
+                        UserEntity user = i.getUser();
+                        AuthorDto author = new AuthorDto(user.getUsername(),
+                                user.getFullName(),
+                                userService.getFollowerCountById(user.getId()));
+                        i.setAuthor(author);
                         return i;
                     })
                     .collect(Collectors.toSet());
@@ -291,8 +298,7 @@ public class RecipeService {
         RecipeDtoList result = new RecipeDtoList(recipe.getSecond().getId(),
                 recipe.getSecond().getTitle(),
                 recipe.getSecond().getOverview(),
-                recipe.getSecond().getViews(),
-                recipe.getSecond().getUser().getUsername());
+                recipe.getSecond().getViews());
 
         recipeRepository.delete(recipe.getSecond());
 
