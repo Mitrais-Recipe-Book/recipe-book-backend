@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class AuthorDto {
     private String username;
     private String fullName;
-    private Long authorFollower;
+    private Long authorFollowers;
 }
