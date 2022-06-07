@@ -1,9 +1,9 @@
 package com.cdcone.recipy.dtoRequest;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 @AllArgsConstructor
 public class SignUpDto {
 
@@ -12,7 +12,7 @@ public class SignUpDto {
     private String password;
     private String fullName;
 
-    public Boolean isBlank() {
+    public Boolean checkBlank() {
         return email.isBlank() || username.isBlank() ||
                 password.isBlank() || fullName.isBlank();
     }
