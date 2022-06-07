@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -16,8 +17,10 @@ import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.entity.UserEntity;
 import com.cdcone.recipy.repository.RecipeRepository;
+import com.cdcone.recipy.util.ImageUtil;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -134,8 +137,8 @@ public class RecipeServiceTest {
     }
 
     @Test
-    void getRecipeImage() {
-        byte[] photo = { 1, 0 };
+    void getRecipeImage() throws IOException{
+        byte[] photo = ImageUtil.randomImage();
 
         when(RECIPE_REPOSITORY.findById(1L))
                 .thenReturn(Optional.of(RECIPE_ENTITY));
@@ -157,6 +160,12 @@ public class RecipeServiceTest {
 
         assertEquals('f',
                 recipeService.getRecipeImage(1L).getFirst().charAt(0));
+    }
+
+    @Test
+    @Disabled
+    void saveRecipePhoto() throws IOException{
+        // todo -> write unit test for save recipe photo
     }
 
     @Test
