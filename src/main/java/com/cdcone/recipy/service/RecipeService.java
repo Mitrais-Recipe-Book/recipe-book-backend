@@ -230,7 +230,7 @@ public class RecipeService {
         }
 
         int views = recipe.getSecond().getViews();
-        recipe.getSecond().setViews(views++);
+        recipe.getSecond().setViews(views + 1);
 
         recipeRepository.save(recipe.getSecond());
         return "success: data updated";
