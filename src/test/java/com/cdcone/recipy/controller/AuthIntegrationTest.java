@@ -1,8 +1,8 @@
 package com.cdcone.recipy.controller;
 
-import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -13,26 +13,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-
 import java.nio.charset.Charset;
 
 @ActiveProfiles("test")
-@RequiredArgsConstructor
+@AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class AuthIntegrationTest {
 
-    private final WebApplicationContext applicationContext;
-    private static MockMvc mockMvc;
-
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
-    }
+    @Autowired
+    private MockMvc mockMvc;
 
     @Test
-    @Sql(scripts = {"/role.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void testFailSignIn() throws Exception {
         String signIn = "{\"username\":\"unavailable\",\"password\":\"unavailable\"}";
         mockMvc.perform(post("/auth/sign-in")
@@ -47,7 +38,7 @@ public class AuthIntegrationTest {
     }
 
     @Test
-    @Sql(scripts = {"/user.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = {"/user.sql"})
     void testSuccessSignIn() throws Exception {
         String signIn = "{\"username\":\"user1\",\"password\":\"password\"}";
         mockMvc.perform(post("/auth/sign-in")
@@ -58,6 +49,59 @@ public class AuthIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value("Success"))
+                .andReturn();
+    }
+
+    @Test
+    void testFailSignUpIfEmptyField() throws Exception {
+        String signUp = "{\"email\":\"\",\"username\":\"\",\"password\":\"\",\"fullName\":\"\"}";
+        mockMvc.perform(post("/auth/sign-up")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding(Charset.defaultCharset())
+                        .content(signUp))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Please fill out all required fields."))
+                .andReturn();
+    }
+
+    @Test
+    void testFailSignUpIfUserAlreadyExist() throws Exception {
+        String signUp = "{\"email\":\"user1@test.com\",\"username\":\"user1\",\"password\":\"password\",\"fullName\":\"test test\"}";
+        mockMvc.perform(post("/auth/sign-up")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding(Charset.defaultCharset())
+                        .content(signUp))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Failed to create user. Username or email is already exists"))
+                .andReturn();
+    }
+
+    @Test
+    @Sql(scripts = {"/role.sql"})
+    void testSuccessSignUp() throws Exception {
+        String signUp = "{\"email\":\"test@test.com\",\"username\":\"test\",\"password\":\"password\",\"fullName\":\"test test\"}";
+        mockMvc.perform(post("/auth/sign-up")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding(Charset.defaultCharset())
+                        .content(signUp))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Success"))
+                .andReturn();
+    }
+
+    @Test
+    void testFailSignUpIfPasswordLessThanEightCharacters() throws Exception {
+        String signUp = "{\"email\":\"test2@test.com\",\"username\":\"test2\",\"password\":\"pass\",\"fullName\":\"test test\"}";
+        mockMvc.perform(post("/auth/sign-up")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding(Charset.defaultCharset())
+                        .content(signUp))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Password must be equal or more than 8 characters"))
                 .andReturn();
     }
 }
