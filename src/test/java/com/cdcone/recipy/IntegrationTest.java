@@ -1,4 +1,4 @@
-package com.cdcone.recipy.controller;
+package com.cdcone.recipy;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,11 +6,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.nio.charset.Charset;
@@ -18,7 +16,7 @@ import java.nio.charset.Charset;
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class AuthIntegrationTest {
+public class IntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -30,7 +28,6 @@ public class AuthIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding(Charset.defaultCharset())
                         .content(signIn))
-                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value("Wrong username or password"))
@@ -38,14 +35,12 @@ public class AuthIntegrationTest {
     }
 
     @Test
-    @Sql(scripts = {"/user.sql"})
     void testSuccessSignIn() throws Exception {
         String signIn = "{\"username\":\"user1\",\"password\":\"password\"}";
         mockMvc.perform(post("/auth/sign-in")
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding(Charset.defaultCharset())
                         .content(signIn))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value("Success"))
@@ -59,7 +54,6 @@ public class AuthIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding(Charset.defaultCharset())
                         .content(signUp))
-                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Please fill out all required fields."))
                 .andReturn();
@@ -72,21 +66,18 @@ public class AuthIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding(Charset.defaultCharset())
                         .content(signUp))
-                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Failed to create user. Username or email is already exists"))
                 .andReturn();
     }
 
     @Test
-    @Sql(scripts = {"/role.sql"})
     void testSuccessSignUp() throws Exception {
         String signUp = "{\"email\":\"test@test.com\",\"username\":\"test\",\"password\":\"password\",\"fullName\":\"test test\"}";
         mockMvc.perform(post("/auth/sign-up")
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding(Charset.defaultCharset())
                         .content(signUp))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Success"))
                 .andReturn();
@@ -99,9 +90,26 @@ public class AuthIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding(Charset.defaultCharset())
                         .content(signUp))
-                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Password must be equal or more than 8 characters"))
+                .andReturn();
+    }
+
+    @Test
+    void testSuccessGetByUsername() throws Exception {
+        String username = "user1";
+        mockMvc.perform(get("/api/v1/user/" + username))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("success: data retrieved"))
+                .andReturn();
+    }
+
+    @Test
+    void testFailGetByUsername() throws Exception {
+        String username = "unavailablexxx";
+        mockMvc.perform(get("/api/v1/user/" + username))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("User not found."))
                 .andReturn();
     }
 }
