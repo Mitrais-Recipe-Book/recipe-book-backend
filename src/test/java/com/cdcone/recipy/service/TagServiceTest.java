@@ -48,7 +48,7 @@ class TagServiceTest {
                 .thenThrow(DataIntegrityViolationException.class);
 
         TagEntity newTag = tagService.saveTag("breakfast").getSecond();
-        assertNull(newTag);
+        assertNull(newTag.getName());
     }
 
     @Test
@@ -64,8 +64,10 @@ class TagServiceTest {
 
     @Test
     void testFailToGetTagById() {
-        assertThrows(NoSuchElementException.class,
-                () -> tagService.getById(1)); // Need error message to check
+        when(tagDao.findById(1)).thenReturn(Optional.empty());
+        Pair<TagEntity, String> result = tagService.getById(1);
+
+        assertTrue(tagService.getById(1).getSecond().startsWith("failed"));
     }
 
     @Test
