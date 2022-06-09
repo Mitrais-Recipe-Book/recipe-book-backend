@@ -17,7 +17,6 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.cdcone.recipy.dtoAccess.RecipeDetailDto;
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
 import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
