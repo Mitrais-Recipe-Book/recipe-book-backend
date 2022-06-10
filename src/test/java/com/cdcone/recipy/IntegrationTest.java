@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -121,6 +122,28 @@ public class IntegrationTest {
     	        .andExpect(jsonPath("$.message").value("SUCCESS"))
                 .andExpect(jsonPath("$.payload.totalPages").value(1))
                 .andExpect(jsonPath("$.payload.data[0].title").value("string"))
+    	        .andReturn();
+    }
+    
+    @Test
+    void testSuccessGetFollowerList() throws Exception {
+    	Long userId = 1L;
+    	mockMvc.perform(get("/api/v1/user/" + userId + "/followers"))
+    	        .andExpect(status().isOk())
+    	        .andExpect(jsonPath("$.message").value("success"))
+    	        .andExpect(jsonPath("$.payload.*").isArray())
+    	        .andExpect(jsonPath("$.payload.length()", is(4)))
+    	        .andReturn();
+    }
+    
+    @Test
+    void testSuccessGetFollowingList() throws Exception {
+    	Long userId = 10L;
+    	mockMvc.perform(get("/api/v1/user/" + userId + "/follow-list"))
+    	        .andExpect(status().isOk())
+    	        .andExpect(jsonPath("$.message").value("succeed"))
+    	        .andExpect(jsonPath("$.payload.*").isArray())
+    	        .andExpect(jsonPath("$.payload.length()", is(1)))
     	        .andReturn();
     }
 }
