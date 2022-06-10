@@ -112,4 +112,15 @@ public class IntegrationTest {
                 .andExpect(jsonPath("$.message").value("User not found."))
                 .andReturn();
     }
+    
+    @Test
+    void testSuccessGetRecipeByUsername() throws Exception {
+    	String username = "user1";
+    	mockMvc.perform(get("/api/v1/user/" + username + "/recipes"))
+    	        .andExpect(status().isOk())
+    	        .andExpect(jsonPath("$.message").value("SUCCESS"))
+                .andExpect(jsonPath("$.payload.totalPages").value(1))
+                .andExpect(jsonPath("$.payload.data[0].title").value("string"))
+    	        .andReturn();
+    }
 }
