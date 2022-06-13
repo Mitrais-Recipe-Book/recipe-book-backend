@@ -37,8 +37,6 @@ import com.cdcone.recipy.util.ImageUtil;
 
 public class UserControllerTest {
 
-    private static final BCryptPasswordEncoder PASS_ENCODER = mock(BCryptPasswordEncoder.class);
-
     private static final UserProfile USER_PROFILE = mock(UserProfile.class);
 
     private static final UserService USER_SERVICE = mock(UserService.class);
