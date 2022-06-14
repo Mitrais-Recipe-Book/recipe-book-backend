@@ -12,8 +12,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.nio.charset.Charset;
-
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -27,7 +25,6 @@ public class IntegrationTest {
         String signIn = "{\"username\":\"unavailable\",\"password\":\"unavailable\"}";
         mockMvc.perform(post("/auth/sign-in")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .characterEncoding(Charset.defaultCharset())
                         .content(signIn))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -40,7 +37,6 @@ public class IntegrationTest {
         String signIn = "{\"username\":\"user1\",\"password\":\"password\"}";
         mockMvc.perform(post("/auth/sign-in")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .characterEncoding(Charset.defaultCharset())
                         .content(signIn))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -53,7 +49,6 @@ public class IntegrationTest {
         String signUp = "{\"email\":\"\",\"username\":\"\",\"password\":\"\",\"fullName\":\"\"}";
         mockMvc.perform(post("/auth/sign-up")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .characterEncoding(Charset.defaultCharset())
                         .content(signUp))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Please fill out all required fields."))
@@ -65,7 +60,6 @@ public class IntegrationTest {
         String signUp = "{\"email\":\"user1@test.com\",\"username\":\"user1\",\"password\":\"password\",\"fullName\":\"test test\"}";
         mockMvc.perform(post("/auth/sign-up")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .characterEncoding(Charset.defaultCharset())
                         .content(signUp))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Failed to create user. Username or email is already exists"))
@@ -77,7 +71,6 @@ public class IntegrationTest {
         String signUp = "{\"email\":\"test@test.com\",\"username\":\"test\",\"password\":\"password\",\"fullName\":\"test test\"}";
         mockMvc.perform(post("/auth/sign-up")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .characterEncoding(Charset.defaultCharset())
                         .content(signUp))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Success"))
@@ -89,7 +82,6 @@ public class IntegrationTest {
         String signUp = "{\"email\":\"test2@test.com\",\"username\":\"test2\",\"password\":\"pass\",\"fullName\":\"test test\"}";
         mockMvc.perform(post("/auth/sign-up")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .characterEncoding(Charset.defaultCharset())
                         .content(signUp))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Password must be equal or more than 8 characters"))
@@ -145,5 +137,103 @@ public class IntegrationTest {
     	        .andExpect(jsonPath("$.payload.*").isArray())
     	        .andExpect(jsonPath("$.payload.length()", is(1)))
     	        .andReturn();
+    }
+    
+    @Test
+    void testFailAddTagIfAlreadyExist() throws Exception {
+    	String duplicateTag = "breakfast";
+    	mockMvc.perform(post("/api/v1/tag")
+                 	.content(duplicateTag))
+    		.andExpect(status().isBadRequest())
+    		.andExpect(jsonPath("$.message").value("failed: cannot save duplicate"))
+    		.andReturn();
+    }
+    
+    @Test
+    void testSuccessAddTag() throws Exception {
+    	String newTag = "eastern";
+    	mockMvc.perform(post("/api/v1/tag")
+    			.content(newTag))
+    		.andExpect(status().isOk())
+    		.andExpect(jsonPath("$.message").value("success: tag saved"))
+    		.andExpect(jsonPath("$.payload.name").value(newTag))
+    		.andReturn();
+    }
+    
+    @Test
+    void testFailEditTagIfAlreadyExist() throws Exception {
+	Integer tagId = 4; // "western"
+	String editTag = "{\"tagId\":" + tagId + ",\"tagReplace\":\"breakfast\"}";
+	mockMvc.perform(put("/api/v1/tag")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(editTag))
+		.andExpect(status().isBadRequest())
+		.andExpect(jsonPath("$.message").value("error: tag already exists"))
+		.andReturn();
+    }
+    
+    @Test
+    void testFailEditTagIfSameName() throws Exception {
+	Integer tagId = 4; // "western"
+	String editTag = "{\"tagId\":" + tagId + ",\"tagReplace\":\"western\"}";
+	mockMvc.perform(put("/api/v1/tag")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(editTag))
+		.andExpect(status().isBadRequest())
+		.andExpect(jsonPath("$.message").value("error: tag must be different"))
+		.andReturn();
+    }
+    
+    @Test
+    void testFailEditTagIfNotFound() throws Exception {
+	Integer tagId = 99;
+	String editTag = "{\"tagId\":" + tagId + ",\"tagReplace\":\"dinner\"}";
+	mockMvc.perform(put("/api/v1/tag")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(editTag))
+		.andExpect(status().isNotFound())
+		.andExpect(jsonPath("$.message").value("error: tag not found"))
+		.andReturn();
+    }
+    
+    @Test
+    void testSuccessEditTag() throws Exception {
+	Integer tagId = 3; // "indonesia seafood"
+	String editTag = "{\"tagId\":" + tagId + ",\"tagReplace\":\"dinner\"}";
+	mockMvc.perform(put("/api/v1/tag")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(editTag))
+		.andExpect(status().isOk())
+		.andExpect(jsonPath("$.message").value("success: data updated"))
+		.andExpect(jsonPath("$.payload.new").value("dinner"))
+		.andReturn();
+    }
+    
+    @Test
+    void testFailDeleteTagIfNotFound() throws Exception {
+	Integer tagId = 99;
+	mockMvc.perform(delete("/api/v1/tag/" + tagId))
+		.andExpect(status().isBadRequest())
+		.andExpect(jsonPath("$.message").value("error: Tag not found"))
+		.andReturn();
+    }
+    
+    @Test
+    void testSuccessDeleteTag() throws Exception {
+	Integer tagId = 2; // "light meal"
+	mockMvc.perform(delete("/api/v1/tag/" + tagId))
+		.andExpect(status().isOk())
+		.andExpect(jsonPath("$.message").value("success: data deleted"))
+		.andExpect(jsonPath("$.payload.name").value("light meal"))
+		.andReturn();
+    }
+    
+    @Test
+    void testSuccessGetAllTags() throws Exception {
+	mockMvc.perform(get("/api/v1/tag"))
+		.andExpect(status().isOk())
+		.andExpect(jsonPath("$.message").value("success: data retrieved"))
+		.andExpect(jsonPath("$.payload").isArray())
+		.andReturn();
     }
 }
