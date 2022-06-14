@@ -72,7 +72,7 @@ public class RecipeService {
 
             recipeRepository.save(recipe);
 
-            return Pair.of("succees: data saved", recipe);
+            return Pair.of("success: data saved", recipe);
         } catch (Exception e) {
 
             if (e instanceof DataIntegrityViolationException) {
