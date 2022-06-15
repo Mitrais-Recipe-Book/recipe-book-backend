@@ -78,6 +78,11 @@ public class RecipeService {
             if (e instanceof DataIntegrityViolationException) {
                 return Pair.of("failed: cannot save duplicate", new RecipeEntity());
             }
+
+            if (e instanceof NullPointerException) {
+                return Pair.of("failed: " + e.getMessage(), new RecipeEntity());
+            }
+
             e.printStackTrace();
             return Pair.of("critical error: unpredicted cause, contact backend team", new RecipeEntity());
         }
@@ -111,6 +116,9 @@ public class RecipeService {
         } catch (Exception e) {
             if (e instanceof DataIntegrityViolationException) {
                 return "failed: cannot save duplicate";
+            }
+            if (e instanceof NullPointerException) {
+                return "failed: " + e.getMessage();
             }
             e.printStackTrace();
             return "critical error: unpredicted cause, contact backend team";

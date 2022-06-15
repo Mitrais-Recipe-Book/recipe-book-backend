@@ -27,8 +27,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Entity()
-@Table(name = "recipes",
-    uniqueConstraints = {
+@Table(name = "recipes", uniqueConstraints = {
         @UniqueConstraint(name = "recipe_title_unique", columnNames = "title_lower_variant")
 })
 public class RecipeEntity {
@@ -40,7 +39,7 @@ public class RecipeEntity {
     @Column(name = "title")
     private String title;
 
-    @Column(name="title_lower_variant", nullable = false)
+    @Column(name = "title_lower_variant", nullable = false)
     private String titleLowerVariant;
 
     @Column(name = "overview", columnDefinition = "TEXT")
@@ -49,7 +48,7 @@ public class RecipeEntity {
     @Column(name = "date_created", nullable = false)
     private LocalDate dateCreated;
 
-    @Column(name = "ingredients", columnDefinition = "TEXT")
+    @Column(name = "ingredients", nullable = false, columnDefinition = "TEXT")
     private String ingredients;
 
     @Column(name = "content", columnDefinition = "TEXT")
@@ -70,7 +69,7 @@ public class RecipeEntity {
     @JsonIgnore
     private byte[] bannerImage;
 
-    @Column(name ="banner_image_type")
+    @Column(name = "banner_image_type")
     private String bannerImageType;
 
     @ManyToOne
@@ -78,10 +77,7 @@ public class RecipeEntity {
     private UserEntity user;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        joinColumns = @JoinColumn(name = "recipe_id", referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id")
-    )
+    @JoinTable(joinColumns = @JoinColumn(name = "recipe_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"))
     private Set<TagEntity> tags;
 
     public RecipeEntity(
@@ -96,10 +92,19 @@ public class RecipeEntity {
             String videoURL,
             int views,
             boolean isDraft) {
+
+        if (title.isBlank()) {
+            throw new NullPointerException("title cannot blank");
+        }
+
+        if (ingredients.isBlank()) {
+            throw new NullPointerException("ingredients cannot blank");
+        }
+
         this.user = userEntity;
         this.tags = tags;
         this.title = title;
-        this.titleLowerVariant =  titleLowerVairant;
+        this.titleLowerVariant = titleLowerVairant;
         this.overview = overview;
         this.dateCreated = dateCreated;
         this.ingredients = ingredients;

@@ -18,6 +18,7 @@ public class RecipeDtoAdd {
     @NotEmpty
     private String title;
     private String overview;
+    @NotEmpty
     private String ingredients;
     private String content;
     private String videoURL;
