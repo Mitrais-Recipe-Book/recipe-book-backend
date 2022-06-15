@@ -33,7 +33,7 @@ public class UserEntity {
     private String fullName;
 
     @Lob
-    @Column(name = "profile_photo")
+    @Column(name = "profile_photo", columnDefinition = "BYTEA")
     @Type(type = "org.hibernate.type.BinaryType")
     @JsonIgnore
     private byte[] profilePhoto;
