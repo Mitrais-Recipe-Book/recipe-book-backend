@@ -2,6 +2,7 @@ package com.cdcone.recipy;
 
 
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
+import com.cdcone.recipy.util.ImageUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -405,10 +406,49 @@ public class IntegrationTest {
 
 	}
 
+	@Test
+	void testFailSaveUserPhotoIfUserNotFound() throws Exception {
+	    byte[] random = {12, 12};
+	    String username = "notfound123";
+	    mockMvc.perform(multipart("/api/v1/user/" + username + "/photo")
+	                    .file("photo", random)
+	                    .with(it -> {
+	                        it.setMethod("PUT");
+	                        return it;
+	                    }))
+	            .andExpect(status().isBadRequest())
+	            .andExpect(jsonPath("$.message").value("User not found."))
+	            .andReturn();
+	}
 
+	@Test
+	void testFailSaveUserPhotoIfInvalidImage() throws Exception {
+	    byte[] random = {12, 13};
+	    String username = "user1";
+	    mockMvc.perform(multipart("/api/v1/user/" + username + "/photo")
+	                    .file("photo", random)
+	                    .with(it -> {
+	                        it.setMethod("PUT");
+	                        return it;
+	                    }))
+	            .andExpect(status().isBadRequest())
+	            .andExpect(jsonPath("$.message").value("Uploaded file is not an image"))
+	            .andReturn();
+	}
 
-
-
-
+	@Test
+	void testSuccessSaveUserPhoto() throws Exception {
+	    byte[] random = ImageUtil.randomImage();
+	    String username = "user1";
+	    mockMvc.perform(multipart("/api/v1/user/" + username + "/photo")
+        	            .file("photo", random)
+        	            .with(it -> {
+        	                it.setMethod("PUT");
+                            return it; 
+        	            }))
+	            .andExpect(status().isOk())
+	            .andExpect(jsonPath("$.message").value("Success"))
+	            .andReturn();
+	}
 
 }
