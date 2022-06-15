@@ -8,10 +8,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -296,12 +304,12 @@ public class IntegrationTest {
 	@Test
 	void testSuccessGetPublishedRecipes() throws Exception {
 		MvcResult mr = mockMvc.perform(get("/api/v1/recipe/search")
-						.queryParam("title", "Bubur")
+						.queryParam("title", "Roti")
 						.queryParam("author", "")
 						.queryParam("page", "0"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.message").value("success: data retrieved"))
-				.andExpect(content().string(containsString("Bubur Ayam")))
+				.andExpect(content().string(containsString("Roti")))
 				.andReturn();
 
 		System.out.println(mr.getResponse().getContentAsString());
@@ -316,12 +324,52 @@ public class IntegrationTest {
 				.andReturn();
 
 		System.out.println(mr.getResponse().getContentAsString());
-
 	}
 
+	@Test
+	void testSuccessGetPopularRecipe() throws Exception {
+		MvcResult mr = mockMvc.perform(get("/api/v1/recipe/popular")
+				.queryParam("limit", "5"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data retrieved"))
+				.andExpect(content().string(containsString("Bubur")))
+				.andReturn();
 
+		System.out.println(mr.getResponse().getContentAsString());
+	}
 
+	@Test
+	void testSuccessGetDiscoverRecipe() throws Exception {
+		MvcResult mr = mockMvc.perform(get("/api/v1/recipe/discover")
+						.queryParam("limit", "5"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data retrieved"))
+				.andExpect(content().string(containsString("Roti")))
+				.andReturn();
 
+		System.out.println(mr.getResponse().getContentAsString());
+	}
 
+	@Test
+	void testSuccessDeleteRecipe() throws Exception {
+		MvcResult mr = mockMvc.perform(delete("/api/v1/recipe/2"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data deleted"))
+				.andExpect(content().string(containsString("Ayam")))
+				.andReturn();
+
+		System.out.println(mr.getResponse().getContentAsString());
+	}
+
+	@Test
+	void testSuccessGetByIdRecipe() throws Exception {
+		MvcResult mr = mockMvc.perform(get("/api/v1/recipe/3"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data retrieved"))
+				.andExpect(content().string(containsString("Roti")))
+				.andReturn();
+
+		System.out.println(mr.getResponse().getContentAsString());
+	}
 
 }
