@@ -3,15 +3,28 @@ package com.cdcone.recipy;
 
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -296,12 +309,12 @@ public class IntegrationTest {
 	@Test
 	void testSuccessGetPublishedRecipes() throws Exception {
 		MvcResult mr = mockMvc.perform(get("/api/v1/recipe/search")
-						.queryParam("title", "Bubur")
+						.queryParam("title", "Roti")
 						.queryParam("author", "")
 						.queryParam("page", "0"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.message").value("success: data retrieved"))
-				.andExpect(content().string(containsString("Bubur Ayam")))
+				.andExpect(content().string(containsString("Roti")))
 				.andReturn();
 
 		System.out.println(mr.getResponse().getContentAsString());
@@ -316,8 +329,82 @@ public class IntegrationTest {
 				.andReturn();
 
 		System.out.println(mr.getResponse().getContentAsString());
+	}
+
+	@Test
+	void testSuccessGetPopularRecipe() throws Exception {
+		MvcResult mr = mockMvc.perform(get("/api/v1/recipe/popular")
+				.queryParam("limit", "5"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data retrieved"))
+				.andExpect(content().string(containsString("Bubur")))
+				.andReturn();
+
+		System.out.println(mr.getResponse().getContentAsString());
+	}
+
+	@Test
+	void testSuccessGetDiscoverRecipe() throws Exception {
+		MvcResult mr = mockMvc.perform(get("/api/v1/recipe/discover")
+						.queryParam("limit", "5"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data retrieved"))
+				.andExpect(content().string(containsString("Roti")))
+				.andReturn();
+
+		System.out.println(mr.getResponse().getContentAsString());
+	}
+
+	@Test
+	void testSuccessDeleteRecipe() throws Exception {
+		MvcResult mr = mockMvc.perform(delete("/api/v1/recipe/2"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data deleted"))
+				.andExpect(content().string(containsString("Ayam")))
+				.andReturn();
+
+		System.out.println(mr.getResponse().getContentAsString());
+	}
+
+	@Test
+	void testSuccessGetByIdRecipe() throws Exception {
+		MvcResult mr = mockMvc.perform(get("/api/v1/recipe/3"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data retrieved"))
+				.andExpect(content().string(containsString("Roti")))
+				.andReturn();
+
+		System.out.println(mr.getResponse().getContentAsString());
+	}
+
+	@Test
+	void testSuccessSaveAndGetRecipePhoto() throws Exception {
+		Resource r = new ClassPathResource("roti.jpg");
+		MockMultipartFile multipartFile = new MockMultipartFile("photo", "roti.jpg", MediaType.IMAGE_JPEG_VALUE, r.getInputStream());
+
+		MockMultipartHttpServletRequestBuilder builder = MockMvcRequestBuilders.multipart("/api/v1/recipe/3/photo");
+		builder.with(request -> {
+			request.setMethod("PUT");
+			return request;
+		});
+
+		HashMap<String, String> contentTypeParams = new HashMap<>();
+		contentTypeParams.put("boundary", "265001916915724");
+		MediaType mediaType = new MediaType("multipart", "form-data", contentTypeParams);
+
+		MvcResult mr = mockMvc.perform(builder.file(multipartFile).contentType(mediaType))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: image updated"))
+				.andReturn();
+
+		System.out.println(mr.getResponse().getContentAsString());
+
+		mockMvc.perform(get("/api/v1/recipe/3/photo"))
+				.andExpect(status().isOk())
+				.andReturn();
 
 	}
+
 
 
 

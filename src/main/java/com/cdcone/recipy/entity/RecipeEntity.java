@@ -64,7 +64,7 @@ public class RecipeEntity {
     private boolean isDraft;
 
     @Lob
-    @Column(name = "banner_image")
+    @Column(name = "banner_image", columnDefinition = "BYTEA")
     @Type(type = "org.hibernate.type.BinaryType")
     @JsonIgnore
     private byte[] bannerImage;
