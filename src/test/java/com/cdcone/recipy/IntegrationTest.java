@@ -1,5 +1,8 @@
 package com.cdcone.recipy;
 
+
+import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -7,7 +10,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.Set;
+
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -19,6 +26,8 @@ public class IntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+	ObjectMapper om = new ObjectMapper();
 
     @Test
     void testFailSignIn() throws Exception {
@@ -236,4 +245,83 @@ public class IntegrationTest {
 		.andExpect(jsonPath("$.payload").isArray())
 		.andReturn();
     }
+
+	@Test
+	void testSuccessAddRecipe() throws Exception {
+		RecipeDtoAdd request = new RecipeDtoAdd();
+		request.setTitle("Ayam Bakar");
+		request.setOverview("Ayam Bakar Madiun");
+		request.setTagIds(Set.of(1));
+		request.setIngredients("[{\"name\":\"Ayam\",\"qty\":\"500gr\"},{\"name\":\"Kecap\",\"qty\":\"500ml\"}]");
+		request.setContent("<p>This is content</p>");
+		request.setDraft(false);
+		request.setUserId(1L);
+
+		String requestbody = om.writeValueAsString(request);
+
+		MvcResult mr = mockMvc.perform(post("/api/v1/recipe/add")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestbody))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data saved"))
+				.andReturn();
+
+		System.out.println(mr.getResponse().getContentAsString());
+	}
+
+	@Test
+	void testSuccessEditRecipe() throws Exception {
+		int recipeId = 1;
+
+		RecipeDtoAdd request = new RecipeDtoAdd();
+		request.setTitle("Soto Goreng");
+		request.setOverview("Soto Goreng Merdeka");
+		request.setTagIds(Set.of(3));
+		request.setIngredients("[{\"name\":\"Ayam\",\"qty\":\"500gr\"},{\"name\":\"Kol\",\"qty\":\"500gr\"}]");
+		request.setContent("<p>This is content</p>");
+		request.setUserId(1L);
+
+		String requestbody = om.writeValueAsString(request);
+
+		MvcResult mr = mockMvc.perform(put("/api/v1/recipe/"+ recipeId + "/edit")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(requestbody))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data updated"))
+				.andReturn();
+
+		System.out.println(mr.getResponse().getContentAsString());
+	}
+
+	@Test
+	void testSuccessGetPublishedRecipes() throws Exception {
+		MvcResult mr = mockMvc.perform(get("/api/v1/recipe/search")
+						.queryParam("title", "Bubur")
+						.queryParam("author", "")
+						.queryParam("page", "0"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data retrieved"))
+				.andExpect(content().string(containsString("Bubur Ayam")))
+				.andReturn();
+
+		System.out.println(mr.getResponse().getContentAsString());
+	}
+
+	@Test
+	void testSuccessAddViewer() throws Exception {
+		MvcResult mr = mockMvc.perform(put("/api/v1/recipe/addview")
+						.queryParam("recipeId", "2"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data updated"))
+				.andReturn();
+
+		System.out.println(mr.getResponse().getContentAsString());
+
+	}
+
+
+
+
+
+
 }
