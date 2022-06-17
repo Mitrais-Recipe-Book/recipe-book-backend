@@ -2,6 +2,7 @@ package com.cdcone.recipy.security;
 
 import com.cdcone.recipy.util.JwtUtil;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
@@ -15,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
 @Configuration
@@ -58,9 +60,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 @OpenAPIDefinition(info = @Info(title = "Recipy API", version = "0.1"))
 @SecurityScheme(
         name = "recipyAuth",
-        bearerFormat = "jwt",
+        bearerFormat = "JWT",
         scheme = "bearer",
-        type = SecuritySchemeType.HTTP
+        type = SecuritySchemeType.HTTP,
+        in = SecuritySchemeIn.HEADER
 )
 class OpenApi3Config {
 }

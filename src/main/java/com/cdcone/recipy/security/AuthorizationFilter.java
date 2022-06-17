@@ -22,26 +22,24 @@ public class AuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String path = request.getServletPath();
-        if (path.equals("/auth/sign-in") || path.equals("/auth/sign-up") || path.contains("/swagger-ui") || path.contains("/v3/api-docs")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer")) {
-            try {
-                String token = authorizationHeader.substring(7);
-                jwtUtil.validateJwt(token);
-                filterChain.doFilter(request, response);
-            } catch (JWTVerificationException e) {
+        if (path.startsWith("/api")) {
+            String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer")) {
+                try {
+                    String token = authorizationHeader.substring(7);
+                    jwtUtil.validateJwt(token);
+                    filterChain.doFilter(request, response);
+                } catch (JWTVerificationException e) {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    new ObjectMapper().writeValue(response.getWriter(), Map.of("error", "Unauthorized"));
+                }
+            } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.setContentType("application/json");
-                new ObjectMapper().writeValue(response.getWriter(), Map.of("error", e.getMessage()));
+                response.addHeader(HttpHeaders.WWW_AUTHENTICATE, "Bearer xxx");
             }
         } else {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
-            new ObjectMapper().writeValue(response.getWriter(), Map.of("error", "Unauthorized"));
+            filterChain.doFilter(request, response);
         }
     }
 }
