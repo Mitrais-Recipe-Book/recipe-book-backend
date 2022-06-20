@@ -40,19 +40,4 @@ public class CommentController {
 
         return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
     }
-
-    @GetMapping("{recipeId}/comment")
-    public ResponseEntity<CommonResponse> getComment(@PathVariable(name = "recipeId") Long recipeId, int page) {
-        List<CommentList> comments = new ArrayList<>();
-        CommentList comment = new CommentList("username", "fullname", LocalDateTime.now(), "comment");
-        comments.add(comment);
-
-        Pair<String, Page<CommentList>> result = Pair.of("success: no implementation yet", new PageImpl<>(comments));
-
-        if (result.getFirst().charAt(0) == 's') {
-            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), result.getSecond()));
-        }
-
-        return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
-    }
 }
