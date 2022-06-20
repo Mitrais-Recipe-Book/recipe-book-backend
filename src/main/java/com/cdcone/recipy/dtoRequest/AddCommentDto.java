@@ -2,8 +2,11 @@ package com.cdcone.recipy.dtoRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 public class AddCommentDto {
     private String username;
