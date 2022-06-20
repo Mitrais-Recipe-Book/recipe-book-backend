@@ -1,6 +1,6 @@
 package com.cdcone.recipy.dtoAccess;
 
-import com.cdcone.recipy.entity.RecipeReactionEntity;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,6 +8,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class RecipeReactionSummaryDto {
 
     private Long recipeId;
@@ -15,10 +16,4 @@ public class RecipeReactionSummaryDto {
     private List<RecipeReactionDto> reactionList;
     private RecipeReactionResponseDto userReaction;
 
-    public RecipeReactionSummaryDto(Long recipeId, String recipeTitle, List<RecipeReactionDto> reactionList, RecipeReactionResponseDto userReaction) {
-        this.recipeId = recipeId;
-        this.recipeTitle = recipeTitle;
-        this.reactionList = reactionList;
-        this.userReaction = userReaction;
-    }
 }
