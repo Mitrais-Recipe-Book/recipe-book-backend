@@ -2,20 +2,22 @@ package com.cdcone.recipy.service;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
-import com.cdcone.recipy.dtoAccess.AuthorDto;
-import com.cdcone.recipy.dtoAccess.RecipeDtoList;
-import com.cdcone.recipy.dtoAccess.UserRecipeDto;
+import com.cdcone.recipy.dtoAccess.*;
 import com.cdcone.recipy.dtoRequest.*;
 import com.cdcone.recipy.entity.RecipeEntity;
+import com.cdcone.recipy.entity.RecipeReactionEntity;
 import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.entity.UserEntity;
+import com.cdcone.recipy.repository.RecipeReactionRepository;
 import com.cdcone.recipy.repository.RecipeRepository;
 
+import com.cdcone.recipy.repository.UserDao;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -23,6 +25,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Pair;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +35,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RecipeService {
     private final RecipeRepository recipeRepository;
+    private final RecipeReactionRepository recipeReactionRepository;
+    private final UserDao userDao;
     private final UserService userService;
     private final TagService tagService;
 
@@ -311,5 +316,52 @@ public class RecipeService {
         recipeRepository.delete(recipe.getSecond());
 
         return Pair.of("success: data deleted", result);
+    }
+
+    public Pair<String, RecipeReactionSummaryDto> getRecipeReaction(long recipeId, String username) {
+        Optional<RecipeEntity> recipeOptional = recipeRepository.findById(recipeId);
+
+        if(recipeOptional.isPresent()) {
+            RecipeEntity recipe = recipeOptional.get();
+            List<RecipeReactionDto> recipeReactionDtoList = recipeReactionRepository.getCountByReaction(recipeId);
+
+            RecipeReactionResponseDto userReaction = null;
+            if(!username.isBlank()) {
+                Optional<UserEntity> userOptional = userDao.findByUsername(username);
+                if(userOptional.isPresent()) {
+                    RecipeReactionEntity userReactionEntity = recipeReactionRepository.findByRecipeIdAndUserId(recipe.getId(), userOptional.get().getId());
+                    userReaction = new RecipeReactionResponseDto(
+                            userReactionEntity.getRecipe().getId(),
+                            userReactionEntity.getUser().getId(),
+                            userReactionEntity.getReaction(),
+                            userReactionEntity.getTimestamp());
+                }
+            }
+
+            RecipeReactionSummaryDto responseDto = new RecipeReactionSummaryDto(
+                    recipe.getId(),
+                    recipe.getTitle(),
+                    recipeReactionDtoList,
+                    userReaction
+            );
+            return Pair.of("success: data retrieved", responseDto);
+        }
+        return Pair.of("failed: data not found", new RecipeReactionSummaryDto());
+    }
+
+    public Pair<String, RecipeReactionEntity> saveRecipeReaction(long recipeId, RecipeReactionRequestDto requestDto) {
+        Optional<UserEntity> userOptional = userDao.findByUsername(requestDto.getUsername());
+        Optional<RecipeEntity> recipeOptional = recipeRepository.findById(recipeId);
+
+        if(userOptional.isPresent() && recipeOptional.isPresent()) {
+            RecipeReactionEntity entity = new RecipeReactionEntity(
+                    userOptional.get(),
+                    recipeOptional.get(),
+                    requestDto.getReaction(),
+                    LocalDateTime.now()
+            );
+            return Pair.of("success: data saved", recipeReactionRepository.save(entity));
+        }
+        return Pair.of("failed: data not found", new RecipeReactionEntity());
     }
 }
