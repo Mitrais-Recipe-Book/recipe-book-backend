@@ -2,7 +2,6 @@ package com.cdcone.recipy.dtoRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Value;
 
 import java.util.List;
 

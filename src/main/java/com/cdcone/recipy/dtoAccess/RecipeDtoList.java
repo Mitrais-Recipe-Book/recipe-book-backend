@@ -1,8 +1,5 @@
 package com.cdcone.recipy.dtoAccess;
 
-import java.beans.Transient;
-
-import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.entity.UserEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

@@ -11,6 +11,7 @@ import com.cdcone.recipy.dtoAccess.AuthorDto;
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
 import com.cdcone.recipy.dtoAccess.UserRecipeDto;
 import com.cdcone.recipy.dtoRequest.*;
+import com.cdcone.recipy.entity.CommentEntity;
 import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.entity.UserEntity;
@@ -311,5 +312,18 @@ public class RecipeService {
         recipeRepository.delete(recipe.getSecond());
 
         return Pair.of("success: data deleted", result);
+    }
+
+    public String addCommentToRecipe(Long recipeId, CommentEntity comment){        
+        Pair<String, RecipeEntity> recipeEntity = getById(recipeId);
+
+        if (recipeEntity.getFirst().charAt(0) != 's'){
+            return recipeEntity.getFirst();
+        }
+
+        recipeEntity.getSecond().getComments().add(comment);
+        recipeRepository.save(recipeEntity.getSecond());
+
+        return "success: comment added";
     }
 }
