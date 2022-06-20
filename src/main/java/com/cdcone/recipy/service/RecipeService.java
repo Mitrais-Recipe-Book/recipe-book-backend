@@ -312,4 +312,19 @@ public class RecipeService {
 
         return Pair.of("success: data deleted", result);
     }
+    
+    public PaginatedDto<UserRecipeDto> getDraftByUsername(String username, int page) {
+        Pageable pageable = PageRequest.of(page, 5);
+        Page<UserRecipeDto> draftRecipes = recipeRepository.findDraftByUsername(username, pageable);
+        
+        draftRecipes.getContent().forEach(it -> {
+            Set<TagEntity> tags = tagService.getByRecipeId(it.getId());
+            it.setTags(tags);
+        });
+        
+        return new PaginatedDto<UserRecipeDto>(
+                draftRecipes.getContent(), 
+                draftRecipes.getNumber(), 
+                draftRecipes.getTotalPages());
+    }
 }

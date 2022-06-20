@@ -44,7 +44,8 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
 
         @Query(value = "SELECT NEW com.cdcone.recipy.dtoAccess.UserRecipeDto" +
                         "(r.id, r.title, r.overview, r.user.fullName, r.views) " +
-                        "FROM RecipeEntity r WHERE r.user.username = :username")
+                        "FROM RecipeEntity r WHERE r.user.username = :username " +
+                        "AND r.isDraft = FALSE")
         Page<UserRecipeDto> findByUsername(@Param("username") String username, Pageable pageable);
 
         @Query("SELECT NEW com.cdcone.recipy.dtoAccess.RecipeDtoList " +
@@ -53,4 +54,10 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
                         "WHERE recipe.isDraft = FALSE " +
                         "ORDER BY recipe.id DESC")
         public Set<RecipeDtoList> getDiscoverRecipes();
+        
+        @Query("SELECT NEW com.cdcone.recipy.dtoAccess.UserRecipeDto"
+                + "(r.id, r.title, r.overview, r.user.fullName, r.views) "
+                + "FROM RecipeEntity r WHERE r.user.username = :username "
+                + "AND r.isDraft = TRUE")
+        Page<UserRecipeDto> findDraftByUsername(@Param("username") String username, Pageable pageable);
 }

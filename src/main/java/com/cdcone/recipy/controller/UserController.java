@@ -119,4 +119,13 @@ public class UserController {
         Boolean isFollowing = userService.isFollowing(creatorId, userId);
         return ResponseEntity.ok(new CommonResponse("success", isFollowing));
     }
+    
+    @GetMapping("{username}/draft-recipes")
+    public ResponseEntity<CommonResponse> getDraftRecipes(
+            @PathVariable(name = "username") String username,
+            @RequestParam(defaultValue = "0") int page) {
+        
+        PaginatedDto<UserRecipeDto> result = recipeService.getDraftByUsername(username, page);
+        return ResponseEntity.ok(new CommonResponse(result));
+    }
 }

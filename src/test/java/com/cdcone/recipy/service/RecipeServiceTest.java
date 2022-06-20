@@ -11,6 +11,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
+import com.cdcone.recipy.dtoAccess.UserRecipeDto;
+import com.cdcone.recipy.dtoRequest.PaginatedDto;
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
 import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
 import com.cdcone.recipy.entity.RecipeEntity;
@@ -24,6 +26,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 
 public class RecipeServiceTest {
@@ -250,5 +254,25 @@ public class RecipeServiceTest {
         assertEquals('f',
                 recipeService.deleteRecipe(1L).getFirst().charAt(0));
 
+    }
+    
+    @Test
+    void successGetDraftRecipesByUsername() {
+        UserRecipeDto mockDraftRecipe = mock(UserRecipeDto.class);
+        UserRecipeDto mockDraftRecipe2 = mock(UserRecipeDto.class);
+        
+        Page<UserRecipeDto> mockResult = new PageImpl<>(
+                List.of(mockDraftRecipe, mockDraftRecipe2));
+        
+        when(mockDraftRecipe.getAuthorName()).thenReturn("any user");
+        when(mockDraftRecipe.getViewCount()).thenReturn(99);
+        when(RECIPE_REPOSITORY.findDraftByUsername(any(String.class), any(Pageable.class)))
+                .thenReturn(mockResult);
+        when(TAG_SERVICE.getByRecipeId(any(Long.class))).thenReturn(Set.of());
+        
+        PaginatedDto<UserRecipeDto> result = recipeService.getDraftByUsername("any", 0);
+        assertEquals(2, result.getData().size());
+        assertEquals(99, result.getData().get(0).getViewCount());
+        assertEquals("any user", result.getData().get(0).getAuthorName());
     }
 }
