@@ -99,7 +99,7 @@ public class UserService implements UserDetailsService {
         Optional<UserEntity> result = userDao.findByUsername(username);
 
         if (result.isEmpty()){
-            return Pair.of("failed: user with username " + username + "not found", new UserEntity());
+            return Pair.of("failed: user with username " + username + " not found", new UserEntity());
         }
 
         return Pair.of("success: user found", result.get());
