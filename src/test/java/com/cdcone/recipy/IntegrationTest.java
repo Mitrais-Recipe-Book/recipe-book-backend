@@ -136,7 +136,7 @@ public class IntegrationTest {
     	        .andExpect(status().isOk())
     	        .andExpect(jsonPath("$.message").value("SUCCESS"))
                 .andExpect(jsonPath("$.payload.totalPages").value(1))
-                .andExpect(jsonPath("$.payload.data[0].title").value("string"))
+                .andExpect(jsonPath("$.payload.data").isArray())
     	        .andReturn();
     }
     

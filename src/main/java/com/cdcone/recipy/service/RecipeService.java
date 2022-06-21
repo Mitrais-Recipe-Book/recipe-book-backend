@@ -74,7 +74,7 @@ public class RecipeService {
 
             return Pair.of("success: data saved", recipe);
         } catch (Exception e) {
-
+            e.printStackTrace();
             if (e instanceof DataIntegrityViolationException) {
                 return Pair.of("failed: cannot save duplicate", new RecipeEntity());
             }
@@ -255,9 +255,9 @@ public class RecipeService {
         return recipeRepository.count();
     }
 
-    public PaginatedDto<UserRecipeDto> getByUsername(String userName, int page) {
+    public PaginatedDto<UserRecipeDto> getByUsername(String userName, int page, boolean isDraft) {
         Pageable pageable = PageRequest.of(page, 5);
-        Page<UserRecipeDto> byUserId = recipeRepository.findByUsername(userName, pageable);
+        Page<UserRecipeDto> byUserId = recipeRepository.findByUsername(userName, isDraft, pageable);
         byUserId.getContent().forEach(it -> {
             Set<TagEntity> tags = tagService.getByRecipeId(it.getId());
             it.setTags(tags);
@@ -311,20 +311,5 @@ public class RecipeService {
         recipeRepository.delete(recipe.getSecond());
 
         return Pair.of("success: data deleted", result);
-    }
-    
-    public PaginatedDto<UserRecipeDto> getDraftByUsername(String username, int page) {
-        Pageable pageable = PageRequest.of(page, 5);
-        Page<UserRecipeDto> draftRecipes = recipeRepository.findDraftByUsername(username, pageable);
-        
-        draftRecipes.getContent().forEach(it -> {
-            Set<TagEntity> tags = tagService.getByRecipeId(it.getId());
-            it.setTags(tags);
-        });
-        
-        return new PaginatedDto<UserRecipeDto>(
-                draftRecipes.getContent(), 
-                draftRecipes.getNumber(), 
-                draftRecipes.getTotalPages());
     }
 }

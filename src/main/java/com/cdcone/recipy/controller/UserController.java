@@ -72,7 +72,7 @@ public class UserController {
     @GetMapping("{username}/recipes")
     public ResponseEntity<CommonResponse> getRecipesByUsername(@PathVariable(name = "username") String username,
             @RequestParam(defaultValue = "0") int page) {
-        PaginatedDto<UserRecipeDto> byUserId = recipeService.getByUsername(username, page);
+        PaginatedDto<UserRecipeDto> byUserId = recipeService.getByUsername(username, page, false);
         return ResponseEntity.ok(new CommonResponse(byUserId));
     }
 
@@ -125,7 +125,7 @@ public class UserController {
             @PathVariable(name = "username") String username,
             @RequestParam(defaultValue = "0") int page) {
         
-        PaginatedDto<UserRecipeDto> result = recipeService.getDraftByUsername(username, page);
+        PaginatedDto<UserRecipeDto> result = recipeService.getByUsername(username, page, true);
         return ResponseEntity.ok(new CommonResponse(result));
     }
 }
