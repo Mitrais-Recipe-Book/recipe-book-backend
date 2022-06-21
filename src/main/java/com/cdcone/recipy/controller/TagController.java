@@ -23,28 +23,24 @@ public class TagController {
 
     @GetMapping
     public ResponseEntity<CommonResponse> getAll() {
-        try {
-            List<TagEntity> allTags = tagService.getAllTags();
-            return ResponseEntity.ok(new CommonResponse("success: data retrieved", allTags));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
+        Pair<String, List<TagEntity>> result = tagService.getAllTags();
+
+        if (result.getFirst().charAt(0) == 's'){
+            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), result.getSecond()));
         }
+
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
     }
 
     @PostMapping
     public ResponseEntity<CommonResponse> addTag(@RequestBody String tagName) {
-        try {
-            TagEntity savedTag = tagService.saveTag(tagName);
-            String msg = "success: data saved";
-            HttpStatus status = HttpStatus.OK;
-            if (savedTag == null) {
-                msg = "error: tag already exists";
-                status = HttpStatus.BAD_REQUEST;
-            }
-            return ResponseEntity.status(status).body(new CommonResponse(msg, savedTag));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new CommonResponse(e.getCause().toString()));
-        }
+       Pair<String, TagEntity> result = tagService.saveTag(tagName);
+
+       if (result.getFirst().charAt(0) == 's'){
+           return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), result.getSecond()));
+       }
+
+       return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
     }
 
     @PutMapping("")

@@ -21,6 +21,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +60,10 @@ public class UserService implements UserDetailsService {
     }
 
     public Pair<Optional<UserDto>, String> addUser(SignUpDto signUpDto) {
+        if (signUpDto.checkBlank()) {
+            return Pair.of(Optional.empty(), "Please fill out all required fields.");
+        }
+
         String msg;
         UserDto createdUser = null;
 
@@ -88,6 +95,16 @@ public class UserService implements UserDetailsService {
         return userDao.getById(id);
     }
 
+    public Pair<String, UserEntity> getByUsername(String username){
+        Optional<UserEntity> result = userDao.findByUsername(username);
+
+        if (result.isEmpty()){
+            return Pair.of("failed: user with username " + username + " not found", new UserEntity());
+        }
+
+        return Pair.of("success: user found", result.get());
+    }
+
     public Optional<UserProfile> findByUsername(String username) {
         Optional<UserProfile> userProfile = userDao.findDetailByUsername(username);
         userProfile.ifPresent(it -> {
@@ -109,17 +126,29 @@ public class UserService implements UserDetailsService {
         boolean uploadedPhoto = false;
         if (byUsername.isPresent()) {
             try {
-                UserEntity user = byUsername.get();
-                user.setProfilePhoto(photo.getBytes());
-                user.setProfilePhotoType(photo.getContentType());
-                userDao.save(user);
-                msg = "Success";
-                uploadedPhoto = true;
+                BufferedImage original = ImageIO.read(photo.getInputStream());
+                if (original != null) {
+                    byte[] resizedPhoto = resizePhoto(original);
+                    UserEntity user = byUsername.get();
+                    user.setProfilePhoto(resizedPhoto);
+                    user.setProfilePhotoType(photo.getContentType());
+                    userDao.save(user);
+                    msg = "Success";
+                    uploadedPhoto = true;
+                } else {
+                    msg = "Uploaded file is not an image";
+                }
             } catch (IOException e) {
                 msg = "Failed to save profile photo.";
             }
         }
         return Pair.of(uploadedPhoto, msg);
+    }
+
+    private byte[] resizePhoto(BufferedImage original) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ImageIO.write(original, "jpg", outputStream);
+        return outputStream.toByteArray();
     }
 
     public PaginatedDto<UserDto> getAllUsers(int page) {
@@ -182,6 +211,10 @@ public class UserService implements UserDetailsService {
 
     public List<FollowerDto> getFollowerList(long userId) {
         return userDao.getFollowersById(userId);
+    }
+
+    public Long getFollowerCountById(long userId){
+        return userDao.getFollowerCountById(userId);
     }
 
     public Boolean isFollowing(Long creatorId, Long userId) {

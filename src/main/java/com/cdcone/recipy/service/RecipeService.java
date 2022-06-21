@@ -2,19 +2,23 @@ package com.cdcone.recipy.service;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.validation.ConstraintViolationException;
+import javax.imageio.ImageIO;
 
-import com.cdcone.recipy.dtoAccess.PhotoDto;
-import com.cdcone.recipy.dtoAccess.RecipeDtoList;
-import com.cdcone.recipy.dtoAccess.UserRecipeDto;
+import com.cdcone.recipy.dtoAccess.*;
 import com.cdcone.recipy.dtoRequest.*;
+import com.cdcone.recipy.entity.CommentEntity;
 import com.cdcone.recipy.entity.RecipeEntity;
+import com.cdcone.recipy.entity.RecipeReactionEntity;
 import com.cdcone.recipy.entity.TagEntity;
+import com.cdcone.recipy.entity.UserEntity;
+import com.cdcone.recipy.repository.RecipeReactionRepository;
 import com.cdcone.recipy.repository.RecipeRepository;
 
+import com.cdcone.recipy.repository.UserDao;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -22,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Pair;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,26 +36,36 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RecipeService {
     private final RecipeRepository recipeRepository;
+    private final RecipeReactionRepository recipeReactionRepository;
+    private final UserDao userDao;
     private final UserService userService;
     private final TagService tagService;
 
-    public Pair<RecipeEntity, String> add(RecipeDtoAdd dto) {
+    private Pair<String, Set<TagEntity>> findMultipleTags(Set<Integer> idTags) {
         Set<TagEntity> tagEntities = new HashSet<TagEntity>();
-
-        for (Integer id : dto.getTagIds()) {
+        for (Integer id : idTags) {
             Pair<TagEntity, String> tag = tagService.getById(id);
 
             if (tag.getFirst().getName() == null) {
-                return Pair.of(new RecipeEntity(), tag.getSecond());
+                return Pair.of(tag.getSecond(), new HashSet<>());
             }
 
             tagEntities.add(tag.getFirst());
+        }
+        return Pair.of("success: data retrieved", tagEntities);
+    }
+
+    public Pair<String, RecipeEntity> add(RecipeDtoAdd dto) {
+        Pair<String, Set<TagEntity>> tagEntities = findMultipleTags(dto.getTagIds());
+
+        if (tagEntities.getFirst().charAt(0) != 's') {
+            return Pair.of(tagEntities.getFirst(), new RecipeEntity());
         }
 
         try {
             RecipeEntity recipe = new RecipeEntity(
                     userService.getById(dto.getUserId()),
-                    tagEntities,
+                    tagEntities.getSecond(),
                     dto.getTitle(),
                     dto.getTitle().toLowerCase(),
                     dto.getOverview(),
@@ -63,20 +78,65 @@ public class RecipeService {
 
             recipeRepository.save(recipe);
 
-            return Pair.of(recipe, "succees: data saved");
+            return Pair.of("success: data saved", recipe);
         } catch (Exception e) {
 
             if (e instanceof DataIntegrityViolationException) {
-                return Pair.of(new RecipeEntity(), "failed: cannot save duplicate");
+                return Pair.of("failed: cannot save duplicate", new RecipeEntity());
             }
 
-            return Pair.of(new RecipeEntity(), "failed: unknown error, contact backend team");
+            if (e instanceof NullPointerException) {
+                e.printStackTrace();
+                return Pair.of("failed: " + e.getMessage(), new RecipeEntity());
+            }
+
+            e.printStackTrace();
+            return Pair.of("critical error: unpredicted cause, contact backend team", new RecipeEntity());
         }
     }
 
-    public Pair<Page<RecipeDtoList>, String> getPublishedRecipes(RecipeSearchDto dto) {
+    public String edit(Long recipeId, RecipeDtoAdd dto) {
+        Pair<String, Set<TagEntity>> tagEntities = findMultipleTags(dto.getTagIds());
+
+        if (tagEntities.getFirst().charAt(0) != 's') {
+            return tagEntities.getFirst();
+        }
+
+        try {
+            Pair<String, RecipeEntity> recipe = getById(recipeId);
+
+            if (recipe.getFirst().charAt(0) != 's') {
+                return recipe.getFirst();
+            }
+
+            recipe.getSecond().setTitle(dto.getTitle());
+            recipe.getSecond().setTags(tagEntities.getSecond());
+            recipe.getSecond().setOverview(dto.getOverview());
+            recipe.getSecond().setIngredients(dto.getIngredients());
+            recipe.getSecond().setContent(dto.getContent());
+            recipe.getSecond().setVideoURL(dto.getVideoURL());
+            recipe.getSecond().setDraft(dto.isDraft());
+
+            recipeRepository.save(recipe.getSecond());
+
+            return "success: data updated";
+        } catch (Exception e) {
+            if (e instanceof DataIntegrityViolationException) {
+                return "failed: cannot save duplicate";
+            }
+            if (e instanceof NullPointerException) {
+                return "failed: " + e.getMessage();
+            }
+            e.printStackTrace();
+            return "critical error: unpredicted cause, contact backend team";
+        }
+    }
+
+    public Pair<String, Page<RecipeDtoList>> getPublishedRecipes(RecipeSearchDto dto) {
         if (dto.getTagId() == null || dto.getTagId().isEmpty()) {
-            Set<Integer> allTags = tagService.getAllTags()
+            Pair<String, List<TagEntity>> tagResult = tagService.getAllTags();
+
+            Set<Integer> allTags = tagResult.getSecond()
                     .stream()
                     .map(n -> n.getId())
                     .collect(Collectors.toSet());
@@ -87,57 +147,115 @@ public class RecipeService {
             Pageable pageable = PageRequest.of(dto.getPage(), 10, Sort.by("views").descending());
             Page<RecipeDtoList> result = recipeRepository.getPublishedRecipes(dto.getTitle(), dto.getAuthor(),
                     dto.getTagId(), pageable);
-            return Pair.of(result, "success: data retrieved");
+
+            result.getContent().forEach(i -> {
+                UserEntity user = i.getUser();
+                AuthorDto author = new AuthorDto(user.getUsername(),
+                        user.getFullName(),
+                        userService.getFollowerCountById(user.getId()));
+                i.setAuthor(author);
+            });
+
+            return Pair.of("success: data retrieved", result);
 
         } catch (Exception e) {
-            List<RecipeDtoList> list = new ArrayList<>();
-
             if (e instanceof IllegalArgumentException) {
-                return Pair.of(new PageImpl<>(list), "failed: page index must not be less than zero");
+                return Pair.of("failed: page index must not be less than zero", new PageImpl<>(new ArrayList<>()));
             }
-
-            return Pair.of(new PageImpl<>(list), "failed: unknown error, contact backend team");
+            e.printStackTrace();
+            return Pair.of("critical error: unpredicted cause, contact backend team",
+                    new PageImpl<>(new ArrayList<>()));
         }
     }
 
-    public Pair<RecipeEntity, String> getRecipeImage(Long recipeId) {
-        RecipeEntity entity = getById(recipeId);
+    public Pair<String, RecipeEntity> getRecipeImage(Long recipeId) {
+        Pair<String, RecipeEntity> entity = getById(recipeId);
 
-        if (entity == null) {
-            return Pair.of(new RecipeEntity(),
-                    "failed: recipe with id " + recipeId + " not found");
+        if (entity.getFirst().charAt(0) != 's') {
+            return entity;
         }
 
-        if (entity.getBannerImage() == null) {
-            return Pair.of(new RecipeEntity(),
-                    "failed: cannot find image with recipe id " + recipeId);
+        if (entity.getSecond().getBannerImage() == null) {
+            return Pair.of("failed: cannot find image with recipe id " + recipeId,
+                    new RecipeEntity());
         }
 
-        return Pair.of(entity, "success: image found");
+        return Pair.of("success: image found", entity.getSecond());
     }
 
-    public Set<RecipeDtoList> getPopularRecipes(int limit) {
-        return recipeRepository.getPopularRecipes()
-                .stream()
-                .limit(limit)
-                .collect(Collectors.toSet());
+    public Pair<String, Set<RecipeDtoList>> getPopularRecipes(int limit) {
+        try {
+            Set<RecipeDtoList> list = recipeRepository.getPopularRecipes()
+                    .stream()
+                    .limit(limit)
+                    .map(i -> {
+                        UserEntity user = i.getUser();
+                        AuthorDto author = new AuthorDto(user.getUsername(),
+                                user.getFullName(),
+                                userService.getFollowerCountById(user.getId()));
+                        i.setAuthor(author);
+                        return i;
+                    })
+                    .collect(Collectors.toSet());
+
+            return Pair.of("success: data retrieved", list);
+        } catch (Exception e) {
+            if (e instanceof IllegalArgumentException) {
+                return Pair.of("failed: limit cannot negative", new HashSet<>());
+            }
+            e.printStackTrace();
+            return Pair.of("critical error: unpredicted cause, contact backend team", new HashSet<>());
+        }
+
     }
 
-    public Set<RecipeDtoList> getDiscoverRecipes(int limit) {
-        return recipeRepository.getDiscoverRecipes()
-                .stream()
-                .limit(limit)
-                .collect(Collectors.toSet());
+    public Pair<String, Set<RecipeDtoList>> getDiscoverRecipes(int limit) {
+        try {
+            Set<RecipeDtoList> list = recipeRepository.getPopularRecipes()
+                    .stream()
+                    .limit(limit)
+                    .map(i -> {
+                        UserEntity user = i.getUser();
+                        AuthorDto author = new AuthorDto(user.getUsername(),
+                                user.getFullName(),
+                                userService.getFollowerCountById(user.getId()));
+                        i.setAuthor(author);
+                        return i;
+                    })
+                    .collect(Collectors.toSet());
+
+            return Pair.of("success: data retrieved", list);
+        } catch (Exception e) {
+            if (e instanceof IllegalArgumentException) {
+                return Pair.of("failed: limit cannot negative", new HashSet<>());
+            }
+            e.printStackTrace();
+            return Pair.of("critical error: unpredicted cause, contact backend team", new HashSet<>());
+        }
     }
 
-    public RecipeEntity getById(Long recipeId) {
-        return recipeRepository.findById(recipeId).orElse(null);
+    public Pair<String, RecipeEntity> getById(Long recipeId) {
+        RecipeEntity result = recipeRepository.findById(recipeId).orElse(null);
+
+        if (result == null) {
+            return Pair.of("failed: cannot find recipe with id " + recipeId, new RecipeEntity());
+        }
+
+        return Pair.of("success: data retrieved", result);
     }
 
-    public void addViewer(Long id) {
-        RecipeEntity entity = recipeRepository.findById(id).get();
-        entity.setViews(entity.getViews() + 1);
-        recipeRepository.save(entity);
+    public String addViewer(Long recipeId) {
+        Pair<String, RecipeEntity> recipe = getById(recipeId);
+
+        if (recipe.getFirst().charAt(0) != 's') {
+            return recipe.getFirst();
+        }
+
+        int views = recipe.getSecond().getViews();
+        recipe.getSecond().setViews(views + 1);
+
+        recipeRepository.save(recipe.getSecond());
+        return "success: data updated";
     }
 
     public long totalRecipes() {
@@ -154,38 +272,115 @@ public class RecipeService {
         return new PaginatedDto<>(byUserId.getContent(), byUserId.getNumber(), byUserId.getTotalPages());
     }
 
-    public Pair<Boolean, String> saveRecipePhoto(MultipartFile photo, Long recipeId) {
-        Optional<RecipeEntity> entity = recipeRepository.findById(recipeId);
-        String msg = "User not found.";
-        boolean uploadedPhoto = false;
-        if (entity.isPresent()) {
-            try {
-                RecipeEntity recipe = entity.get();
-                recipe.setBannerImage(photo.getBytes());
-                recipe.setBannerImageType(photo.getContentType());
-                recipeRepository.save(recipe);
-                msg = "Success";
-                uploadedPhoto = true;
-            } catch (IOException e) {
-                msg = "Failed to save profile photo.";
-            }
+    public String saveRecipePhoto(MultipartFile photo, Long recipeId) {
+        Pair<String, RecipeEntity> recipe = getById(recipeId);
+
+        if (recipe.getFirst().charAt(0) != 's') {
+            return recipe.getFirst();
         }
-        return Pair.of(uploadedPhoto, msg);
+
+        try {
+            if (ImageIO.read(photo.getInputStream()) == null) {
+                throw new NullPointerException();
+            }
+
+            recipe.getSecond().setBannerImage(photo.getBytes());
+            recipe.getSecond().setBannerImageType(photo.getContentType());
+            recipeRepository.save(recipe.getSecond());
+
+            return "success: image updated";
+        } catch (Exception e) {
+            if (e instanceof IOException) {
+                return "failed: image not updated";
+            }
+
+            if (e instanceof NullPointerException) {
+                return "failed: file is not image";
+            }
+
+            e.printStackTrace();
+            return "critical error: unpredicted cause, contact backend team";
+        }
     }
 
-    public RecipeDtoList deleteRecipe(long recipeId) {
-        Optional<RecipeEntity> byId = recipeRepository.findById(recipeId);
-        RecipeDtoList deleted = null;
-        if (byId.isPresent()) {
-            RecipeEntity toBeDeleted = byId.get();
-            recipeRepository.delete(toBeDeleted);
-            deleted = new RecipeDtoList(
-                    toBeDeleted.getId(),
-                    toBeDeleted.getTitle(),
-                    toBeDeleted.getOverview(),
-                    toBeDeleted.getViews(),
-                    toBeDeleted.getUser().getFullName());
+    public Pair<String, RecipeDtoList> deleteRecipe(long recipeId) {
+        Pair<String, RecipeEntity> recipe = getById(recipeId);
+
+        if (recipe.getFirst().charAt(0) != 's') {
+            return Pair.of(recipe.getFirst(), new RecipeDtoList());
         }
-        return deleted;
+
+        RecipeDtoList result = new RecipeDtoList(recipe.getSecond().getId(),
+                recipe.getSecond().getTitle(),
+                recipe.getSecond().getOverview(),
+                recipe.getSecond().getViews());
+
+        recipeRepository.delete(recipe.getSecond());
+
+        return Pair.of("success: data deleted", result);
+    }
+
+    public String addCommentToRecipe(Long recipeId, CommentEntity comment){        
+        Pair<String, RecipeEntity> recipeEntity = getById(recipeId);
+
+        if (recipeEntity.getFirst().charAt(0) != 's'){
+            return recipeEntity.getFirst();
+        }
+
+        if (recipeEntity.getSecond().isDraft()){
+            return "failed: cannot comment on unpublished recipe";
+        }
+
+        recipeEntity.getSecond().getComments().add(comment);
+        recipeRepository.save(recipeEntity.getSecond());
+
+        return "success: comment added";
+    }
+
+    public Pair<String, RecipeReactionSummaryDto> getRecipeReaction(long recipeId, String username) {
+        Optional<RecipeEntity> recipeOptional = recipeRepository.findById(recipeId);
+
+        if(recipeOptional.isPresent()) {
+            RecipeEntity recipe = recipeOptional.get();
+            List<RecipeReactionDto> recipeReactionDtoList = recipeReactionRepository.getCountByReaction(recipeId);
+
+            RecipeReactionResponseDto userReaction = null;
+            if(!username.isBlank()) {
+                Optional<UserEntity> userOptional = userDao.findByUsername(username);
+                if(userOptional.isPresent()) {
+                    RecipeReactionEntity userReactionEntity = recipeReactionRepository.findByRecipeIdAndUserId(recipe.getId(), userOptional.get().getId());
+                    userReaction = new RecipeReactionResponseDto(
+                            userReactionEntity.getRecipe().getId(),
+                            userReactionEntity.getUser().getId(),
+                            userReactionEntity.getReaction(),
+                            userReactionEntity.getTimestamp());
+                }
+            }
+
+            RecipeReactionSummaryDto responseDto = new RecipeReactionSummaryDto(
+                    recipe.getId(),
+                    recipe.getTitle(),
+                    recipeReactionDtoList,
+                    userReaction
+            );
+            return Pair.of("success: data retrieved", responseDto);
+        }
+        return Pair.of("failed: data not found", new RecipeReactionSummaryDto());
+    }
+
+    public Pair<String, RecipeReactionEntity> saveRecipeReaction(long recipeId, RecipeReactionRequestDto requestDto) {
+        Optional<UserEntity> userOptional = userDao.findByUsername(requestDto.getUsername());
+        Optional<RecipeEntity> recipeOptional = recipeRepository.findById(recipeId);
+
+        if(userOptional.isPresent() && recipeOptional.isPresent()) {
+            RecipeReactionEntity entity = new RecipeReactionEntity(
+                    userOptional.get(),
+                    recipeOptional.get(),
+                    requestDto.getReaction(),
+                    LocalDateTime.now()
+            );
+            return Pair.of("success: data saved", recipeReactionRepository.save(entity));
+        }
+        return Pair.of("failed: data not found", new RecipeReactionEntity());
     }
 }

@@ -1,13 +1,15 @@
 package com.cdcone.recipy.dtoRequest;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import java.util.List;
 
-@Value
+@Data
+@AllArgsConstructor
 public class PaginatedDto<T> {
 
-    List<T> data;
-    int currentPage;
-    int totalPages;
+    private List<T> data;
+    private int currentPage;
+    private int totalPages;
 }
