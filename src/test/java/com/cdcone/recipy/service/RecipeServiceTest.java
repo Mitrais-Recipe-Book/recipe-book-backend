@@ -13,6 +13,7 @@ import java.util.Set;
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
 import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
+import com.cdcone.recipy.entity.CommentEntity;
 import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.entity.UserEntity;
@@ -111,7 +112,6 @@ public class RecipeServiceTest {
         List<TagEntity> mockTag = mock(List.class);
         Pair<String, List<TagEntity>> mockService = Pair.of("success:", mockTag);
 
-
         when(RECIPE_REPOSITORY.getPublishedRecipes(any(), any(), any(), any()))
                 .thenReturn(mock(Page.class));
         when(TAG_SERVICE.getAllTags()).thenReturn(mockService);
@@ -126,10 +126,9 @@ public class RecipeServiceTest {
         List<TagEntity> mockTag = mock(List.class);
         Pair<String, List<TagEntity>> mockService = Pair.of("success:", mockTag);
 
-
         when(RECIPE_REPOSITORY.getPublishedRecipes(any(), any(), any(), any()))
                 .thenThrow(IllegalArgumentException.class);
- 
+
         when(TAG_SERVICE.getAllTags()).thenReturn(mockService);
 
         assertEquals('f',
@@ -137,7 +136,7 @@ public class RecipeServiceTest {
     }
 
     @Test
-    void getRecipeImage() throws IOException{
+    void getRecipeImage() throws IOException {
         byte[] photo = ImageUtil.randomImage();
 
         when(RECIPE_REPOSITORY.findById(1L))
@@ -164,7 +163,7 @@ public class RecipeServiceTest {
 
     @Test
     @Disabled
-    void saveRecipePhoto() throws IOException{
+    void saveRecipePhoto() throws IOException {
         // todo -> write unit test for save recipe photo
     }
 
@@ -250,5 +249,16 @@ public class RecipeServiceTest {
         assertEquals('f',
                 recipeService.deleteRecipe(1L).getFirst().charAt(0));
 
+    }
+
+    @Test
+    void addCommentToRecipe() {
+        Optional<RecipeEntity> mockEntity = Optional.of(RECIPE_ENTITY);
+
+        when(RECIPE_REPOSITORY.findById(1L)).thenReturn(mockEntity);
+        when(RECIPE_ENTITY.isDraft()).thenReturn(false);
+
+        assertEquals('s',
+                recipeService.addCommentToRecipe(1L, new CommentEntity()).charAt(0));
     }
 }
