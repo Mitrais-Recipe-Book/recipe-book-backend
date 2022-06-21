@@ -98,11 +98,11 @@ public class RecipeEntity {
             int views,
             boolean isDraft) {
 
-        if (title.isBlank()) {
+        if (title == null || title.isBlank()) {
             throw new NullPointerException("title cannot blank");
         }
 
-        if (ingredients.isBlank()) {
+        if (ingredients == null || ingredients.isBlank()) {
             throw new NullPointerException("ingredients cannot blank");
         }
 

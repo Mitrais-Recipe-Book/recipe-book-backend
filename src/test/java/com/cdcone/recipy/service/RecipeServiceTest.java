@@ -53,6 +53,7 @@ public class RecipeServiceTest {
     @Test
     void addRecipe() {
         when(ADD_RECIPE_DTO.getTitle()).thenReturn("title");
+        when(ADD_RECIPE_DTO.getIngredients()).thenReturn("ingredients");
 
         assertEquals('s',
                 recipeService.add(ADD_RECIPE_DTO).getFirst().charAt(0));
@@ -64,7 +65,7 @@ public class RecipeServiceTest {
         when(RECIPE_REPOSITORY.save(any())).thenThrow(DataIntegrityViolationException.class);
 
         assertEquals('f',
-                recipeService.getById(1L).getFirst().charAt(0));
+                recipeService.add(ADD_RECIPE_DTO).getFirst().charAt(0));
     }
 
     @Test
