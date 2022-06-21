@@ -320,10 +320,12 @@ public class RecipeService {
         return Pair.of("success: data deleted", result);
     }
 
-    public String addCommentToRecipe(Long recipeId, CommentEntity comment){        
+    public String addCommentToRecipe(Long recipeId, CommentEntity comment){      
+        System.out.println("masuk recipe service");
+
         Pair<String, RecipeEntity> recipeEntity = getById(recipeId);
 
-        if (recipeEntity.getFirst().charAt(0) != 's'){
+        if (recipeEntity.getFirst().charAt(0) != 's'){            
             return recipeEntity.getFirst();
         }
 
