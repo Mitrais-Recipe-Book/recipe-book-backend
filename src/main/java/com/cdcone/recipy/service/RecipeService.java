@@ -321,6 +321,10 @@ public class RecipeService {
             return recipeEntity.getFirst();
         }
 
+        if (recipeEntity.getSecond().isDraft()){
+            return "failed: cannot comment on unpublished recipe";
+        }
+
         recipeEntity.getSecond().getComments().add(comment);
         recipeRepository.save(recipeEntity.getSecond());
 
