@@ -11,16 +11,16 @@ import java.util.Set;
 
 @Getter
 public class RecipeDetailDto {
-    Long id;
-    String title;
-    String overview;
-    LocalDate dateCreated;
-    String ingredients;
-    String content;
-    String videoURL;
-    int views;
-    Map<String, Object> author;
-    Set<TagEntity> tags;
+    private Long id;
+    private String title;
+    private String overview;
+    private LocalDate dateCreated;
+    private String ingredients;
+    private String content;
+    private String videoURL;
+    private int views;
+    private Map<String, Object> author;
+    private Set<TagEntity> tags;
 
     public RecipeDetailDto(RecipeEntity recipe) {
         UserEntity author = recipe.getUser();
