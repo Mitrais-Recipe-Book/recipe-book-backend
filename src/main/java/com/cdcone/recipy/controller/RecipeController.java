@@ -2,11 +2,12 @@ package com.cdcone.recipy.controller;
 
 import java.util.Set;
 
-import com.cdcone.recipy.dtoAccess.RecipeDetailDto;
-import com.cdcone.recipy.dtoAccess.RecipeDtoList;
+import com.cdcone.recipy.dtoAccess.*;
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
+import com.cdcone.recipy.dtoRequest.RecipeReactionRequestDto;
 import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
 import com.cdcone.recipy.entity.RecipeEntity;
+import com.cdcone.recipy.entity.RecipeReactionEntity;
 import com.cdcone.recipy.response.CommonResponse;
 import com.cdcone.recipy.service.RecipeService;
 
@@ -143,6 +144,33 @@ public class RecipeController {
             return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), dto));
         }
 
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
+    }
+
+    @GetMapping("{id}/reaction")
+    public ResponseEntity<CommonResponse> getRecipeReaction(@PathVariable(name = "id") long recipeId, @RequestParam(defaultValue = "") String username) {
+        Pair<String, RecipeReactionSummaryDto> result = recipeService.getRecipeReaction(recipeId, username);
+
+        if (result.getFirst().charAt(0) == 's') {
+            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), result.getSecond()));
+        }
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
+    }
+
+    @PostMapping("{id}/reaction")
+    public ResponseEntity<CommonResponse> saveRecipeReaction(@PathVariable(name = "id") long recipeId, @RequestBody RecipeReactionRequestDto requestDto) {
+        Pair<String, RecipeReactionEntity> result = recipeService.saveRecipeReaction(recipeId, requestDto);
+
+        if (result.getFirst().charAt(0) == 's') {
+            RecipeReactionEntity response = result.getSecond();
+            RecipeReactionResponseDto responseDto = new RecipeReactionResponseDto(
+                    response.getRecipe().getId(),
+                    response.getUser().getId(),
+                    response.getReaction(),
+                    response.getTimestamp()
+            );
+            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), responseDto));
+        }
         return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
     }
 }

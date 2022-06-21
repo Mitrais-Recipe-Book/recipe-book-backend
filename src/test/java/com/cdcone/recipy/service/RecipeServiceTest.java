@@ -16,7 +16,9 @@ import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
 import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.entity.UserEntity;
+import com.cdcone.recipy.repository.RecipeReactionRepository;
 import com.cdcone.recipy.repository.RecipeRepository;
+import com.cdcone.recipy.repository.UserDao;
 import com.cdcone.recipy.util.ImageUtil;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +33,9 @@ public class RecipeServiceTest {
     private RecipeService recipeService;
 
     private final RecipeRepository RECIPE_REPOSITORY = mock(RecipeRepository.class);
+    private final RecipeReactionRepository RECIPE_REACTION_REPOSITORY = mock(RecipeReactionRepository.class);
 
+    private final UserDao USER_DAO = mock(UserDao.class);
     private final UserService USER_SERVICE = mock(UserService.class);
     private final TagService TAG_SERVICE = mock(TagService.class);
 
@@ -42,7 +46,7 @@ public class RecipeServiceTest {
 
     @BeforeEach
     public void init() {
-        recipeService = new RecipeService(RECIPE_REPOSITORY, USER_SERVICE, TAG_SERVICE);
+        recipeService = new RecipeService(RECIPE_REPOSITORY,RECIPE_REACTION_REPOSITORY, USER_DAO, USER_SERVICE, TAG_SERVICE);
     }
 
     @Test
