@@ -21,16 +21,15 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     public String add(Long recipeId, AddCommentDto dto) {
-        Pair<String,UserEntity> userEntity = userService.getByUsername(dto.getUsername());
+        Pair<String, UserEntity> userEntity = userService.getByUsername(dto.getUsername());
 
-        if (userEntity.getFirst().charAt(0) != 's'){
+        if (userEntity.getFirst().charAt(0) != 's') {
             return userEntity.getFirst();
         }
 
         CommentEntity commentEntity = new CommentEntity(userEntity.getSecond(), LocalDateTime.now(), dto.getComment());
         commentEntity = commentRepository.save(commentEntity);
-        recipeService.addCommentToRecipe(recipeId, commentEntity);
 
-        return "success: comment added";
+        return recipeService.addCommentToRecipe(recipeId, commentEntity);
     }
 }
