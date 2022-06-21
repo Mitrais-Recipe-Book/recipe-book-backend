@@ -291,4 +291,23 @@ public class RecipeServiceTest {
         assertEquals('s',
                 recipeService.addCommentToRecipe(1L, new CommentEntity()).charAt(0));
     }
+
+    @Test
+    void failedCommentRecipeNotFound(){
+        when(RECIPE_REPOSITORY.findById(1L)).thenReturn(Optional.empty());
+
+        assertEquals('f',
+                recipeService.addCommentToRecipe(1L, new CommentEntity()).charAt(0));
+    }
+
+    @Test
+    void failedCommentRecipeNotPublished(){
+        Optional<RecipeEntity> mockEntity = Optional.of(RECIPE_ENTITY);
+
+        when(RECIPE_REPOSITORY.findById(1L)).thenReturn(mockEntity);
+        when(RECIPE_ENTITY.isDraft()).thenReturn(true);
+
+        assertEquals('f',
+                recipeService.addCommentToRecipe(1L, new CommentEntity()).charAt(0));
+    }
 }
