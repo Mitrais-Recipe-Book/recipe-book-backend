@@ -15,10 +15,13 @@ import com.cdcone.recipy.dtoAccess.UserRecipeDto;
 import com.cdcone.recipy.dtoRequest.PaginatedDto;
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
 import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
+import com.cdcone.recipy.entity.CommentEntity;
 import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.entity.UserEntity;
+import com.cdcone.recipy.repository.RecipeReactionRepository;
 import com.cdcone.recipy.repository.RecipeRepository;
+import com.cdcone.recipy.repository.UserDao;
 import com.cdcone.recipy.util.ImageUtil;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +38,9 @@ public class RecipeServiceTest {
     private RecipeService recipeService;
 
     private final RecipeRepository RECIPE_REPOSITORY = mock(RecipeRepository.class);
+    private final RecipeReactionRepository RECIPE_REACTION_REPOSITORY = mock(RecipeReactionRepository.class);
 
+    private final UserDao USER_DAO = mock(UserDao.class);
     private final UserService USER_SERVICE = mock(UserService.class);
     private final TagService TAG_SERVICE = mock(TagService.class);
 
@@ -46,12 +51,13 @@ public class RecipeServiceTest {
 
     @BeforeEach
     public void init() {
-        recipeService = new RecipeService(RECIPE_REPOSITORY, USER_SERVICE, TAG_SERVICE);
+        recipeService = new RecipeService(RECIPE_REPOSITORY,RECIPE_REACTION_REPOSITORY, USER_DAO, USER_SERVICE, TAG_SERVICE);
     }
 
     @Test
     void addRecipe() {
         when(ADD_RECIPE_DTO.getTitle()).thenReturn("title");
+        when(ADD_RECIPE_DTO.getIngredients()).thenReturn("ingredients");
 
         assertEquals('s',
                 recipeService.add(ADD_RECIPE_DTO).getFirst().charAt(0));
@@ -60,10 +66,11 @@ public class RecipeServiceTest {
     @Test
     void failedAddRecipeDuplicateData() {
         when(ADD_RECIPE_DTO.getTitle()).thenReturn("title");
+        when(ADD_RECIPE_DTO.getIngredients()).thenReturn("ingredients");
         when(RECIPE_REPOSITORY.save(any())).thenThrow(DataIntegrityViolationException.class);
 
         assertEquals('f',
-                recipeService.getById(1L).getFirst().charAt(0));
+                recipeService.add(ADD_RECIPE_DTO).getFirst().charAt(0));
     }
 
     @Test
@@ -115,7 +122,6 @@ public class RecipeServiceTest {
         List<TagEntity> mockTag = mock(List.class);
         Pair<String, List<TagEntity>> mockService = Pair.of("success:", mockTag);
 
-
         when(RECIPE_REPOSITORY.getPublishedRecipes(any(), any(), any(), any()))
                 .thenReturn(mock(Page.class));
         when(TAG_SERVICE.getAllTags()).thenReturn(mockService);
@@ -130,10 +136,9 @@ public class RecipeServiceTest {
         List<TagEntity> mockTag = mock(List.class);
         Pair<String, List<TagEntity>> mockService = Pair.of("success:", mockTag);
 
-
         when(RECIPE_REPOSITORY.getPublishedRecipes(any(), any(), any(), any()))
                 .thenThrow(IllegalArgumentException.class);
- 
+
         when(TAG_SERVICE.getAllTags()).thenReturn(mockService);
 
         assertEquals('f',
@@ -141,7 +146,7 @@ public class RecipeServiceTest {
     }
 
     @Test
-    void getRecipeImage() throws IOException{
+    void getRecipeImage() throws IOException {
         byte[] photo = ImageUtil.randomImage();
 
         when(RECIPE_REPOSITORY.findById(1L))
@@ -168,7 +173,7 @@ public class RecipeServiceTest {
 
     @Test
     @Disabled
-    void saveRecipePhoto() throws IOException{
+    void saveRecipePhoto() throws IOException {
         // todo -> write unit test for save recipe photo
     }
 
@@ -274,5 +279,16 @@ public class RecipeServiceTest {
         assertEquals(2, result.getData().size());
         assertEquals(99, result.getData().get(0).getViewCount());
         assertEquals("any user", result.getData().get(0).getAuthorName());
+    }
+
+    @Test
+    void addCommentToRecipe() {
+        Optional<RecipeEntity> mockEntity = Optional.of(RECIPE_ENTITY);
+
+        when(RECIPE_REPOSITORY.findById(1L)).thenReturn(mockEntity);
+        when(RECIPE_ENTITY.isDraft()).thenReturn(false);
+
+        assertEquals('s',
+                recipeService.addCommentToRecipe(1L, new CommentEntity()).charAt(0));
     }
 }

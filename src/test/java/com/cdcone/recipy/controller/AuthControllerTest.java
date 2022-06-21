@@ -56,6 +56,7 @@ public class AuthControllerTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void signIn() {
         Map<String, Object> mockMap = mock(Map.class);
         Optional<Map<String, Object>> mockResult = Optional.of(mockMap);

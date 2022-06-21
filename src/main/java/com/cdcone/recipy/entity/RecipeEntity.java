@@ -14,6 +14,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -80,6 +81,10 @@ public class RecipeEntity {
     @JoinTable(joinColumns = @JoinColumn(name = "recipe_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"))
     private Set<TagEntity> tags;
 
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "comment_id")
+    private Set<CommentEntity> comments;
+
     public RecipeEntity(
             UserEntity userEntity,
             Set<TagEntity> tags,
@@ -93,11 +98,11 @@ public class RecipeEntity {
             int views,
             boolean isDraft) {
 
-        if (title.isBlank()) {
+        if (title == null || title.isBlank()) {
             throw new NullPointerException("title cannot blank");
         }
 
-        if (ingredients.isBlank()) {
+        if (ingredients == null || ingredients.isBlank()) {
             throw new NullPointerException("ingredients cannot blank");
         }
 
