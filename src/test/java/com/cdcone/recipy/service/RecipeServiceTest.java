@@ -6,22 +6,26 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
+import com.cdcone.recipy.dtoAccess.RecipeReactionDto;
+import com.cdcone.recipy.dtoAccess.RecipeReactionResponseDto;
+import com.cdcone.recipy.dtoAccess.RecipeReactionSummaryDto;
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
+import com.cdcone.recipy.dtoRequest.RecipeReactionRequestDto;
 import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
-import com.cdcone.recipy.entity.CommentEntity;
-import com.cdcone.recipy.entity.RecipeEntity;
-import com.cdcone.recipy.entity.TagEntity;
-import com.cdcone.recipy.entity.UserEntity;
+import com.cdcone.recipy.entity.*;
 import com.cdcone.recipy.repository.RecipeReactionRepository;
 import com.cdcone.recipy.repository.RecipeRepository;
 import com.cdcone.recipy.repository.UserDao;
 import com.cdcone.recipy.util.ImageUtil;
 
+import io.swagger.v3.core.util.Json;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -266,4 +270,75 @@ public class RecipeServiceTest {
         assertEquals('s',
                 recipeService.addCommentToRecipe(1L, new CommentEntity()).charAt(0));
     }
+
+    @Test
+    void successGetRecipeReaction() {
+        RecipeEntity recipe = new RecipeEntity();
+        recipe.setId(1L);
+        recipe.setTitle("Recipe 1");
+
+        List<RecipeReactionDto> recipeReaction = List.of(
+                new RecipeReactionDto("LIKED", 10L),
+                new RecipeReactionDto("HAPPY", 2L)
+        );
+
+        UserEntity user = new UserEntity();
+        user.setId(10L);
+        user.setUsername("user1");
+
+        RecipeReactionEntity reactionEntity = new RecipeReactionEntity(
+                user,
+                recipe,
+                "LIKED",
+                LocalDateTime.now()
+        );
+
+        when(RECIPE_REPOSITORY.findById(1L)).thenReturn(Optional.of(recipe));
+        when(RECIPE_REACTION_REPOSITORY.getCountByReaction(1L)).thenReturn(recipeReaction);
+        when(USER_DAO.findByUsername("user1")).thenReturn(Optional.of(user));
+        when(RECIPE_REACTION_REPOSITORY.findByRecipeIdAndUserId(1L, 10L)).thenReturn(reactionEntity);
+
+        Pair<String, RecipeReactionSummaryDto> result = recipeService.getRecipeReaction(1L, "user1");
+
+        assertEquals("success: data retrieved", result.getFirst());
+        assertEquals("LIKED", result.getSecond().getUserReaction().getReaction());
+        assertEquals(2, result.getSecond().getReactionList().size());
+
+        Json.prettyPrint(result.getSecond());
+    }
+
+    @Test
+    void successSaveRecipeReaction() {
+        RecipeEntity recipe = new RecipeEntity();
+        recipe.setId(1L);
+        recipe.setTitle("Recipe 1");
+
+        UserEntity user = new UserEntity();
+        user.setId(10L);
+        user.setUsername("user1");
+
+        RecipeReactionRequestDto requestDto = new RecipeReactionRequestDto();
+        requestDto.setUsername("user1");
+        requestDto.setReaction("LIKED");
+
+        RecipeReactionEntity saveEntity = new RecipeReactionEntity(
+                user,
+                recipe,
+                requestDto.getReaction(),
+                LocalDateTime.now()
+        );
+
+        when(RECIPE_REPOSITORY.findById(1L)).thenReturn(Optional.of(recipe));
+        when(USER_DAO.findByUsername("user1")).thenReturn(Optional.of(user));
+        when(RECIPE_REACTION_REPOSITORY.save(saveEntity)).thenReturn(saveEntity);
+
+        Pair<String, RecipeReactionEntity> result = recipeService.saveRecipeReaction(1L, requestDto);
+
+        assertEquals("success: data saved", result.getFirst());
+        assertEquals("LIKED", result.getSecond().getReaction());
+
+        Json.prettyPrint(result.getSecond());
+    }
+
+
 }
