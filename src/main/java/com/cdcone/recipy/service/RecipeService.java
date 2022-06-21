@@ -10,6 +10,7 @@ import javax.imageio.ImageIO;
 
 import com.cdcone.recipy.dtoAccess.*;
 import com.cdcone.recipy.dtoRequest.*;
+import com.cdcone.recipy.entity.CommentEntity;
 import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.entity.RecipeReactionEntity;
 import com.cdcone.recipy.entity.TagEntity;
@@ -85,6 +86,7 @@ public class RecipeService {
             }
 
             if (e instanceof NullPointerException) {
+                e.printStackTrace();
                 return Pair.of("failed: " + e.getMessage(), new RecipeEntity());
             }
 
@@ -316,6 +318,23 @@ public class RecipeService {
         recipeRepository.delete(recipe.getSecond());
 
         return Pair.of("success: data deleted", result);
+    }
+    
+    public String addCommentToRecipe(Long recipeId, CommentEntity comment){        
+        Pair<String, RecipeEntity> recipeEntity = getById(recipeId);
+
+        if (recipeEntity.getFirst().charAt(0) != 's'){
+            return recipeEntity.getFirst();
+        }
+
+        if (recipeEntity.getSecond().isDraft()){
+            return "failed: cannot comment on unpublished recipe";
+        }
+
+        recipeEntity.getSecond().getComments().add(comment);
+        recipeRepository.save(recipeEntity.getSecond());
+
+        return "success: comment added";
     }
 
     public Pair<String, RecipeReactionSummaryDto> getRecipeReaction(long recipeId, String username) {
