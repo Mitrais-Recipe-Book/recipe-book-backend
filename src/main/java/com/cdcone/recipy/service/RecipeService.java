@@ -328,6 +328,7 @@ public class RecipeService {
     }
 
     public String addCommentToRecipe(Long recipeId, CommentEntity comment){   
+
         Pair<String, RecipeEntity> recipeEntity = getById(recipeId);
 
         if (recipeEntity.getFirst().charAt(0) != 's'){            
@@ -356,11 +357,13 @@ public class RecipeService {
                 Optional<UserEntity> userOptional = userDao.findByUsername(username);
                 if(userOptional.isPresent()) {
                     RecipeReactionEntity userReactionEntity = recipeReactionRepository.findByRecipeIdAndUserId(recipe.getId(), userOptional.get().getId());
-                    userReaction = new RecipeReactionResponseDto(
-                            userReactionEntity.getRecipe().getId(),
-                            userReactionEntity.getUser().getId(),
-                            userReactionEntity.getReaction(),
-                            userReactionEntity.getTimestamp());
+                    if(userReactionEntity!=null) {
+                        userReaction = new RecipeReactionResponseDto(
+                                userReactionEntity.getRecipe().getId(),
+                                userReactionEntity.getUser().getId(),
+                                userReactionEntity.getReaction(),
+                                userReactionEntity.getTimestamp());
+                    }
                 }
             }
 
