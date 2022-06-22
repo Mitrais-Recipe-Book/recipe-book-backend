@@ -340,4 +340,50 @@ public class RecipeControllerTest {
         assertEquals("failed: data not found", result.getBody().getMessage());
     }
 
+    @Test
+    void successDeleteRecipeReaction() {
+        RecipeEntity recipe = new RecipeEntity();
+        recipe.setId(1L);
+        recipe.setTitle("Recipe 1");
+
+        UserEntity user = new UserEntity();
+        user.setId(10L);
+        user.setUsername("user1");
+
+        RecipeReactionRequestDto requestDto = new RecipeReactionRequestDto();
+        requestDto.setUsername("user1");
+        requestDto.setReaction("LIKED");
+
+        RecipeReactionEntity saveEntity = new RecipeReactionEntity(
+                user,
+                recipe,
+                requestDto.getReaction(),
+                LocalDateTime.now()
+        );
+
+        when(RECIPE_SERVICE.deleteRecipeReaction(1L, requestDto)).thenReturn(
+                Pair.of("success: data deleted", saveEntity)
+        );
+
+        ResponseEntity<CommonResponse> result = recipeController.deleteRecipeReaction(1L, requestDto);
+
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals("success: data deleted", result.getBody().getMessage());
+    }
+
+    @Test
+    void failDeleteRecipeReaction() {
+        RecipeReactionRequestDto requestDto = new RecipeReactionRequestDto();
+        requestDto.setUsername("user1");
+        requestDto.setReaction("LIKED");
+
+        when(RECIPE_SERVICE.deleteRecipeReaction(1L, requestDto)).thenReturn(
+                Pair.of("failed: data not found", mock(RecipeReactionEntity.class))
+        );
+
+        ResponseEntity<CommonResponse> result = recipeController.deleteRecipeReaction(1L, requestDto);
+
+        assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
+        assertEquals("failed: data not found", result.getBody().getMessage());
+    }
 }

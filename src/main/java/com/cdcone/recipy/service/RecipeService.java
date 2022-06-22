@@ -327,8 +327,7 @@ public class RecipeService {
         return Pair.of("success: data deleted", result);
     }
 
-    public String addCommentToRecipe(Long recipeId, CommentEntity comment){   
-
+    public String addCommentToRecipe(Long recipeId, CommentEntity comment){
         Pair<String, RecipeEntity> recipeEntity = getById(recipeId);
 
         if (recipeEntity.getFirst().charAt(0) != 's'){            
@@ -390,6 +389,19 @@ public class RecipeService {
                     LocalDateTime.now()
             );
             return Pair.of("success: data saved", recipeReactionRepository.save(entity));
+        }
+        return Pair.of("failed: data not found", new RecipeReactionEntity());
+    }
+
+    public Pair<String, RecipeReactionEntity> deleteRecipeReaction(long recipeId, RecipeReactionRequestDto requestDto) {
+        Optional<UserEntity> userOptional = userDao.findByUsername(requestDto.getUsername());
+
+        if(userOptional.isPresent()) {
+            Optional<RecipeReactionEntity> reactionOptional = recipeReactionRepository.findByRecipeIdAndUserIdAndReaction(recipeId, userOptional.get().getId(), requestDto.getReaction());
+            if(reactionOptional.isPresent()) {
+                recipeReactionRepository.delete(reactionOptional.get());
+                return Pair.of("success: data deleted", reactionOptional.get());
+            }
         }
         return Pair.of("failed: data not found", new RecipeReactionEntity());
     }
