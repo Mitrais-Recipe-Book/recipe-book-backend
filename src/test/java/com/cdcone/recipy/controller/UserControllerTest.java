@@ -137,7 +137,7 @@ public class UserControllerTest {
 
                 PaginatedDto<UserRecipeDto> mockResult = new PaginatedDto<>(mockUserRecipe, 0, 1);
 
-                when(RECIPE_SERVICE.getByUsername("any", 0))
+                when(RECIPE_SERVICE.getByUsername("any", 0, false))
                                 .thenReturn(mockResult);
                 assertEquals(HttpStatus.OK,
                                 userController.getRecipesByUsername("any", 0).getStatusCode());

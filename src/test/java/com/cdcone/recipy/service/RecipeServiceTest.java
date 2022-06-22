@@ -11,6 +11,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
+import com.cdcone.recipy.dtoAccess.UserRecipeDto;
+import com.cdcone.recipy.dtoRequest.PaginatedDto;
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
 import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
 import com.cdcone.recipy.entity.CommentEntity;
@@ -27,6 +29,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 
 public class RecipeServiceTest {
@@ -62,6 +66,7 @@ public class RecipeServiceTest {
     @Test
     void failedAddRecipeDuplicateData() {
         when(ADD_RECIPE_DTO.getTitle()).thenReturn("title");
+        when(ADD_RECIPE_DTO.getIngredients()).thenReturn("ingredients");
         when(RECIPE_REPOSITORY.save(any())).thenThrow(DataIntegrityViolationException.class);
 
         assertEquals('f',
@@ -255,6 +260,26 @@ public class RecipeServiceTest {
                 recipeService.deleteRecipe(1L).getFirst().charAt(0));
 
     }
+    
+    @Test
+    void successGetRecipesByUsername() {
+        UserRecipeDto mockRecipe = mock(UserRecipeDto.class);
+        UserRecipeDto mockRecipe2 = mock(UserRecipeDto.class);
+        
+        Page<UserRecipeDto> mockResult = new PageImpl<>(
+                List.of(mockRecipe, mockRecipe2));
+        
+        when(mockRecipe.getAuthorName()).thenReturn("any user");
+        when(mockRecipe.getViewCount()).thenReturn(99);
+        when(RECIPE_REPOSITORY.findByUsername(any(String.class), any(Boolean.class), any(Pageable.class)))
+                .thenReturn(mockResult);
+        when(TAG_SERVICE.getByRecipeId(any(Long.class))).thenReturn(Set.of());
+        
+        PaginatedDto<UserRecipeDto> result = recipeService.getByUsername("any", 0, false);
+        assertEquals(2, result.getData().size());
+        assertEquals(99, result.getData().get(0).getViewCount());
+        assertEquals("any user", result.getData().get(0).getAuthorName());
+    }
 
     @Test
     void addCommentToRecipe() {
@@ -264,6 +289,25 @@ public class RecipeServiceTest {
         when(RECIPE_ENTITY.isDraft()).thenReturn(false);
 
         assertEquals('s',
+                recipeService.addCommentToRecipe(1L, new CommentEntity()).charAt(0));
+    }
+
+    @Test
+    void failedCommentRecipeNotFound(){
+        when(RECIPE_REPOSITORY.findById(1L)).thenReturn(Optional.empty());
+
+        assertEquals('f',
+                recipeService.addCommentToRecipe(1L, new CommentEntity()).charAt(0));
+    }
+
+    @Test
+    void failedCommentRecipeNotPublished(){
+        Optional<RecipeEntity> mockEntity = Optional.of(RECIPE_ENTITY);
+
+        when(RECIPE_REPOSITORY.findById(1L)).thenReturn(mockEntity);
+        when(RECIPE_ENTITY.isDraft()).thenReturn(true);
+
+        assertEquals('f',
                 recipeService.addCommentToRecipe(1L, new CommentEntity()).charAt(0));
     }
 }
