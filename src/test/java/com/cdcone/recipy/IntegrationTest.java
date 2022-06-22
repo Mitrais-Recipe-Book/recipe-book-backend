@@ -2,8 +2,10 @@ package com.cdcone.recipy;
 
 
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
+import com.cdcone.recipy.dtoRequest.RecipeReactionRequestDto;
 import com.cdcone.recipy.util.ImageUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.core.util.Json;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -442,6 +444,43 @@ public class IntegrationTest {
 	            .andExpect(status().isOk())
 	            .andExpect(jsonPath("$.message").value("Success"))
 	            .andReturn();
+	}
+
+	@Test
+	void testSuccessGetRecipeReaction() throws Exception {
+		String recipeId = "3";
+		String username = "user1";
+
+		MvcResult result = mockMvc.perform(get("/api/v1/recipe/" + recipeId + "/reaction")
+				.queryParam("username", username))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data retrieved"))
+				.andExpect(jsonPath("$.payload.reactionList[0].reaction").isNotEmpty())
+				.andReturn();
+
+		System.out.println(result.getResponse().getContentAsString());
+	}
+
+	@Test
+	void testSuccessSaveRecipeReaction() throws Exception {
+		String recipeId = "3";
+		RecipeReactionRequestDto requestDto = new RecipeReactionRequestDto();
+		requestDto.setUsername("user1");
+		requestDto.setReaction("AMAZED");
+
+		String requestbody = om.writeValueAsString(requestDto);
+
+		MvcResult mr = mockMvc.perform(post("/api/v1/recipe/"+ recipeId + "/reaction")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(requestbody))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data saved"))
+				.andExpect(jsonPath("$.payload.reaction").value("AMAZED"))
+				.andExpect(jsonPath("$.payload.recipeId").value(3))
+				.andExpect(jsonPath("$.payload.userId").value(1))
+				.andReturn();
+
+		System.out.println(mr.getResponse().getContentAsString());
 	}
 
 }

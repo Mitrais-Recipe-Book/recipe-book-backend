@@ -2,12 +2,18 @@ package com.cdcone.recipy.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Set;
 
+import com.cdcone.recipy.dtoAccess.RecipeReactionSummaryDto;
+import com.cdcone.recipy.dtoRequest.RecipeReactionRequestDto;
+import com.cdcone.recipy.entity.RecipeReactionEntity;
+import com.cdcone.recipy.response.CommonResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -15,6 +21,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cdcone.recipy.dtoAccess.RecipeDtoList;
@@ -261,4 +268,76 @@ public class RecipeControllerTest {
         assertNotEquals(HttpStatus.OK,
                 recipeController.getById(1L).getStatusCode());
     }
+
+    @Test
+    void successGetRecipeReaction() {
+        when(RECIPE_SERVICE.getRecipeReaction(1L, "user1")).thenReturn(
+                Pair.of("success: data retrieved", mock(RecipeReactionSummaryDto.class))
+        );
+
+        ResponseEntity<CommonResponse> result = recipeController.getRecipeReaction(1L, "user1");
+
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals("success: data retrieved", result.getBody().getMessage());
+    }
+
+    @Test
+    void failGetRecipeReaction() {
+        when(RECIPE_SERVICE.getRecipeReaction(1L, "user1")).thenReturn(
+                Pair.of("failed: data not found", mock(RecipeReactionSummaryDto.class))
+        );
+
+        ResponseEntity<CommonResponse> result = recipeController.getRecipeReaction(1L, "user1");
+
+        assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
+        assertEquals("failed: data not found", result.getBody().getMessage());
+    }
+
+    @Test
+    void successSaveRecipeReaction() {
+        RecipeEntity recipe = new RecipeEntity();
+        recipe.setId(1L);
+        recipe.setTitle("Recipe 1");
+
+        UserEntity user = new UserEntity();
+        user.setId(10L);
+        user.setUsername("user1");
+
+        RecipeReactionRequestDto requestDto = new RecipeReactionRequestDto();
+        requestDto.setUsername("user1");
+        requestDto.setReaction("LIKED");
+
+        RecipeReactionEntity saveEntity = new RecipeReactionEntity(
+                user,
+                recipe,
+                requestDto.getReaction(),
+                LocalDateTime.now()
+        );
+
+        when(RECIPE_SERVICE.saveRecipeReaction(1L, requestDto)).thenReturn(
+                Pair.of("success: data saved", saveEntity)
+        );
+
+        ResponseEntity<CommonResponse> result = recipeController.saveRecipeReaction(1L, requestDto);
+
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals("success: data saved", result.getBody().getMessage());
+    }
+
+    @Test
+    void failSaveRecipeReaction() {
+        RecipeReactionRequestDto requestDto = new RecipeReactionRequestDto();
+        requestDto.setUsername("user1");
+        requestDto.setReaction("LIKED");
+
+        when(RECIPE_SERVICE.saveRecipeReaction(1L, requestDto)).thenReturn(
+                Pair.of("failed: data not found", mock(RecipeReactionEntity.class))
+        );
+
+        ResponseEntity<CommonResponse> result = recipeController.saveRecipeReaction(1L, requestDto);
+
+        assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
+        assertEquals("failed: data not found", result.getBody().getMessage());
+    }
+
 }
