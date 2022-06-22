@@ -39,7 +39,7 @@ public class CommentController {
 
     @GetMapping("{recipeId}/comments")
     public ResponseEntity<CommonResponse> getComment(@PathVariable(name = "recipeId") Long recipeId,
-            @RequestParam int page) {
+            @RequestParam(defaultValue = "0") int page) {
         Pair<String, Page<CommentListDto>> result = commentService.getComment(recipeId, page);
 
         if (result.getFirst().charAt(0) == 's') {
