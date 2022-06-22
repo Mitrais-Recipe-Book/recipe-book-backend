@@ -61,12 +61,12 @@ public class RecipeService {
             return Pair.of(tagEntities.getFirst(), new RecipeEntity());
         }
 
-        if (dto.getTitle().length()> 128){
-            return Pair.of("failed: title length cannot more than 128 character", new RecipeEntity());
+        if (dto.getTitle().length()> 140){
+            return Pair.of("failed: title length cannot more than 140 character", new RecipeEntity());
         }
 
-        if (dto.getTitle().length() < 16){
-            return Pair.of("failed: title length cannot less than 16 character", new RecipeEntity());
+        if (dto.getTitle().length() == 0){
+            return Pair.of("failed: title length cannot less than 1 character", new RecipeEntity());
         }
 
         try {
