@@ -2,13 +2,9 @@ package com.cdcone.recipy.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.Optional;
-import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,10 +12,8 @@ import org.springframework.data.util.Pair;
 
 import com.cdcone.recipy.dtoRequest.AddCommentDto;
 import com.cdcone.recipy.entity.CommentEntity;
-import com.cdcone.recipy.entity.RecipeEntity;
 import com.cdcone.recipy.entity.UserEntity;
 import com.cdcone.recipy.repository.CommentRepository;
-import com.cdcone.recipy.repository.RecipeRepository;
 
 public class CommentServiceTest {
 
