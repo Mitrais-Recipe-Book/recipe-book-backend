@@ -386,5 +386,4 @@ public class RecipeControllerTest {
         assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
         assertEquals("failed: data not found", result.getBody().getMessage());
     }
-
 }

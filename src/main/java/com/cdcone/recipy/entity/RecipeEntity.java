@@ -82,7 +82,7 @@ public class RecipeEntity {
     private Set<TagEntity> tags;
 
     @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "comment_id")
+    @JoinColumn(name = "recipe_id", referencedColumnName = "id")
     private Set<CommentEntity> comments;
 
     public RecipeEntity(

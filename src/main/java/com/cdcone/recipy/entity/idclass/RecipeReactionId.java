@@ -1,9 +1,5 @@
 package com.cdcone.recipy.entity.idclass;
 
-import com.cdcone.recipy.entity.RecipeEntity;
-import com.cdcone.recipy.entity.UserEntity;
-import org.hibernate.Hibernate;
-
 import java.io.Serializable;
 import java.util.Objects;
 

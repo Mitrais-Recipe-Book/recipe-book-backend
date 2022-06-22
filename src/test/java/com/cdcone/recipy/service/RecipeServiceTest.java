@@ -415,6 +415,4 @@ public class RecipeServiceTest {
         assertEquals('f',
                 recipeService.addCommentToRecipe(1L, new CommentEntity()).charAt(0));
     }
-
-
 }

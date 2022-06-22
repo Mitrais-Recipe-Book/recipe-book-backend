@@ -504,5 +504,4 @@ public class IntegrationTest {
 
 		System.out.println(mr.getResponse().getContentAsString());
 	}
-
 }
