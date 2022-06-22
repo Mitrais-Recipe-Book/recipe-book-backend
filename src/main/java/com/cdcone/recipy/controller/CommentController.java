@@ -43,9 +43,9 @@ public class CommentController {
         Pair<String, Page<CommentListDto>> result = commentService.getComment(recipeId, page);
 
         if (result.getFirst().charAt(0) == 's') {
-            return ResponseEntity.ok().body(new CommonResponse(result));
+            return ResponseEntity.ok().body(new CommonResponse(result.getSecond()));
         }
 
-        return ResponseEntity.badRequest().body(new CommonResponse(result));
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
     }
 }
