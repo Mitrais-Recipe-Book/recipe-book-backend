@@ -23,9 +23,4 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
     public Page<CommentListDto> getComments(
             @PathParam("recipeId") Long recipeId,
             Pageable pageable);
-
-    // @Query("SELECT NEW com.cdcone.recipy.dtoAccess.CommentListDto " +
-    //         " (c.user.username, c.user.fullname, c.date, c.comment)" +
-    //         " FROM CommentEntity c")
-    // public CommentListDto getComments();
 }

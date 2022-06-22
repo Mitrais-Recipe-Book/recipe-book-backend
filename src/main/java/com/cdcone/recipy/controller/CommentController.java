@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,7 +36,7 @@ public class CommentController {
         return ResponseEntity.badRequest().body(new CommonResponse(result));
     }
 
-    @PostMapping("{recipeId}/comment/get")
+    @GetMapping("{recipeId}/comments")
     public ResponseEntity<CommonResponse> getComment(@PathVariable(name = "recipeId") Long recipeId,
             int page) {
         Pair<String, Page<CommentListDto>> result = commentService.getComment(recipeId, page);
