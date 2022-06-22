@@ -26,7 +26,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Pair;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -262,9 +261,9 @@ public class RecipeService {
         return recipeRepository.count();
     }
 
-    public PaginatedDto<UserRecipeDto> getByUsername(String userName, int page) {
+    public PaginatedDto<UserRecipeDto> getByUsername(String userName, int page, boolean isDraft) {
         Pageable pageable = PageRequest.of(page, 5);
-        Page<UserRecipeDto> byUserId = recipeRepository.findByUsername(userName, pageable);
+        Page<UserRecipeDto> byUserId = recipeRepository.findByUsername(userName, isDraft, pageable);
         byUserId.getContent().forEach(it -> {
             Set<TagEntity> tags = tagService.getByRecipeId(it.getId());
             it.setTags(tags);
@@ -319,11 +318,12 @@ public class RecipeService {
 
         return Pair.of("success: data deleted", result);
     }
-    
+
     public String addCommentToRecipe(Long recipeId, CommentEntity comment){        
+
         Pair<String, RecipeEntity> recipeEntity = getById(recipeId);
 
-        if (recipeEntity.getFirst().charAt(0) != 's'){
+        if (recipeEntity.getFirst().charAt(0) != 's'){            
             return recipeEntity.getFirst();
         }
 

@@ -44,8 +44,9 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
 
         @Query(value = "SELECT NEW com.cdcone.recipy.dtoAccess.UserRecipeDto" +
                         "(r.id, r.title, r.overview, r.user.fullName, r.views) " +
-                        "FROM RecipeEntity r WHERE r.user.username = :username")
-        Page<UserRecipeDto> findByUsername(@Param("username") String username, Pageable pageable);
+                        "FROM RecipeEntity r WHERE r.user.username = :username " +
+                        "AND r.isDraft = :isDraft")
+        Page<UserRecipeDto> findByUsername(@Param("username") String username, @Param("isDraft") boolean isDraft,    Pageable pageable);
 
         @Query("SELECT NEW com.cdcone.recipy.dtoAccess.RecipeDtoList " +
                         "(recipe.id, recipe.title, recipe.overview, recipe.views, recipe.user) " +

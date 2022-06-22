@@ -28,7 +28,7 @@ public class CommentService {
         }
 
         CommentEntity commentEntity = new CommentEntity(userEntity.getSecond(), LocalDateTime.now(), dto.getComment());
-        commentEntity = commentRepository.save(commentEntity);
+        commentEntity = commentRepository.save(commentEntity);       
 
         return recipeService.addCommentToRecipe(recipeId, commentEntity);
     }
