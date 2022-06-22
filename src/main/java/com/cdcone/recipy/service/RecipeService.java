@@ -349,11 +349,13 @@ public class RecipeService {
                 Optional<UserEntity> userOptional = userDao.findByUsername(username);
                 if(userOptional.isPresent()) {
                     RecipeReactionEntity userReactionEntity = recipeReactionRepository.findByRecipeIdAndUserId(recipe.getId(), userOptional.get().getId());
-                    userReaction = new RecipeReactionResponseDto(
-                            userReactionEntity.getRecipe().getId(),
-                            userReactionEntity.getUser().getId(),
-                            userReactionEntity.getReaction(),
-                            userReactionEntity.getTimestamp());
+                    if(userReactionEntity!=null) {
+                        userReaction = new RecipeReactionResponseDto(
+                                userReactionEntity.getRecipe().getId(),
+                                userReactionEntity.getUser().getId(),
+                                userReactionEntity.getReaction(),
+                                userReactionEntity.getTimestamp());
+                    }
                 }
             }
 
