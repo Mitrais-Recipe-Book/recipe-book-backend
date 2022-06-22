@@ -44,6 +44,7 @@ public class CommentController {
 
         if (result.getFirst().charAt(0) == 's') {
             return ResponseEntity.ok().body(new CommonResponse(result.getSecond()));
+            
         }
 
         return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
