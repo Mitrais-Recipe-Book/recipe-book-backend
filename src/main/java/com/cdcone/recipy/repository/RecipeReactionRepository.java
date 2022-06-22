@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RecipeReactionRepository extends JpaRepository<RecipeReactionEntity, Long> {
@@ -20,6 +21,10 @@ public interface RecipeReactionRepository extends JpaRepository<RecipeReactionEn
     @Query("SELECT r FROM RecipeReactionEntity r " +
             "WHERE r.recipe.id = :recipeId AND r.user.id = :userId")
     RecipeReactionEntity findByRecipeIdAndUserId(@Param("recipeId") Long recipeId, @Param("userId") Long userId);
+
+    @Query("SELECT r FROM RecipeReactionEntity r " +
+            "WHERE r.recipe.id = :recipeId AND r.user.id = :userId AND r.reaction = :reaction")
+    Optional<RecipeReactionEntity> findByRecipeIdAndUserIdAndReaction(@Param("recipeId") Long recipeId, @Param("userId") Long userId, @Param("reaction") String reaction);
 
 
 

@@ -385,4 +385,17 @@ public class RecipeService {
         }
         return Pair.of("failed: data not found", new RecipeReactionEntity());
     }
+
+    public Pair<String, RecipeReactionEntity> deleteRecipeReaction(long recipeId, RecipeReactionRequestDto requestDto) {
+        Optional<UserEntity> userOptional = userDao.findByUsername(requestDto.getUsername());
+
+        if(userOptional.isPresent()) {
+            Optional<RecipeReactionEntity> reactionOptional = recipeReactionRepository.findByRecipeIdAndUserIdAndReaction(recipeId, userOptional.get().getId(), requestDto.getReaction());
+            if(reactionOptional.isPresent()) {
+                recipeReactionRepository.delete(reactionOptional.get());
+                return Pair.of("success: data deleted", reactionOptional.get());
+            }
+        }
+        return Pair.of("failed: data not found", new RecipeReactionEntity());
+    }
 }

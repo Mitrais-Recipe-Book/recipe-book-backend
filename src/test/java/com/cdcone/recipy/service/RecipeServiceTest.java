@@ -365,6 +365,39 @@ public class RecipeServiceTest {
     }
 
     @Test
+    void successDeleteRecipeReaction() {
+        RecipeEntity recipe = new RecipeEntity();
+        recipe.setId(1L);
+        recipe.setTitle("Recipe 1");
+
+        UserEntity user = new UserEntity();
+        user.setId(10L);
+        user.setUsername("user1");
+
+        RecipeReactionRequestDto requestDto = new RecipeReactionRequestDto();
+        requestDto.setUsername("user1");
+        requestDto.setReaction("LIKED");
+
+        RecipeReactionEntity reactionEntity = new RecipeReactionEntity(
+                user,
+                recipe,
+                requestDto.getReaction(),
+                LocalDateTime.now()
+        );
+
+        when(USER_DAO.findByUsername("user1")).thenReturn(Optional.of(user));
+        when(RECIPE_REACTION_REPOSITORY.findByRecipeIdAndUserIdAndReaction(1L, 10L, "LIKED")).thenReturn(Optional.of(reactionEntity));
+
+        Pair<String, RecipeReactionEntity> result = recipeService.deleteRecipeReaction(1L, requestDto);
+
+        assertEquals("success: data deleted", result.getFirst());
+        assertEquals("LIKED", result.getSecond().getReaction());
+
+        Json.prettyPrint(result.getSecond());
+
+    }
+
+    @Test
     void failedCommentRecipeNotFound(){
         when(RECIPE_REPOSITORY.findById(1L)).thenReturn(Optional.empty());
 
@@ -382,4 +415,6 @@ public class RecipeServiceTest {
         assertEquals('f',
                 recipeService.addCommentToRecipe(1L, new CommentEntity()).charAt(0));
     }
+
+
 }

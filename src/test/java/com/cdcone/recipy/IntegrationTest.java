@@ -483,4 +483,26 @@ public class IntegrationTest {
 		System.out.println(mr.getResponse().getContentAsString());
 	}
 
+	@Test
+	void testSuccessDeleteRecipeReaction() throws Exception {
+		String recipeId = "1";
+		RecipeReactionRequestDto requestDto = new RecipeReactionRequestDto();
+		requestDto.setUsername("user1");
+		requestDto.setReaction("LIKED");
+
+		String requestbody = om.writeValueAsString(requestDto);
+
+		MvcResult mr = mockMvc.perform(delete("/api/v1/recipe/"+ recipeId + "/reaction/")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(requestbody))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data deleted"))
+				.andExpect(jsonPath("$.payload.reaction").value("LIKED"))
+				.andExpect(jsonPath("$.payload.recipeId").value(1))
+				.andExpect(jsonPath("$.payload.userId").value(1))
+				.andReturn();
+
+		System.out.println(mr.getResponse().getContentAsString());
+	}
+
 }
