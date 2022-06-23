@@ -138,9 +138,8 @@ public class RecipeController {
     public ResponseEntity<CommonResponse> getById(@PathVariable(name = "id") long recipeId) {
         Pair<String, RecipeEntity> result = recipeService.getById(recipeId);
 
-        RecipeDetailDto dto = new RecipeDetailDto(result.getSecond());
-
         if (result.getFirst().charAt(0) == 's') {
+            RecipeDetailDto dto = new RecipeDetailDto(result.getSecond());
             return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), dto));
         }
 
