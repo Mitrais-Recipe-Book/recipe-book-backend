@@ -174,7 +174,8 @@ public class RecipeController {
         return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
     }
 
-    @DeleteMapping("{id}/reaction/")
+
+    @DeleteMapping("{id}/reaction")
     public ResponseEntity<CommonResponse> deleteRecipeReaction(@PathVariable(name = "id") long recipeId, @RequestBody RecipeReactionRequestDto requestDto) {
         Pair<String, RecipeReactionEntity> result = recipeService.deleteRecipeReaction(recipeId, requestDto);
 
