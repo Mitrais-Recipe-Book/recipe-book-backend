@@ -313,7 +313,7 @@ public class RecipeServiceTest {
         RecipeReactionEntity reactionEntity = new RecipeReactionEntity(
                 user,
                 recipe,
-                "LIKED",
+                RecipeReactionEntity.Reaction.LIKED,
                 LocalDateTime.now()
         );
 
@@ -348,7 +348,7 @@ public class RecipeServiceTest {
         RecipeReactionEntity saveEntity = new RecipeReactionEntity(
                 user,
                 recipe,
-                requestDto.getReaction(),
+                RecipeReactionEntity.Reaction.valueOf(requestDto.getReaction()),
                 LocalDateTime.now()
         );
 
@@ -359,7 +359,7 @@ public class RecipeServiceTest {
         Pair<String, RecipeReactionEntity> result = recipeService.saveRecipeReaction(1L, requestDto);
 
         assertEquals("success: data saved", result.getFirst());
-        assertEquals("LIKED", result.getSecond().getReaction());
+        assertEquals("LIKED", result.getSecond().getReaction().toString());
 
         Json.prettyPrint(result.getSecond());
     }
@@ -381,17 +381,17 @@ public class RecipeServiceTest {
         RecipeReactionEntity reactionEntity = new RecipeReactionEntity(
                 user,
                 recipe,
-                requestDto.getReaction(),
+                RecipeReactionEntity.Reaction.valueOf(requestDto.getReaction()),
                 LocalDateTime.now()
         );
 
         when(USER_DAO.findByUsername("user1")).thenReturn(Optional.of(user));
-        when(RECIPE_REACTION_REPOSITORY.findByRecipeIdAndUserIdAndReaction(1L, 10L, "LIKED")).thenReturn(Optional.of(reactionEntity));
+        when(RECIPE_REACTION_REPOSITORY.findByRecipeIdAndUserIdAndReaction(1L, 10L, RecipeReactionEntity.Reaction.LIKED)).thenReturn(Optional.of(reactionEntity));
 
         Pair<String, RecipeReactionEntity> result = recipeService.deleteRecipeReaction(1L, requestDto);
 
         assertEquals("success: data deleted", result.getFirst());
-        assertEquals("LIKED", result.getSecond().getReaction());
+        assertEquals("LIKED", result.getSecond().getReaction().toString());
 
         Json.prettyPrint(result.getSecond());
 

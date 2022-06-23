@@ -166,7 +166,7 @@ public class RecipeController {
             RecipeReactionResponseDto responseDto = new RecipeReactionResponseDto(
                     response.getRecipe().getId(),
                     response.getUser().getId(),
-                    response.getReaction(),
+                    response.getReaction().toString(),
                     response.getTimestamp()
             );
             return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), responseDto));
@@ -183,7 +183,7 @@ public class RecipeController {
             RecipeReactionResponseDto responseDto = new RecipeReactionResponseDto(
                     response.getRecipe().getId(),
                     response.getUser().getId(),
-                    response.getReaction(),
+                    response.getReaction().toString(),
                     response.getTimestamp()
             );
             return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), responseDto));

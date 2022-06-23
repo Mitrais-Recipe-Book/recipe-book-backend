@@ -310,7 +310,7 @@ public class RecipeControllerTest {
         RecipeReactionEntity saveEntity = new RecipeReactionEntity(
                 user,
                 recipe,
-                requestDto.getReaction(),
+                RecipeReactionEntity.Reaction.valueOf(requestDto.getReaction()),
                 LocalDateTime.now()
         );
 
@@ -357,7 +357,7 @@ public class RecipeControllerTest {
         RecipeReactionEntity saveEntity = new RecipeReactionEntity(
                 user,
                 recipe,
-                requestDto.getReaction(),
+                RecipeReactionEntity.Reaction.valueOf(requestDto.getReaction()),
                 LocalDateTime.now()
         );
 
