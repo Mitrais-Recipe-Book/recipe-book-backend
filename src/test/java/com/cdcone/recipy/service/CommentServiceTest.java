@@ -5,11 +5,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
 import org.springframework.data.util.Pair;
 
+import com.cdcone.recipy.dtoAccess.CommentListDto;
 import com.cdcone.recipy.dtoRequest.AddCommentDto;
 import com.cdcone.recipy.entity.CommentEntity;
 import com.cdcone.recipy.entity.UserEntity;
@@ -54,7 +55,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    void failAddComment(){
+    void failAddComment() {
         Pair<String, UserEntity> mockResult = Pair.of("failed", new UserEntity());
 
         when(ADD_COMMENT_DTO.getComment()).thenReturn("comment");
@@ -68,5 +69,27 @@ public class CommentServiceTest {
                 .thenReturn("success");
 
         assertEquals('f', commentService.add(1L, ADD_COMMENT_DTO).charAt(0));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void getComment() {
+        Page<CommentListDto> mockResult = mock(Page.class);
+        when(COMMENT_REPOSITORY.getComments(any(), any()))
+                .thenReturn(mockResult);
+
+        assertEquals("success: data retrieved",
+                commentService.getComment(1L, 0).getFirst());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void failedGetComment() {
+        Page<CommentListDto> mockResult = mock(Page.class);
+        when(COMMENT_REPOSITORY.getComments(any(), any()))
+                .thenReturn(mockResult);
+
+        assertEquals("failed: page index must not be less than zero",
+                commentService.getComment(1L, -1).getFirst());
     }
 }

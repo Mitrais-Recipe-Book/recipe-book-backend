@@ -2,7 +2,6 @@ package com.cdcone.recipy.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -272,8 +271,7 @@ public class RecipeControllerTest {
     @Test
     void successGetRecipeReaction() {
         when(RECIPE_SERVICE.getRecipeReaction(1L, "user1")).thenReturn(
-                Pair.of("success: data retrieved", mock(RecipeReactionSummaryDto.class))
-        );
+                Pair.of("success: data retrieved", mock(RecipeReactionSummaryDto.class)));
 
         ResponseEntity<CommonResponse> result = recipeController.getRecipeReaction(1L, "user1");
 
@@ -284,8 +282,7 @@ public class RecipeControllerTest {
     @Test
     void failGetRecipeReaction() {
         when(RECIPE_SERVICE.getRecipeReaction(1L, "user1")).thenReturn(
-                Pair.of("failed: data not found", mock(RecipeReactionSummaryDto.class))
-        );
+                Pair.of("failed: data not found", mock(RecipeReactionSummaryDto.class)));
 
         ResponseEntity<CommonResponse> result = recipeController.getRecipeReaction(1L, "user1");
 
@@ -311,12 +308,10 @@ public class RecipeControllerTest {
                 user,
                 recipe,
                 RecipeReactionEntity.Reaction.valueOf(requestDto.getReaction()),
-                LocalDateTime.now()
-        );
+                LocalDateTime.now());
 
         when(RECIPE_SERVICE.saveRecipeReaction(1L, requestDto)).thenReturn(
-                Pair.of("success: data saved", saveEntity)
-        );
+                Pair.of("success: data saved", saveEntity));
 
         ResponseEntity<CommonResponse> result = recipeController.saveRecipeReaction(1L, requestDto);
 
@@ -331,8 +326,7 @@ public class RecipeControllerTest {
         requestDto.setReaction("LIKED");
 
         when(RECIPE_SERVICE.saveRecipeReaction(1L, requestDto)).thenReturn(
-                Pair.of("failed: data not found", mock(RecipeReactionEntity.class))
-        );
+                Pair.of("failed: data not found", mock(RecipeReactionEntity.class)));
 
         ResponseEntity<CommonResponse> result = recipeController.saveRecipeReaction(1L, requestDto);
 
@@ -358,12 +352,10 @@ public class RecipeControllerTest {
                 user,
                 recipe,
                 RecipeReactionEntity.Reaction.valueOf(requestDto.getReaction()),
-                LocalDateTime.now()
-        );
+                LocalDateTime.now());
 
         when(RECIPE_SERVICE.deleteRecipeReaction(1L, requestDto)).thenReturn(
-                Pair.of("success: data deleted", saveEntity)
-        );
+                Pair.of("success: data deleted", saveEntity));
 
         ResponseEntity<CommonResponse> result = recipeController.deleteRecipeReaction(1L, requestDto);
 
@@ -378,8 +370,7 @@ public class RecipeControllerTest {
         requestDto.setReaction("LIKED");
 
         when(RECIPE_SERVICE.deleteRecipeReaction(1L, requestDto)).thenReturn(
-                Pair.of("failed: data not found", mock(RecipeReactionEntity.class))
-        );
+                Pair.of("failed: data not found", mock(RecipeReactionEntity.class)));
 
         ResponseEntity<CommonResponse> result = recipeController.deleteRecipeReaction(1L, requestDto);
 
