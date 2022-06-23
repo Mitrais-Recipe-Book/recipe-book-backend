@@ -12,7 +12,7 @@ public class UserProfile {
     private final String username;
     private final String fullName;
     private final int totalRecipes;
-    private final int recipeLikes;
+    private int recipeLikes;
     private Long followers;
     private Set<RoleEntity> roles;
 
@@ -30,5 +30,9 @@ public class UserProfile {
 
     public void setFollowers(Long followers) {
         this.followers = followers;
+    }
+    
+    public void setRecipeLikes(int recipeLikes) {
+        this.recipeLikes = recipeLikes;
     }
 }

@@ -26,4 +26,7 @@ public interface RecipeReactionRepository extends JpaRepository<RecipeReactionEn
             "WHERE r.recipe.id = :recipeId AND r.user.id = :userId AND r.reaction = :reaction")
     Optional<RecipeReactionEntity> findByRecipeIdAndUserIdAndReaction(@Param("recipeId") Long recipeId, @Param("userId") Long userId, @Param("reaction") RecipeReactionEntity.Reaction reaction);
 
+    @Query("SELECT COUNT(rr.reaction) FROM RecipeReactionEntity rr "
+            + "JOIN rr.recipe r WHERE rr.reaction='LIKED' AND r.id=:userId")
+    Integer getTotalRecipeLikeByUserId(@Param("userId") long userId);
 }
