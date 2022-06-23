@@ -360,7 +360,7 @@ public class RecipeService {
                         userReaction = new RecipeReactionResponseDto(
                                 userReactionEntity.getRecipe().getId(),
                                 userReactionEntity.getUser().getId(),
-                                userReactionEntity.getReaction(),
+                                userReactionEntity.getReaction().toString(),
                                 userReactionEntity.getTimestamp());
                     }
                 }
@@ -381,14 +381,18 @@ public class RecipeService {
         Optional<UserEntity> userOptional = userDao.findByUsername(requestDto.getUsername());
         Optional<RecipeEntity> recipeOptional = recipeRepository.findById(recipeId);
 
-        if(userOptional.isPresent() && recipeOptional.isPresent()) {
-            RecipeReactionEntity entity = new RecipeReactionEntity(
-                    userOptional.get(),
-                    recipeOptional.get(),
-                    requestDto.getReaction(),
-                    LocalDateTime.now()
-            );
-            return Pair.of("success: data saved", recipeReactionRepository.save(entity));
+        try {
+            if(userOptional.isPresent() && recipeOptional.isPresent()) {
+                RecipeReactionEntity entity = new RecipeReactionEntity(
+                        userOptional.get(),
+                        recipeOptional.get(),
+                        RecipeReactionEntity.Reaction.valueOf(requestDto.getReaction()),
+                        LocalDateTime.now()
+                );
+                return Pair.of("success: data saved", recipeReactionRepository.save(entity));
+            }
+        } catch (IllegalArgumentException e) {
+            return Pair.of("failed: invalid reaction", new RecipeReactionEntity());
         }
         return Pair.of("failed: data not found", new RecipeReactionEntity());
     }
@@ -397,7 +401,7 @@ public class RecipeService {
         Optional<UserEntity> userOptional = userDao.findByUsername(requestDto.getUsername());
 
         if(userOptional.isPresent()) {
-            Optional<RecipeReactionEntity> reactionOptional = recipeReactionRepository.findByRecipeIdAndUserIdAndReaction(recipeId, userOptional.get().getId(), requestDto.getReaction());
+            Optional<RecipeReactionEntity> reactionOptional = recipeReactionRepository.findByRecipeIdAndUserIdAndReaction(recipeId, userOptional.get().getId(), RecipeReactionEntity.Reaction.valueOf(requestDto.getReaction()));
             if(reactionOptional.isPresent()) {
                 recipeReactionRepository.delete(reactionOptional.get());
                 return Pair.of("success: data deleted", reactionOptional.get());

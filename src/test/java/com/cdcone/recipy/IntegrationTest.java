@@ -466,7 +466,7 @@ public class IntegrationTest {
 		String recipeId = "3";
 		RecipeReactionRequestDto requestDto = new RecipeReactionRequestDto();
 		requestDto.setUsername("user1");
-		requestDto.setReaction("AMAZED");
+		requestDto.setReaction("DISLIKED");
 
 		String requestbody = om.writeValueAsString(requestDto);
 
@@ -475,7 +475,7 @@ public class IntegrationTest {
 				.content(requestbody))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.message").value("success: data saved"))
-				.andExpect(jsonPath("$.payload.reaction").value("AMAZED"))
+				.andExpect(jsonPath("$.payload.reaction").value("DISLIKED"))
 				.andExpect(jsonPath("$.payload.recipeId").value(3))
 				.andExpect(jsonPath("$.payload.userId").value(1))
 				.andReturn();

@@ -138,9 +138,8 @@ public class RecipeController {
     public ResponseEntity<CommonResponse> getById(@PathVariable(name = "id") long recipeId) {
         Pair<String, RecipeEntity> result = recipeService.getById(recipeId);
 
-        RecipeDetailDto dto = new RecipeDetailDto(result.getSecond());
-
         if (result.getFirst().charAt(0) == 's') {
+            RecipeDetailDto dto = new RecipeDetailDto(result.getSecond());
             return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), dto));
         }
 
@@ -166,7 +165,7 @@ public class RecipeController {
             RecipeReactionResponseDto responseDto = new RecipeReactionResponseDto(
                     response.getRecipe().getId(),
                     response.getUser().getId(),
-                    response.getReaction(),
+                    response.getReaction().toString(),
                     response.getTimestamp()
             );
             return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), responseDto));
@@ -174,7 +173,7 @@ public class RecipeController {
         return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
     }
 
-    @DeleteMapping("{id}/reaction/")
+    @DeleteMapping("{id}/reaction")
     public ResponseEntity<CommonResponse> deleteRecipeReaction(@PathVariable(name = "id") long recipeId, @RequestBody RecipeReactionRequestDto requestDto) {
         Pair<String, RecipeReactionEntity> result = recipeService.deleteRecipeReaction(recipeId, requestDto);
 
@@ -183,7 +182,7 @@ public class RecipeController {
             RecipeReactionResponseDto responseDto = new RecipeReactionResponseDto(
                     response.getRecipe().getId(),
                     response.getUser().getId(),
-                    response.getReaction(),
+                    response.getReaction().toString(),
                     response.getTimestamp()
             );
             return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), responseDto));

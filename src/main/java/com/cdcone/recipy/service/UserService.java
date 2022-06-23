@@ -5,6 +5,7 @@ import com.cdcone.recipy.dtoRequest.PaginatedDto;
 import com.cdcone.recipy.dtoRequest.SignUpDto;
 import com.cdcone.recipy.entity.RoleEntity;
 import com.cdcone.recipy.entity.UserEntity;
+import com.cdcone.recipy.repository.RecipeReactionRepository;
 import com.cdcone.recipy.repository.RoleDao;
 import com.cdcone.recipy.repository.UserDao;
 import com.cdcone.recipy.util.CustomUser;
@@ -37,6 +38,7 @@ public class UserService implements UserDetailsService {
 
     private final UserDao userDao;
     private final RoleDao roleDao;
+    private final RecipeReactionRepository reactionRepo;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
@@ -108,10 +110,12 @@ public class UserService implements UserDetailsService {
     public Optional<UserProfile> findByUsername(String username) {
         Optional<UserProfile> userProfile = userDao.findDetailByUsername(username);
         userProfile.ifPresent(it -> {
+            int recipeLikes = reactionRepo.getTotalRecipeLikeByUserId(it.getId());
             Set<RoleEntity> roles = roleDao.findByUserId(it.getId());
             Long followerCount = userDao.getFollowerCountById(it.getId());
             it.setRoles(roles);
             it.setFollowers(followerCount);
+            it.setRecipeLikes(recipeLikes);
         });
         return userProfile;
     }
