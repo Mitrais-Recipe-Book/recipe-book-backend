@@ -46,7 +46,7 @@ public class CommentControllerTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    void getComment(){
+    void getComment() {
         Pair<String, Page<CommentListDto>> mockResult = Pair.of("success", mock(Page.class));
 
         when(COMMENT_SERVICE.getComment(1L, 0)).thenReturn(mockResult);
@@ -56,7 +56,7 @@ public class CommentControllerTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    void failGetComment(){
+    void failGetComment() {
         Pair<String, Page<CommentListDto>> mockResult = Pair.of("failed", mock(Page.class));
 
         when(COMMENT_SERVICE.getComment(1L, 0)).thenReturn(mockResult);

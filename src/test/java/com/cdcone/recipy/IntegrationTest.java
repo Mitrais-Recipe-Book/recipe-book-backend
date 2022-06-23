@@ -22,7 +22,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.HashMap;
 import java.util.Set;
 
-
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -514,80 +513,81 @@ public class IntegrationTest {
 		String requestbody = om.writeValueAsString(requestDto);
 
 		MvcResult mr = mockMvc.perform(post("/api/v1/recipe/" + recipeId + "/comment/add")
-			.contentType(MediaType.APPLICATION_JSON)
-			.content(requestbody))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.message").value("success: comment added"))
-			.andReturn();
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestbody))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: comment added"))
+				.andReturn();
 
-			System.out.println(mr.getResponse().getContentAsString());
+		System.out.println(mr.getResponse().getContentAsString());
 	}
 
 	@Test
-	void testFailedAddCommentRecipeNotFound() throws Exception{
+	void testFailedAddCommentRecipeNotFound() throws Exception {
 		String recipeId = "10";
 		AddCommentDto requestDto = new AddCommentDto("user1", "Horay!");
 
 		String requestbody = om.writeValueAsString(requestDto);
 
 		MvcResult mr = mockMvc.perform(post("/api/v1/recipe/" + recipeId + "/comment/add")
-			.contentType(MediaType.APPLICATION_JSON)
-			.content(requestbody))
-			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.message").value("failed: cannot find recipe with id " + recipeId))
-			.andReturn();
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestbody))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("failed: cannot find recipe with id " + recipeId))
+				.andReturn();
 
-			System.out.println(mr.getResponse().getContentAsString());
+		System.out.println(mr.getResponse().getContentAsString());
 	}
 
 	@Test
-	void testFailedAddCommentUserNotFound() throws Exception{
+	void testFailedAddCommentUserNotFound() throws Exception {
 		String recipeId = "1";
 		AddCommentDto requestDto = new AddCommentDto("user50", "Horay!");
 
 		String requestbody = om.writeValueAsString(requestDto);
 
 		MvcResult mr = mockMvc.perform(post("/api/v1/recipe/" + recipeId + "/comment/add")
-			.contentType(MediaType.APPLICATION_JSON)
-			.content(requestbody))
-			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.message").value("failed: user with username " + requestDto.getUsername() + " not found"))
-			.andReturn();
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestbody))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message")
+						.value("failed: user with username " + requestDto.getUsername() + " not found"))
+				.andReturn();
 
-			System.out.println(mr.getResponse().getContentAsString());
+		System.out.println(mr.getResponse().getContentAsString());
 	}
 
 	@Test
-	void testFailedAddCommentUnpublishedRecipe() throws Exception{
+	void testFailedAddCommentUnpublishedRecipe() throws Exception {
 		String recipeId = "4";
 		AddCommentDto requestDto = new AddCommentDto("user1", "Horay!");
 
 		String requestbody = om.writeValueAsString(requestDto);
 
 		MvcResult mr = mockMvc.perform(post("/api/v1/recipe/" + recipeId + "/comment/add")
-			.contentType(MediaType.APPLICATION_JSON)
-			.content(requestbody))
-			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.message").value("failed: cannot comment on unpublished recipe"))
-			.andReturn();
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestbody))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("failed: cannot comment on unpublished recipe"))
+				.andReturn();
 
-			System.out.println(mr.getResponse().getContentAsString());
+		System.out.println(mr.getResponse().getContentAsString());
 	}
 
 	@Test
-	void testFailedAddCommentNoCommentAttached() throws Exception{
+	void testFailedAddCommentNoCommentAttached() throws Exception {
 		String recipeId = "2";
 		AddCommentDto requestDto = new AddCommentDto("user1", "");
 
 		String requestbody = om.writeValueAsString(requestDto);
 
 		MvcResult mr = mockMvc.perform(post("/api/v1/recipe/" + recipeId + "/comment/add")
-			.contentType(MediaType.APPLICATION_JSON)
-			.content(requestbody))
-			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.message").value("failed: cannot post null comment"))
-			.andReturn();
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestbody))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("failed: cannot post null comment"))
+				.andReturn();
 
-			System.out.println(mr.getResponse().getContentAsString());
+		System.out.println(mr.getResponse().getContentAsString());
 	}
 }
