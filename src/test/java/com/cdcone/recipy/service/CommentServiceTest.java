@@ -5,16 +5,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 
 import com.cdcone.recipy.dtoAccess.CommentListDto;
@@ -35,8 +29,6 @@ public class CommentServiceTest {
         private final CommentEntity COMMENT_ENTITY = mock(CommentEntity.class);
 
         private final AddCommentDto ADD_COMMENT_DTO = mock(AddCommentDto.class);
-
-        private final Pageable PAGEABLE = mock(Pageable.class);
 
         @BeforeEach
         void init() {

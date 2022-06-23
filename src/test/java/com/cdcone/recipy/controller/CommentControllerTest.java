@@ -38,7 +38,7 @@ public class CommentControllerTest {
     @Test
     void failAddComment() {
         when(COMMENT_SERVICE.add(1L, ADD_COMMENT_DTO))
-                .thenReturn("failedd");
+                .thenReturn("failed");
 
         assertEquals(HttpStatus.BAD_REQUEST,
                 commentController.addComment(1L, ADD_COMMENT_DTO).getStatusCode());
