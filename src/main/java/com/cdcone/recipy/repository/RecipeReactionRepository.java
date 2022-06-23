@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface RecipeReactionRepository extends JpaRepository<RecipeReactionEntity, Long> {
 
-    @Query("SELECT new com.cdcone.recipy.dtoAccess.RecipeReactionDto(reaction, count(*))" +
+    @Query("SELECT new com.cdcone.recipy.dtoAccess.RecipeReactionDto(CAST(reaction AS string), count(*))" +
             "FROM RecipeReactionEntity r " +
             "WHERE r.recipe.id = :recipeId GROUP BY r.reaction")
     List<RecipeReactionDto> getCountByReaction(@Param("recipeId") Long recipeId);
@@ -24,9 +24,6 @@ public interface RecipeReactionRepository extends JpaRepository<RecipeReactionEn
 
     @Query("SELECT r FROM RecipeReactionEntity r " +
             "WHERE r.recipe.id = :recipeId AND r.user.id = :userId AND r.reaction = :reaction")
-    Optional<RecipeReactionEntity> findByRecipeIdAndUserIdAndReaction(@Param("recipeId") Long recipeId, @Param("userId") Long userId, @Param("reaction") String reaction);
-
-
-
+    Optional<RecipeReactionEntity> findByRecipeIdAndUserIdAndReaction(@Param("recipeId") Long recipeId, @Param("userId") Long userId, @Param("reaction") RecipeReactionEntity.Reaction reaction);
 
 }

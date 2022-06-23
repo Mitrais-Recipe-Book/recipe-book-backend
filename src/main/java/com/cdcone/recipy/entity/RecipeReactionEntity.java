@@ -28,12 +28,13 @@ public class RecipeReactionEntity {
     private RecipeEntity recipe;
 
     @Column(name = "reaction")
-    private String reaction;
+    @Enumerated(EnumType.STRING)
+    private Reaction reaction;
 
     @Column(name = "timestamp")
     private LocalDateTime timestamp;
 
-    public RecipeReactionEntity(UserEntity user, RecipeEntity recipe, String reaction, LocalDateTime timestamp) {
+    public RecipeReactionEntity(UserEntity user, RecipeEntity recipe, Reaction reaction, LocalDateTime timestamp) {
         this.user = user;
         this.recipe = recipe;
         this.reaction = reaction;
@@ -52,5 +53,10 @@ public class RecipeReactionEntity {
     @Override
     public int hashCode() {
         return Objects.hash(user, recipe);
+    }
+
+    public enum Reaction {
+        LIKED,
+        DISLIKED
     }
 }

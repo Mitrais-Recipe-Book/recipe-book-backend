@@ -166,14 +166,13 @@ public class RecipeController {
             RecipeReactionResponseDto responseDto = new RecipeReactionResponseDto(
                     response.getRecipe().getId(),
                     response.getUser().getId(),
-                    response.getReaction(),
+                    response.getReaction().toString(),
                     response.getTimestamp()
             );
             return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), responseDto));
         }
         return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
     }
-
 
     @DeleteMapping("{id}/reaction")
     public ResponseEntity<CommonResponse> deleteRecipeReaction(@PathVariable(name = "id") long recipeId, @RequestBody RecipeReactionRequestDto requestDto) {
@@ -184,7 +183,7 @@ public class RecipeController {
             RecipeReactionResponseDto responseDto = new RecipeReactionResponseDto(
                     response.getRecipe().getId(),
                     response.getUser().getId(),
-                    response.getReaction(),
+                    response.getReaction().toString(),
                     response.getTimestamp()
             );
             return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), responseDto));
