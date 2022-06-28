@@ -6,6 +6,7 @@ import com.cdcone.recipy.dtoRequest.SignUpDto;
 import com.cdcone.recipy.entity.RoleEntity;
 import com.cdcone.recipy.entity.UserEntity;
 import com.cdcone.recipy.repository.RecipeReactionRepository;
+import com.cdcone.recipy.repository.RecipeRepository;
 import com.cdcone.recipy.repository.RoleDao;
 import com.cdcone.recipy.repository.UserDao;
 import com.cdcone.recipy.util.CustomUser;
@@ -37,6 +38,7 @@ class UserServiceTest {
     private static final UserDao userRepo = mock(UserDao.class);
     private static final RoleDao roleRepo = mock(RoleDao.class);
     private static final RecipeReactionRepository reactionRepo = mock(RecipeReactionRepository.class);
+    private static final RecipeRepository recipeRepo = mock(RecipeRepository.class);
     private static final RoleEntity userRole = mock(RoleEntity.class);
     private static final SignUpDto signUpDto = mock(SignUpDto.class);
     private static final UserEntity creator = mock(UserEntity.class);
@@ -45,7 +47,8 @@ class UserServiceTest {
 
     @BeforeAll
     public static void setUp() {
-        userService = new UserService(userRepo, roleRepo, reactionRepo, new BCryptPasswordEncoder());
+        userService = new UserService(userRepo, roleRepo, 
+                reactionRepo, recipeRepo, new BCryptPasswordEncoder());
 
         when(signUpDto.getEmail()).thenReturn("test@mail.com");
         when(signUpDto.getUsername()).thenReturn("test");
