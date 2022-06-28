@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cdcone.recipy.dtoAccess.CommentListDto;
 import com.cdcone.recipy.dtoRequest.AddCommentDto;
+import com.cdcone.recipy.dtoRequest.PaginatedDto;
 import com.cdcone.recipy.response.CommonResponse;
 import com.cdcone.recipy.service.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -41,11 +42,13 @@ public class CommentController {
     public ResponseEntity<CommonResponse> getComment(@PathVariable(name = "recipeId") Long recipeId,
             @RequestParam(defaultValue = "0") int page) {
         Pair<String, Page<CommentListDto>> result = commentService.getComment(recipeId, page);
+        PaginatedDto<CommentListDto> paginated = new PaginatedDto<CommentListDto>(result.getSecond().getContent(),
+                page, result.getSecond().getTotalPages(),
+                result.getSecond().isLast(),
+                result.getSecond().getTotalElements());
 
         if (result.getFirst().charAt(0) == 's') {
-
-            return ResponseEntity.ok().body(new CommonResponse(result.getSecond()));
-            
+            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), paginated));
         }
 
         return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
