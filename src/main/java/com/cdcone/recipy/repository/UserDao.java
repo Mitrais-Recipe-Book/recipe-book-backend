@@ -27,7 +27,7 @@ public interface UserDao extends JpaRepository<UserEntity, Long> {
     Page<UserEntity> findAllPaged(Pageable pageable);
 
     @Query("SELECT NEW com.cdcone.recipy.dtoAccess.UserProfile " +
-            "(u.id, u.username, u.fullName, SIZE(u.recipes), 0) " +
+            "(u.id, u.username, u.fullName, 0, 0) " +
             "FROM UserEntity u WHERE u.username = :username")
     Optional<UserProfile> findDetailByUsername(@Param("username") String username);
 

@@ -54,4 +54,9 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
                         "WHERE recipe.isDraft = FALSE " +
                         "ORDER BY recipe.id DESC")
         public Set<RecipeDtoList> getDiscoverRecipes();
+        
+        @Query("SELECT COUNT(r.id) FROM RecipeEntity r "
+                + "WHERE r.user.username = :username "
+                + "AND r.isDraft = 'FALSE'")
+        public Integer getTotalRecipeByUsername(@Param("username") String username);
 }
