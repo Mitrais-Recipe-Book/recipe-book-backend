@@ -97,10 +97,10 @@ public class UserService implements UserDetailsService {
         return userDao.getById(id);
     }
 
-    public Pair<String, UserEntity> getByUsername(String username){
+    public Pair<String, UserEntity> getByUsername(String username) {
         Optional<UserEntity> result = userDao.findByUsername(username);
 
-        if (result.isEmpty()){
+        if (result.isEmpty()) {
             return Pair.of("failed: user with username " + username + " not found", new UserEntity());
         }
 
@@ -162,7 +162,11 @@ public class UserService implements UserDetailsService {
                 .stream()
                 .map(UserDto::toDto)
                 .collect(Collectors.toList());
-        return new PaginatedDto<>(userDtoList, allPaged.getNumber(), allPaged.getTotalPages());
+        return new PaginatedDto<>(userDtoList,
+                allPaged.getNumber(),
+                allPaged.getTotalPages(),
+                allPaged.isLast(),
+                allPaged.getTotalElements());
     }
 
     public void addFollow(long userId, long creatorId) throws Exception {
@@ -217,7 +221,7 @@ public class UserService implements UserDetailsService {
         return userDao.getFollowersById(userId);
     }
 
-    public Long getFollowerCountById(long userId){
+    public Long getFollowerCountById(long userId) {
         return userDao.getFollowerCountById(userId);
     }
 

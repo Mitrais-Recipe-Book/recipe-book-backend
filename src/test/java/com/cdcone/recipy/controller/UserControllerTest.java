@@ -135,7 +135,7 @@ public class UserControllerTest {
                 "authorName",
                 1));
 
-        PaginatedDto<UserRecipeDto> mockResult = new PaginatedDto<>(mockUserRecipe, 0, 1);
+        PaginatedDto<UserRecipeDto> mockResult = new PaginatedDto<>(mockUserRecipe, 0, 1, true, 1);
 
         when(RECIPE_SERVICE.getByUsername("any", 0, false))
                 .thenReturn(mockResult);
