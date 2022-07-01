@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 public class UserService implements UserDetailsService {
 
     private final UserDao userDao;
+    private final RoleService roleService;
     private final RoleDao roleDao;
     private final RecipeReactionRepository reactionRepo;
     private final RecipeRepository recipeRepo;
@@ -231,5 +232,22 @@ public class UserService implements UserDetailsService {
 
     public Boolean isFollowing(Long creatorId, Long userId) {
         return userDao.isFollowing(creatorId, userId);
+    }
+
+    public String requestCreatorRole(String username) {
+        Pair<String, RoleEntity> role = roleService.getByName("Request");
+        Pair<String, UserEntity> user = getByUsername(username);
+
+        if (role.getFirst().charAt(0) == 'f') {
+            return role.getFirst();
+        }
+        if (user.getFirst().charAt(0) == 'f') {
+            return user.getFirst();
+        }
+
+        user.getSecond().getRoles().add(role.getSecond());
+        userDao.save(user.getSecond());
+
+        return "success: requesting creator role";
     }
 }

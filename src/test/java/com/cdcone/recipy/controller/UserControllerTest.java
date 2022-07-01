@@ -207,4 +207,9 @@ public class UserControllerTest {
         assertEquals(HttpStatus.OK,
                 userController.isFollowing(1L, 2L).getStatusCode());
     }
+
+    @Test
+    void successRequestCreatorRole(){
+
+    }
 }

@@ -44,10 +44,11 @@ class UserServiceTest {
     private static final UserEntity creator = mock(UserEntity.class);
     private static final UserEntity follower1 = mock(UserEntity.class);
     private static UserService userService;
+    private static final RoleService ROLE_SERVICE = mock(RoleService.class);
 
     @BeforeAll
     public static void setUp() {
-        userService = new UserService(userRepo, roleRepo, 
+        userService = new UserService(userRepo, ROLE_SERVICE, roleRepo,
                 reactionRepo, recipeRepo, new BCryptPasswordEncoder());
 
         when(signUpDto.getEmail()).thenReturn("test@mail.com");
@@ -260,7 +261,7 @@ class UserServiceTest {
     }
 
     @Test
-    void testSuccessAddFollow() throws Exception{
+    void testSuccessAddFollow() throws Exception {
         when(userRepo.findById(2L)).thenReturn(Optional.of(creator));
         when(userRepo.findById(1L)).thenReturn(Optional.of(follower1));
         when(creator.getFollows()).thenReturn(Set.of());
@@ -272,7 +273,7 @@ class UserServiceTest {
     }
 
     @Test
-    void testFailUnfollowIfNotFollowing(){
+    void testFailUnfollowIfNotFollowing() {
         when(userRepo.findById(2L)).thenReturn(Optional.of(creator));
         when(userRepo.findById(1L)).thenReturn(Optional.of(follower1));
         when(creator.getFollows()).thenReturn(Set.of());
@@ -284,7 +285,7 @@ class UserServiceTest {
     }
 
     @Test
-    void testSuccessUnfollow() throws Exception{
+    void testSuccessUnfollow() throws Exception {
         UserEntity mockFollower = mock(UserEntity.class);
         when(userRepo.findById(2L)).thenReturn(Optional.of(creator));
         when(userRepo.findById(1L)).thenReturn(Optional.of(mockFollower));
@@ -306,5 +307,15 @@ class UserServiceTest {
         List<FollowerDto> followerList = userService.getFollowerList(22L);
         assertEquals(1, followerList.size());
         assertEquals("mockuser", followerList.get(0).getUsername());
+    }
+
+    @Test
+    void successRequestCreatorRole() {
+        RoleEntity mockRole = mock(RoleEntity.class);
+        UserEntity mockUser = mock(UserEntity.class);
+        when(ROLE_SERVICE.getByName("User")).thenReturn(Pair.of("success", mockRole));
+        when(userService.getByUsername("user1")).thenReturn(Pair.of("success", mockUser));
+
+        assertEquals('s', userService.requestCreatorRole("user1"));
     }
 }
