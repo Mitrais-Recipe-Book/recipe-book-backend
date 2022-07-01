@@ -26,6 +26,7 @@ import com.cdcone.recipy.dtoAccess.UserProfile;
 import com.cdcone.recipy.dtoAccess.UserRecipeDto;
 import com.cdcone.recipy.dtoRequest.FollowUserDto;
 import com.cdcone.recipy.dtoRequest.PaginatedDto;
+import com.cdcone.recipy.entity.UserEntity;
 import com.cdcone.recipy.service.RecipeService;
 import com.cdcone.recipy.service.UserService;
 import com.cdcone.recipy.util.ImageUtil;
@@ -206,5 +207,24 @@ public class UserControllerTest {
 
         assertEquals(HttpStatus.OK,
                 userController.isFollowing(1L, 2L).getStatusCode());
+    }
+    
+    @Test
+    void successGetProfile() {
+        String username = "user1";
+        UserEntity mockUser = mock(UserEntity.class);
+        when(USER_SERVICE.getByUsername(username))
+                .thenReturn(Pair.of("success: user found", mockUser));
+        
+        assertEquals(HttpStatus.OK, userController.getProfile("user1").getStatusCode());
+    }
+    
+    @Test
+    void failedGetProfileNotFound() {
+        String username = "user1";
+        when(USER_SERVICE.getByUsername(username))
+                .thenReturn(Pair.of("failed: user with username " + username + " not found", mock(UserEntity.class)));
+        
+        assertEquals(HttpStatus.NOT_FOUND, userController.getProfile("user1").getStatusCode());
     }
 }

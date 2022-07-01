@@ -2,6 +2,7 @@ package com.cdcone.recipy.controller;
 
 import com.cdcone.recipy.dtoAccess.*;
 import com.cdcone.recipy.dtoRequest.*;
+import com.cdcone.recipy.entity.UserEntity;
 import com.cdcone.recipy.response.CommonResponse;
 import com.cdcone.recipy.service.RecipeService;
 import com.cdcone.recipy.service.UserService;
@@ -127,5 +128,17 @@ public class UserController {
         
         PaginatedDto<UserRecipeDto> result = recipeService.getByUsername(username, page, true);
         return ResponseEntity.ok(new CommonResponse(result));
+    }
+    
+    @GetMapping("{username}/profile")
+    public ResponseEntity<CommonResponse> getProfile(@PathVariable("username") String username) {
+        Pair<String, UserEntity> byUsername = userService.getByUsername(username);
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        UserDto result = null;
+        if (byUsername.getFirst().charAt(0) == 's') {
+            status = HttpStatus.OK;
+            result = UserDto.toDto(byUsername.getSecond());
+        }
+        return ResponseEntity.status(status).body(new CommonResponse(byUsername.getFirst(), result));
     }
 }
