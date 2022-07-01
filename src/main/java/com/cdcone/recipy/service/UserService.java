@@ -3,6 +3,7 @@ package com.cdcone.recipy.service;
 import com.cdcone.recipy.dtoAccess.*;
 import com.cdcone.recipy.dtoRequest.PaginatedDto;
 import com.cdcone.recipy.dtoRequest.SignUpDto;
+import com.cdcone.recipy.dtoRequest.UpdateUserDto;
 import com.cdcone.recipy.entity.RoleEntity;
 import com.cdcone.recipy.entity.UserEntity;
 import com.cdcone.recipy.repository.RecipeReactionRepository;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -231,5 +233,28 @@ public class UserService implements UserDetailsService {
 
     public Boolean isFollowing(Long creatorId, Long userId) {
         return userDao.isFollowing(creatorId, userId);
+    }
+    
+    public Pair<HttpStatus, Optional<UserDto>> updateUser(String username, UpdateUserDto updateUserDto) {
+        UserDto result = null;
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        Pair<String, UserEntity> byUsername = getByUsername(username);
+        
+        if (byUsername.getFirst().charAt(0) == 's') {
+            try {
+                UserEntity user = byUsername.getSecond();
+                user.setEmail(updateUserDto.getEmail().toLowerCase());
+                user.setUsername(updateUserDto.getUsername().toLowerCase());
+                user.setFullName(updateUserDto.getFullName());
+                userDao.save(user);
+                result = UserDto.toDto(user);
+                
+                status = HttpStatus.OK;
+            } catch (DataIntegrityViolationException e) {
+                status = HttpStatus.BAD_REQUEST;
+            }
+        }
+        
+        return Pair.of(status, Optional.ofNullable(result));
     }
 }

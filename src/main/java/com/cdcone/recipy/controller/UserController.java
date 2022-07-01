@@ -141,4 +141,23 @@ public class UserController {
         }
         return ResponseEntity.status(status).body(new CommonResponse(byUsername.getFirst(), result));
     }
+    
+    @PutMapping("{username}/profile")
+    public ResponseEntity<CommonResponse> updateProfile(
+            @PathVariable("username") String username,
+            @RequestBody UpdateUserDto updateUserDto) {
+        Pair<HttpStatus, Optional<UserDto>> updateUser =
+                userService.updateUser(username, updateUserDto);
+        String msg = "Failed: user not found";
+        UserDto result = null;
+        HttpStatus status = updateUser.getFirst();
+        if (status.equals(HttpStatus.OK)) {
+            msg = "Success: user updated";
+            result = updateUser.getSecond().get();
+        } else if (status.equals(HttpStatus.BAD_REQUEST)) {
+            msg = "Failed to update user. Username or email is already exists";
+        }
+        
+        return ResponseEntity.status(status).body(new CommonResponse(msg, result));
+    }
 }
