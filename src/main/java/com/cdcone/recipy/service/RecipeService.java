@@ -61,11 +61,11 @@ public class RecipeService {
             return Pair.of(tagEntities.getFirst(), new RecipeEntity());
         }
 
-        if (dto.getTitle().length()> 140){
+        if (dto.getTitle().length() > 140) {
             return Pair.of("failed: title length cannot more than 140 character", new RecipeEntity());
         }
 
-        if (dto.getTitle().length() == 0){
+        if (dto.getTitle().length() == 0) {
             return Pair.of("failed: title length cannot less than 1 character", new RecipeEntity());
         }
 
@@ -276,7 +276,11 @@ public class RecipeService {
             Set<TagEntity> tags = tagService.getByRecipeId(it.getId());
             it.setTags(tags);
         });
-        return new PaginatedDto<>(byUserId.getContent(), byUserId.getNumber(), byUserId.getTotalPages());
+        return new PaginatedDto<>(byUserId.getContent(),
+                byUserId.getNumber(),
+                byUserId.getTotalPages(),
+                byUserId.isLast(),
+                byUserId.getTotalElements());
     }
 
     public String saveRecipePhoto(MultipartFile photo, Long recipeId) {
@@ -327,14 +331,14 @@ public class RecipeService {
         return Pair.of("success: data deleted", result);
     }
 
-    public String addCommentToRecipe(Long recipeId, CommentEntity comment){
+    public String addCommentToRecipe(Long recipeId, CommentEntity comment) {
         Pair<String, RecipeEntity> recipeEntity = getById(recipeId);
 
-        if (recipeEntity.getFirst().charAt(0) != 's'){            
+        if (recipeEntity.getFirst().charAt(0) != 's') {
             return recipeEntity.getFirst();
         }
 
-        if (recipeEntity.getSecond().isDraft()){
+        if (recipeEntity.getSecond().isDraft()) {
             return "failed: cannot comment on unpublished recipe";
         }
 
@@ -347,16 +351,17 @@ public class RecipeService {
     public Pair<String, RecipeReactionSummaryDto> getRecipeReaction(long recipeId, String username) {
         Optional<RecipeEntity> recipeOptional = recipeRepository.findById(recipeId);
 
-        if(recipeOptional.isPresent()) {
+        if (recipeOptional.isPresent()) {
             RecipeEntity recipe = recipeOptional.get();
             List<RecipeReactionDto> recipeReactionDtoList = recipeReactionRepository.getCountByReaction(recipeId);
 
             RecipeReactionResponseDto userReaction = null;
-            if(!username.isBlank()) {
+            if (!username.isBlank()) {
                 Optional<UserEntity> userOptional = userDao.findByUsername(username);
-                if(userOptional.isPresent()) {
-                    RecipeReactionEntity userReactionEntity = recipeReactionRepository.findByRecipeIdAndUserId(recipe.getId(), userOptional.get().getId());
-                    if(userReactionEntity!=null) {
+                if (userOptional.isPresent()) {
+                    RecipeReactionEntity userReactionEntity = recipeReactionRepository
+                            .findByRecipeIdAndUserId(recipe.getId(), userOptional.get().getId());
+                    if (userReactionEntity != null) {
                         userReaction = new RecipeReactionResponseDto(
                                 userReactionEntity.getRecipe().getId(),
                                 userReactionEntity.getUser().getId(),
@@ -370,8 +375,7 @@ public class RecipeService {
                     recipe.getId(),
                     recipe.getTitle(),
                     recipeReactionDtoList,
-                    userReaction
-            );
+                    userReaction);
             return Pair.of("success: data retrieved", responseDto);
         }
         return Pair.of("failed: data not found", new RecipeReactionSummaryDto());
@@ -382,13 +386,12 @@ public class RecipeService {
         Optional<RecipeEntity> recipeOptional = recipeRepository.findById(recipeId);
 
         try {
-            if(userOptional.isPresent() && recipeOptional.isPresent()) {
+            if (userOptional.isPresent() && recipeOptional.isPresent()) {
                 RecipeReactionEntity entity = new RecipeReactionEntity(
                         userOptional.get(),
                         recipeOptional.get(),
                         RecipeReactionEntity.Reaction.valueOf(requestDto.getReaction()),
-                        LocalDateTime.now()
-                );
+                        LocalDateTime.now());
                 return Pair.of("success: data saved", recipeReactionRepository.save(entity));
             }
         } catch (IllegalArgumentException e) {
@@ -400,9 +403,11 @@ public class RecipeService {
     public Pair<String, RecipeReactionEntity> deleteRecipeReaction(long recipeId, RecipeReactionRequestDto requestDto) {
         Optional<UserEntity> userOptional = userDao.findByUsername(requestDto.getUsername());
 
-        if(userOptional.isPresent()) {
-            Optional<RecipeReactionEntity> reactionOptional = recipeReactionRepository.findByRecipeIdAndUserIdAndReaction(recipeId, userOptional.get().getId(), RecipeReactionEntity.Reaction.valueOf(requestDto.getReaction()));
-            if(reactionOptional.isPresent()) {
+        if (userOptional.isPresent()) {
+            Optional<RecipeReactionEntity> reactionOptional = recipeReactionRepository
+                    .findByRecipeIdAndUserIdAndReaction(recipeId, userOptional.get().getId(),
+                            RecipeReactionEntity.Reaction.valueOf(requestDto.getReaction()));
+            if (reactionOptional.isPresent()) {
                 recipeReactionRepository.delete(reactionOptional.get());
                 return Pair.of("success: data deleted", reactionOptional.get());
             }
