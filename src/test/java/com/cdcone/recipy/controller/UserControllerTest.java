@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -134,7 +135,8 @@ public class UserControllerTest {
                 "title",
                 "overview",
                 "authorName",
-                1));
+                1,
+                LocalDate.now()));
 
         PaginatedDto<UserRecipeDto> mockResult = new PaginatedDto<>(mockUserRecipe, 0, 1, true, 1);
 
@@ -208,23 +210,31 @@ public class UserControllerTest {
         assertEquals(HttpStatus.OK,
                 userController.isFollowing(1L, 2L).getStatusCode());
     }
-    
+
+    @Test
+    void successRequestCreatorRole() {
+        when(USER_SERVICE.requestCreatorRole("any")).thenReturn("success");
+
+        assertEquals(HttpStatus.OK,
+                userController.requestCreatorRole("any").getStatusCode());
+    }
+
     @Test
     void successGetProfile() {
         String username = "user1";
         UserEntity mockUser = mock(UserEntity.class);
         when(USER_SERVICE.getByUsername(username))
                 .thenReturn(Pair.of("success: user found", mockUser));
-        
+
         assertEquals(HttpStatus.OK, userController.getProfile("user1").getStatusCode());
     }
-    
+
     @Test
     void failedGetProfileNotFound() {
         String username = "user1";
         when(USER_SERVICE.getByUsername(username))
                 .thenReturn(Pair.of("failed: user with username " + username + " not found", mock(UserEntity.class)));
-        
+
         assertEquals(HttpStatus.NOT_FOUND, userController.getProfile("user1").getStatusCode());
     }
 }
