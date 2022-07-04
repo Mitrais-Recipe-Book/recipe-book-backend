@@ -128,4 +128,15 @@ public class UserController {
         PaginatedDto<UserRecipeDto> result = recipeService.getByUsername(username, page, true);
         return ResponseEntity.ok(new CommonResponse(result));
     }
+
+    @GetMapping("{username}/request-creator")
+    public ResponseEntity<CommonResponse> requestCreatorRole(@PathVariable(name = "username") String username) {
+        String result = userService.requestCreatorRole(username);
+
+        if (result.charAt(0) == 's') {
+            return ResponseEntity.ok(new CommonResponse(result));
+        }
+
+        return ResponseEntity.badRequest().body(new CommonResponse(result));
+    }
 }

@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.util.Pair;
 
 import com.cdcone.recipy.entity.RoleEntity;
 import com.cdcone.recipy.repository.RoleDao;

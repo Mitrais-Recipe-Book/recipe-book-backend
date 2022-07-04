@@ -311,11 +311,13 @@ class UserServiceTest {
 
     @Test
     void successRequestCreatorRole() {
-        RoleEntity mockRole = mock(RoleEntity.class);
+        Pair<String, RoleEntity> mockRole = Pair.of("success", mock(RoleEntity.class));
         UserEntity mockUser = mock(UserEntity.class);
-        when(ROLE_SERVICE.getByName("User")).thenReturn(Pair.of("success", mockRole));
-        when(userService.getByUsername("user1")).thenReturn(Pair.of("success", mockUser));
 
-        assertEquals('s', userService.requestCreatorRole("user1"));
+        when(ROLE_SERVICE.getByName("Request")).thenReturn(mockRole);
+        when(userRepo.findByUsername("User")).thenReturn(Optional.of(mockUser));
+        
+
+        assertEquals('s', userService.requestCreatorRole("User").charAt(0));
     }
 }
