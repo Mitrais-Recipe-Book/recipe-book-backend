@@ -661,4 +661,21 @@ public class IntegrationTest {
 
 		System.out.println(mr.getResponse().getContentAsString());
 	}
+
+	@Test
+	void testSuccessGetRecipeFavorite() throws Exception {
+		String username = "user1";
+		String recipeId = "4";
+
+		RecipeFavoriteRequestDto requestDto = new RecipeFavoriteRequestDto(username);
+
+		MvcResult mr = mockMvc.perform(get("/api/v1/recipe/" + recipeId + "/favorite")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(om.writeValueAsString(requestDto)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data retrieved"))
+				.andReturn();
+
+		System.out.println(mr.getResponse().getContentAsString());
+	}
 }

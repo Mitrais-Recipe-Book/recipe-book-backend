@@ -439,4 +439,16 @@ public class RecipeService {
         }
         return Pair.of("failed: data not found", new RecipeFavoriteEntity());
     }
+
+    public Pair<String, RecipeFavoriteEntity> getRecipeFavorite(long recipeId, RecipeFavoriteRequestDto requestDto) {
+        Optional<UserEntity> userOptional = userDao.findByUsername(requestDto.getUsername());
+
+        if(userOptional.isPresent()) {
+            Optional<RecipeFavoriteEntity> recipeFavoriteOptional = recipeFavoriteRepository.findByRecipeIdAndUserId(recipeId, userOptional.get().getId());
+            if(recipeFavoriteOptional.isPresent()) {
+                return Pair.of("success: data retrieved", recipeFavoriteOptional.get());
+            }
+        }
+        return Pair.of("failed: data not found", new RecipeFavoriteEntity());
+    }
 }
