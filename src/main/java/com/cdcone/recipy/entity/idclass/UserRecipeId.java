@@ -3,7 +3,7 @@ package com.cdcone.recipy.entity.idclass;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class RecipeReactionId implements Serializable {
+public class UserRecipeId implements Serializable {
 
     private long user;
     private long recipe;
@@ -12,7 +12,7 @@ public class RecipeReactionId implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RecipeReactionId that = (RecipeReactionId) o;
+        UserRecipeId that = (UserRecipeId) o;
         return user == that.user && recipe == that.recipe;
     }
 

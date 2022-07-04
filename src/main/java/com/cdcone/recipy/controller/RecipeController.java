@@ -3,11 +3,9 @@ package com.cdcone.recipy.controller;
 import java.util.Set;
 
 import com.cdcone.recipy.dtoAccess.*;
-import com.cdcone.recipy.dtoRequest.PaginatedDto;
-import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
-import com.cdcone.recipy.dtoRequest.RecipeReactionRequestDto;
-import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
+import com.cdcone.recipy.dtoRequest.*;
 import com.cdcone.recipy.entity.RecipeEntity;
+import com.cdcone.recipy.entity.RecipeFavoriteEntity;
 import com.cdcone.recipy.entity.RecipeReactionEntity;
 import com.cdcone.recipy.response.CommonResponse;
 import com.cdcone.recipy.service.RecipeService;
@@ -196,5 +194,37 @@ public class RecipeController {
         }
         return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
     }
+
+    @PostMapping("{id}/favorite")
+    public ResponseEntity<CommonResponse> saveRecipeFavorite(@PathVariable(name = "id") long recipeId, @RequestBody RecipeFavoriteRequestDto requestDto) {
+        Pair<String, RecipeFavoriteEntity> result = recipeService.saveRecipeFavorite(recipeId, requestDto);
+
+        if (result.getFirst().charAt(0) == 's') {
+            RecipeFavoriteEntity response = result.getSecond();
+            RecipeFavoriteResponseDto responseDto = new RecipeFavoriteResponseDto(
+                    response.getRecipe().getId(),
+                    response.getUser().getId(),
+                    response.getTimestamp());
+            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), responseDto));
+        }
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
+    }
+
+    @DeleteMapping("{id}/favorite")
+    public ResponseEntity<CommonResponse> deleteRecipeFavorite(@PathVariable(name = "id") long recipeId, @RequestBody RecipeFavoriteRequestDto requestDto) {
+        Pair<String, RecipeFavoriteEntity> result = recipeService.deleteRecipeFavorite(recipeId, requestDto);
+
+        if (result.getFirst().charAt(0) == 's') {
+            RecipeFavoriteEntity response = result.getSecond();
+            RecipeFavoriteResponseDto responseDto = new RecipeFavoriteResponseDto(
+                    response.getRecipe().getId(),
+                    response.getUser().getId(),
+                    response.getTimestamp());
+            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), responseDto));
+        }
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
+    }
+
+
 
 }

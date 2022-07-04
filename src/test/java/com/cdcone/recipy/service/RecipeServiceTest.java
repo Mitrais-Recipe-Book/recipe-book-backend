@@ -20,6 +20,7 @@ import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
 import com.cdcone.recipy.dtoRequest.RecipeReactionRequestDto;
 import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
 import com.cdcone.recipy.entity.*;
+import com.cdcone.recipy.repository.RecipeFavoriteRepository;
 import com.cdcone.recipy.repository.RecipeReactionRepository;
 import com.cdcone.recipy.repository.RecipeRepository;
 import com.cdcone.recipy.repository.UserDao;
@@ -41,6 +42,7 @@ public class RecipeServiceTest {
 
     private final RecipeRepository RECIPE_REPOSITORY = mock(RecipeRepository.class);
     private final RecipeReactionRepository RECIPE_REACTION_REPOSITORY = mock(RecipeReactionRepository.class);
+    private final RecipeFavoriteRepository RECIPE_FAVORITE_REPOSITORY = mock(RecipeFavoriteRepository.class);
 
     private final UserDao USER_DAO = mock(UserDao.class);
     private final UserService USER_SERVICE = mock(UserService.class);
@@ -53,7 +55,7 @@ public class RecipeServiceTest {
 
     @BeforeEach
     public void init() {
-        recipeService = new RecipeService(RECIPE_REPOSITORY, RECIPE_REACTION_REPOSITORY, USER_DAO, USER_SERVICE,
+        recipeService = new RecipeService(RECIPE_REPOSITORY, RECIPE_REACTION_REPOSITORY, RECIPE_FAVORITE_REPOSITORY, USER_DAO, USER_SERVICE,
                 TAG_SERVICE);
     }
 
