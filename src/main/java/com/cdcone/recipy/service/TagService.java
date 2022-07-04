@@ -21,26 +21,29 @@ public class TagService {
     }
 
     public Pair<String, TagEntity> saveTag(String name) {
+        String msg;
+        TagEntity tag;
         try {
-            TagEntity newTag = new TagEntity(name.toLowerCase());
-            return Pair.of("success: tag saved", tagRepository.save(newTag));
-        } catch (Exception e) {
-            
-            if (e instanceof DataIntegrityViolationException){
-                return Pair.of("failed: cannot save duplicate", new TagEntity());
-            }
-
-            e.printStackTrace();
-            return Pair.of("critical error: unpredicted cause, contact backend team", new TagEntity());
+            tag = tagRepository.save(new TagEntity(name.toLowerCase()));
+            msg = "success: tag saved";
+        } catch (DataIntegrityViolationException e) {
+            msg = "failed: tag already exists";
+            tag = new TagEntity();
         }
+        return Pair.of(msg, tag);
     }
 
     public Pair<TagEntity, String> getById(int id) {
-        try {
-            return Pair.of(tagRepository.findById(id).get(), "success: data retrieved");
-        } catch (NoSuchElementException e) {
-            return Pair.of(new TagEntity(), "failed: tag with id " + id + " not found");
+        Optional<TagEntity> tagById = tagRepository.findById(id);
+        String msg = "failed: tag with id " + id + " not found";
+        TagEntity result = new TagEntity();
+
+        if (tagById.isPresent()) {
+            msg = "success: data retrieved";
+            result = tagById.get();
         }
+
+        return Pair.of(result, msg);
     }
 
     public Pair<HttpStatus, Map<String, String>> editTag(int old, String tag) {
@@ -86,5 +89,18 @@ public class TagService {
 
     public Set<TagEntity> getByRecipeId(Long recipeId) {
         return tagRepository.findByRecipeId(recipeId);
+    }
+
+    public String addViewCount(int tagId) {
+        String msg = "failed: tag not found";
+        Optional<TagEntity> tagById = tagRepository.findById(tagId);
+        if (tagById.isPresent()) {
+            TagEntity tag = tagById.get();
+            int viewCount = tag.getViews() == null ? 0 : tag.getViews();
+            tag.setViews(viewCount + 1);
+            tagRepository.save(tag);
+            msg = "success: data updated";
+        }
+        return msg;
     }
 }
