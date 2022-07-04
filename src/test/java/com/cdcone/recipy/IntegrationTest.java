@@ -160,7 +160,7 @@ public class IntegrationTest {
 		mockMvc.perform(post("/api/v1/tag")
 				.content(duplicateTag))
 				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.message").value("failed: cannot save duplicate"))
+				.andExpect(jsonPath("$.message").value("failed: tag already exists"))
 				.andReturn();
 	}
 
@@ -677,5 +677,23 @@ public class IntegrationTest {
 				.andReturn();
 
 		System.out.println(mr.getResponse().getContentAsString());
+	}
+
+	@Test
+	void testFailAddTagViewIfNotFound() throws Exception {
+		int tagId = 999;
+		mockMvc.perform(put("/api/v1/tag/addview?tagId=" + tagId))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.message").value("failed: tag not found"))
+				.andReturn();
+	}
+
+	@Test
+	void testSuccessAddTagView() throws Exception {
+		int tagId = 1;
+		mockMvc.perform(put("/api/v1/tag/addview?tagId=" + tagId))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data updated"))
+				.andReturn();
 	}
 }

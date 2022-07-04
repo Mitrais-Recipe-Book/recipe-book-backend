@@ -67,4 +67,14 @@ public class TagController {
         }
         return ResponseEntity.status(status).body(new CommonResponse(msg, tagEntity));
     }
+
+    @PutMapping("addview")
+    public ResponseEntity<CommonResponse> addViewCount(int tagId) {
+        String result = tagService.addViewCount(tagId);
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        if (result.charAt(0) == 's') {
+            status = HttpStatus.OK;
+        }
+        return ResponseEntity.status(status).body(new CommonResponse(result));
+    }
 }

@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -25,6 +26,10 @@ public class TagEntity {
 
     @Column(name = "name", nullable = false)
     private String name;
+
+    @JsonIgnore
+    @Column(name = "views", nullable = false)
+    private Integer views = 0;
 
     public TagEntity(String name) {
         this.name = name;

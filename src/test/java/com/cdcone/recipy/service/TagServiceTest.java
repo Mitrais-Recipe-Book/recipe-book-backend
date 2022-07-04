@@ -153,4 +153,22 @@ class TagServiceTest {
         assertTrue(byRecipeId.contains(tag1));
         assertTrue(byRecipeId.contains(tag2));
     }
+
+    @Test
+    void testFailAddViewCountIfNotFound() {
+        when(tagDao.findById(1)).thenReturn(Optional.empty());
+
+        String result = tagService.addViewCount(1);
+        assertEquals("failed: tag not found", result);
+    }
+
+    @Test
+    void testSuccessAddViewCount() {
+        when(tagDao.findById(1)).thenReturn(Optional.of(tag1));
+        when(tag1.getViews()).thenReturn(0);
+
+        String result = tagService.addViewCount(1);
+        verify(tagDao).save(tag1);
+        assertEquals("success: data updated", result);
+    }
 }

@@ -132,7 +132,19 @@ public class UserController {
 
     @PostMapping("{username}/request-creator")
     public ResponseEntity<CommonResponse> requestCreatorRole(@PathVariable(name = "username") String username) {
-        String result = userService.requestCreatorRole(username);
+        String result = userService.assignRole(username, "Request");
+
+        if (result.charAt(0) == 's') {
+            return ResponseEntity.ok(new CommonResponse(result));
+        }
+
+        return ResponseEntity.badRequest().body(new CommonResponse(result));
+    }
+
+    @PostMapping("{username}/assign-{role}")
+    public ResponseEntity<CommonResponse> assignRole(@PathVariable(name = "username") String username,
+            @PathVariable(name = "role") String rolename) {
+        String result = userService.assignRole(username, rolename);
 
         if (result.charAt(0) == 's') {
             return ResponseEntity.ok(new CommonResponse(result));
