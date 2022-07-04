@@ -1,7 +1,9 @@
 package com.cdcone.recipy.service;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import com.cdcone.recipy.entity.RoleEntity;
@@ -29,5 +31,15 @@ public class RoleService {
 
     public List<RoleEntity> getAll(){
         return roleRepository.findAll();
+    }
+
+    public Pair<String, RoleEntity> getByName(String name){
+        Optional<RoleEntity> result = roleRepository.findByName(name);
+
+        if (result.isEmpty()){
+            return Pair.of("failed: cannot find role with name " + name, new RoleEntity());
+        }
+
+        return Pair.of("success: data retrieved", result.get());
     }
 }

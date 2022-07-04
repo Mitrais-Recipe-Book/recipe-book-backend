@@ -65,7 +65,7 @@ class TagServiceTest {
     @Test
     void testFailToGetTagById() {
         when(tagDao.findById(1)).thenReturn(Optional.empty());
-        Pair<TagEntity, String> result = tagService.getById(1);
+        //Pair<TagEntity, String> result = tagService.getById(1);
 
         assertTrue(tagService.getById(1).getSecond().startsWith("failed"));
     }

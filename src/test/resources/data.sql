@@ -1,5 +1,7 @@
 INSERT INTO roles (id, name) VALUES (1, 'User');
 INSERT INTO roles (id, name) VALUES (2, 'Creator');
+INSERT INTO roles (id, name) VALUES (3, 'Admin');
+INSERT INTO roles (id, name) VALUES (4, 'Request');
 
 INSERT INTO users VALUES (1, 'user1@mail.com', 'User 1', '$2a$10$sDM60diK4x0xIltTV9cHkeQaz8RfWgfnRDx0OhR9DK1/yN31y7yrm', null, null, 'user1');
 INSERT INTO users VALUES (10, 'faristest@test.com', 'faris test', 'passsssssssssssssssssssssssssssssssssssssssss', NULL, NULL, 'faristest');
