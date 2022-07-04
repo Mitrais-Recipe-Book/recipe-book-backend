@@ -130,7 +130,7 @@ public class UserController {
         return ResponseEntity.ok(new CommonResponse(result));
     }
 
-    @GetMapping("{username}/request-creator")
+    @PostMapping("{username}/request-creator")
     public ResponseEntity<CommonResponse> requestCreatorRole(@PathVariable(name = "username") String username) {
         String result = userService.requestCreatorRole(username);
 
