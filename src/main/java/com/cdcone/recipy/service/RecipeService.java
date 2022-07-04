@@ -10,11 +10,8 @@ import javax.imageio.ImageIO;
 
 import com.cdcone.recipy.dtoAccess.*;
 import com.cdcone.recipy.dtoRequest.*;
-import com.cdcone.recipy.entity.CommentEntity;
-import com.cdcone.recipy.entity.RecipeEntity;
-import com.cdcone.recipy.entity.RecipeReactionEntity;
-import com.cdcone.recipy.entity.TagEntity;
-import com.cdcone.recipy.entity.UserEntity;
+import com.cdcone.recipy.entity.*;
+import com.cdcone.recipy.repository.RecipeFavoriteRepository;
 import com.cdcone.recipy.repository.RecipeReactionRepository;
 import com.cdcone.recipy.repository.RecipeRepository;
 
@@ -36,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class RecipeService {
     private final RecipeRepository recipeRepository;
     private final RecipeReactionRepository recipeReactionRepository;
+    private final RecipeFavoriteRepository recipeFavoriteRepository;
     private final UserDao userDao;
     private final UserService userService;
     private final TagService tagService;
@@ -413,5 +411,32 @@ public class RecipeService {
             }
         }
         return Pair.of("failed: data not found", new RecipeReactionEntity());
+    }
+
+    public Pair<String, RecipeFavoriteEntity> saveRecipeFavorite(long recipeId, RecipeFavoriteRequestDto requestDto) {
+        Optional<UserEntity> userOptional = userDao.findByUsername(requestDto.getUsername());
+        Optional<RecipeEntity> recipeOptional = recipeRepository.findById(recipeId);
+
+        if (userOptional.isPresent() && recipeOptional.isPresent()) {
+            RecipeFavoriteEntity entity = new RecipeFavoriteEntity(
+                    userOptional.get(),
+                    recipeOptional.get(),
+                    LocalDateTime.now());
+            return Pair.of("success: data saved", recipeFavoriteRepository.save(entity));
+        }
+        return Pair.of("failed: data not found", new RecipeFavoriteEntity());
+    }
+
+    public Pair<String, RecipeFavoriteEntity> deleteRecipeFavorite(long recipeId, RecipeFavoriteRequestDto requestDto) {
+        Optional<UserEntity> userOptional = userDao.findByUsername(requestDto.getUsername());
+
+        if(userOptional.isPresent()) {
+            Optional<RecipeFavoriteEntity> recipeFavoriteOptional = recipeFavoriteRepository.findByRecipeIdAndUserId(recipeId, userOptional.get().getId());
+            if(recipeFavoriteOptional.isPresent()) {
+                recipeFavoriteRepository.delete(recipeFavoriteOptional.get());
+                return Pair.of("success: data deleted", recipeFavoriteOptional.get());
+            }
+        }
+        return Pair.of("failed: data not found", new RecipeFavoriteEntity());
     }
 }
