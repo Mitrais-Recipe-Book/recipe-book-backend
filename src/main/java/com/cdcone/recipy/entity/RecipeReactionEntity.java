@@ -1,6 +1,6 @@
 package com.cdcone.recipy.entity;
 
-import com.cdcone.recipy.entity.idclass.RecipeReactionId;
+import com.cdcone.recipy.entity.idclass.UserRecipeId;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -14,7 +14,7 @@ import java.util.Objects;
 @Setter
 @ToString
 @Table(name = "recipes_reaction")
-@IdClass(RecipeReactionId.class)
+@IdClass(UserRecipeId.class)
 public class RecipeReactionEntity {
 
     @Id

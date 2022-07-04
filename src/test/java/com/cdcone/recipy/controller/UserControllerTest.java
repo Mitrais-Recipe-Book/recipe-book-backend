@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -134,7 +135,8 @@ public class UserControllerTest {
                 "title",
                 "overview",
                 "authorName",
-                1));
+                1,
+                LocalDate.now()));
 
         PaginatedDto<UserRecipeDto> mockResult = new PaginatedDto<>(mockUserRecipe, 0, 1, true, 1);
 

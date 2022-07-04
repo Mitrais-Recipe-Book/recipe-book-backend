@@ -1,9 +1,6 @@
 package com.cdcone.recipy;
 
-import com.cdcone.recipy.dtoRequest.AddCommentDto;
-import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
-import com.cdcone.recipy.dtoRequest.RecipeReactionRequestDto;
-import com.cdcone.recipy.dtoRequest.UpdateUserDto;
+import com.cdcone.recipy.dtoRequest.*;
 import com.cdcone.recipy.util.ImageUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -629,5 +626,39 @@ public class IntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Success: user updated"))
                 .andReturn();
+	}
+
+	@Test
+	void testSuccessSaveRecipeFavorite() throws Exception {
+		String username = "user1";
+		String recipeId = "4";
+
+		RecipeFavoriteRequestDto requestDto = new RecipeFavoriteRequestDto(username);
+
+		MvcResult mr = mockMvc.perform(post("/api/v1/recipe/" + recipeId + "/favorite")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(om.writeValueAsString(requestDto)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data saved"))
+				.andReturn();
+
+		System.out.println(mr.getResponse().getContentAsString());
+	}
+
+	@Test
+	void testSuccessDeleteRecipeFavorite() throws Exception {
+		String username = "user1";
+		String recipeId = "3";
+
+		RecipeFavoriteRequestDto requestDto = new RecipeFavoriteRequestDto(username);
+
+		MvcResult mr = mockMvc.perform(delete("/api/v1/recipe/" + recipeId + "/favorite")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(om.writeValueAsString(requestDto)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data deleted"))
+				.andReturn();
+
+		System.out.println(mr.getResponse().getContentAsString());
 	}
 }
