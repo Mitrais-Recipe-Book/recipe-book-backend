@@ -27,6 +27,10 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     public String add(Long recipeId, AddCommentDto dto) {
+        if (dto.getComment() == null || dto.getComment().isBlank() || dto.getComment().isEmpty()){
+            return "failed: cannot post null comment";
+        }
+
         Pair<String, UserEntity> userEntity = userService.getByUsername(dto.getUsername());
 
         if (userEntity.getFirst().charAt(0) != 's') {

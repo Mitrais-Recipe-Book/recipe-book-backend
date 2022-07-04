@@ -7,7 +7,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -54,7 +53,8 @@ public class RecipeServiceTest {
 
     @BeforeEach
     public void init() {
-        recipeService = new RecipeService(RECIPE_REPOSITORY,RECIPE_REACTION_REPOSITORY, USER_DAO, USER_SERVICE, TAG_SERVICE);
+        recipeService = new RecipeService(RECIPE_REPOSITORY, RECIPE_REACTION_REPOSITORY, USER_DAO, USER_SERVICE,
+                TAG_SERVICE);
     }
 
     @Test
@@ -263,21 +263,21 @@ public class RecipeServiceTest {
                 recipeService.deleteRecipe(1L).getFirst().charAt(0));
 
     }
-    
+
     @Test
     void successGetRecipesByUsername() {
         UserRecipeDto mockRecipe = mock(UserRecipeDto.class);
         UserRecipeDto mockRecipe2 = mock(UserRecipeDto.class);
-        
+
         Page<UserRecipeDto> mockResult = new PageImpl<>(
                 List.of(mockRecipe, mockRecipe2));
-        
+
         when(mockRecipe.getAuthorName()).thenReturn("any user");
         when(mockRecipe.getViewCount()).thenReturn(99);
         when(RECIPE_REPOSITORY.findByUsername(any(String.class), any(Boolean.class), any(Pageable.class)))
                 .thenReturn(mockResult);
         when(TAG_SERVICE.getByRecipeId(any(Long.class))).thenReturn(Set.of());
-        
+
         PaginatedDto<UserRecipeDto> result = recipeService.getByUsername("any", 0, false);
         assertEquals(2, result.getData().size());
         assertEquals(99, result.getData().get(0).getViewCount());
@@ -303,8 +303,7 @@ public class RecipeServiceTest {
 
         List<RecipeReactionDto> recipeReaction = List.of(
                 new RecipeReactionDto("LIKED", 10L),
-                new RecipeReactionDto("HAPPY", 2L)
-        );
+                new RecipeReactionDto("HAPPY", 2L));
 
         UserEntity user = new UserEntity();
         user.setId(10L);
@@ -398,7 +397,7 @@ public class RecipeServiceTest {
     }
 
     @Test
-    void failedCommentRecipeNotFound(){
+    void failedCommentRecipeNotFound() {
         when(RECIPE_REPOSITORY.findById(1L)).thenReturn(Optional.empty());
 
         assertEquals('f',
@@ -406,7 +405,7 @@ public class RecipeServiceTest {
     }
 
     @Test
-    void failedCommentRecipeNotPublished(){
+    void failedCommentRecipeNotPublished() {
         Optional<RecipeEntity> mockEntity = Optional.of(RECIPE_ENTITY);
 
         when(RECIPE_REPOSITORY.findById(1L)).thenReturn(mockEntity);

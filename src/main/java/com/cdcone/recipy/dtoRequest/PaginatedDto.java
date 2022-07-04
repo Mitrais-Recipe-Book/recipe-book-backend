@@ -12,4 +12,6 @@ public class PaginatedDto<T> {
     private List<T> data;
     private int currentPage;
     private int totalPages;
+    private boolean islast;
+    private long totalItem;
 }

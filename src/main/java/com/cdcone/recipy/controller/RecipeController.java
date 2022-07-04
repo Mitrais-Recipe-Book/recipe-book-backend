@@ -3,6 +3,7 @@ package com.cdcone.recipy.controller;
 import java.util.Set;
 
 import com.cdcone.recipy.dtoAccess.*;
+import com.cdcone.recipy.dtoRequest.PaginatedDto;
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
 import com.cdcone.recipy.dtoRequest.RecipeReactionRequestDto;
 import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
@@ -54,9 +55,14 @@ public class RecipeController {
     @GetMapping("/search")
     public ResponseEntity<CommonResponse> getPublishedRecipes(RecipeSearchDto dto) {
         Pair<String, Page<RecipeDtoList>> result = recipeService.getPublishedRecipes(dto);
+        PaginatedDto<RecipeDtoList> paginated = new PaginatedDto<>(result.getSecond().getContent(),
+                dto.getPage(),
+                result.getSecond().getTotalPages(),
+                result.getSecond().isLast(),
+                result.getSecond().getTotalElements());
 
         if (result.getFirst().charAt(0) == 's') {
-            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), result.getSecond()));
+            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), paginated));
         }
 
         return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
@@ -138,9 +144,8 @@ public class RecipeController {
     public ResponseEntity<CommonResponse> getById(@PathVariable(name = "id") long recipeId) {
         Pair<String, RecipeEntity> result = recipeService.getById(recipeId);
 
-        RecipeDetailDto dto = new RecipeDetailDto(result.getSecond());
-
         if (result.getFirst().charAt(0) == 's') {
+            RecipeDetailDto dto = new RecipeDetailDto(result.getSecond());
             return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), dto));
         }
 
@@ -148,7 +153,8 @@ public class RecipeController {
     }
 
     @GetMapping("{id}/reaction")
-    public ResponseEntity<CommonResponse> getRecipeReaction(@PathVariable(name = "id") long recipeId, @RequestParam(defaultValue = "") String username) {
+    public ResponseEntity<CommonResponse> getRecipeReaction(@PathVariable(name = "id") long recipeId,
+            @RequestParam(defaultValue = "") String username) {
         Pair<String, RecipeReactionSummaryDto> result = recipeService.getRecipeReaction(recipeId, username);
 
         if (result.getFirst().charAt(0) == 's') {
@@ -158,7 +164,8 @@ public class RecipeController {
     }
 
     @PostMapping("{id}/reaction")
-    public ResponseEntity<CommonResponse> saveRecipeReaction(@PathVariable(name = "id") long recipeId, @RequestBody RecipeReactionRequestDto requestDto) {
+    public ResponseEntity<CommonResponse> saveRecipeReaction(@PathVariable(name = "id") long recipeId,
+            @RequestBody RecipeReactionRequestDto requestDto) {
         Pair<String, RecipeReactionEntity> result = recipeService.saveRecipeReaction(recipeId, requestDto);
 
         if (result.getFirst().charAt(0) == 's') {
@@ -167,15 +174,15 @@ public class RecipeController {
                     response.getRecipe().getId(),
                     response.getUser().getId(),
                     response.getReaction().toString(),
-                    response.getTimestamp()
-            );
+                    response.getTimestamp());
             return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), responseDto));
         }
         return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
     }
 
     @DeleteMapping("{id}/reaction")
-    public ResponseEntity<CommonResponse> deleteRecipeReaction(@PathVariable(name = "id") long recipeId, @RequestBody RecipeReactionRequestDto requestDto) {
+    public ResponseEntity<CommonResponse> deleteRecipeReaction(@PathVariable(name = "id") long recipeId,
+            @RequestBody RecipeReactionRequestDto requestDto) {
         Pair<String, RecipeReactionEntity> result = recipeService.deleteRecipeReaction(recipeId, requestDto);
 
         if (result.getFirst().charAt(0) == 's') {
@@ -184,8 +191,7 @@ public class RecipeController {
                     response.getRecipe().getId(),
                     response.getUser().getId(),
                     response.getReaction().toString(),
-                    response.getTimestamp()
-            );
+                    response.getTimestamp());
             return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), responseDto));
         }
         return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));

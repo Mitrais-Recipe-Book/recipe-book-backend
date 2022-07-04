@@ -3,8 +3,11 @@ package com.cdcone.recipy.service;
 import com.cdcone.recipy.dtoAccess.*;
 import com.cdcone.recipy.dtoRequest.PaginatedDto;
 import com.cdcone.recipy.dtoRequest.SignUpDto;
+import com.cdcone.recipy.dtoRequest.UpdateUserDto;
 import com.cdcone.recipy.entity.RoleEntity;
 import com.cdcone.recipy.entity.UserEntity;
+import com.cdcone.recipy.repository.RecipeReactionRepository;
+import com.cdcone.recipy.repository.RecipeRepository;
 import com.cdcone.recipy.repository.RoleDao;
 import com.cdcone.recipy.repository.UserDao;
 import com.cdcone.recipy.util.CustomUser;
@@ -14,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -37,6 +41,8 @@ public class UserService implements UserDetailsService {
 
     private final UserDao userDao;
     private final RoleDao roleDao;
+    private final RecipeReactionRepository reactionRepo;
+    private final RecipeRepository recipeRepo;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
@@ -95,10 +101,10 @@ public class UserService implements UserDetailsService {
         return userDao.getById(id);
     }
 
-    public Pair<String, UserEntity> getByUsername(String username){
+    public Pair<String, UserEntity> getByUsername(String username) {
         Optional<UserEntity> result = userDao.findByUsername(username);
 
-        if (result.isEmpty()){
+        if (result.isEmpty()) {
             return Pair.of("failed: user with username " + username + " not found", new UserEntity());
         }
 
@@ -108,10 +114,14 @@ public class UserService implements UserDetailsService {
     public Optional<UserProfile> findByUsername(String username) {
         Optional<UserProfile> userProfile = userDao.findDetailByUsername(username);
         userProfile.ifPresent(it -> {
+            int recipeLikes = reactionRepo.getTotalRecipeLikeByUserId(it.getId());
             Set<RoleEntity> roles = roleDao.findByUserId(it.getId());
             Long followerCount = userDao.getFollowerCountById(it.getId());
+            Integer recipeCount = recipeRepo.getTotalRecipeByUsername(username);
             it.setRoles(roles);
             it.setFollowers(followerCount);
+            it.setRecipeLikes(recipeLikes);
+            it.setTotalRecipes(recipeCount);
         });
         return userProfile;
     }
@@ -158,7 +168,11 @@ public class UserService implements UserDetailsService {
                 .stream()
                 .map(UserDto::toDto)
                 .collect(Collectors.toList());
-        return new PaginatedDto<>(userDtoList, allPaged.getNumber(), allPaged.getTotalPages());
+        return new PaginatedDto<>(userDtoList,
+                allPaged.getNumber(),
+                allPaged.getTotalPages(),
+                allPaged.isLast(),
+                allPaged.getTotalElements());
     }
 
     public void addFollow(long userId, long creatorId) throws Exception {
@@ -213,11 +227,34 @@ public class UserService implements UserDetailsService {
         return userDao.getFollowersById(userId);
     }
 
-    public Long getFollowerCountById(long userId){
+    public Long getFollowerCountById(long userId) {
         return userDao.getFollowerCountById(userId);
     }
 
     public Boolean isFollowing(Long creatorId, Long userId) {
         return userDao.isFollowing(creatorId, userId);
+    }
+    
+    public Pair<HttpStatus, Optional<UserDto>> updateUser(String username, UpdateUserDto updateUserDto) {
+        UserDto result = null;
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        Pair<String, UserEntity> byUsername = getByUsername(username);
+        
+        if (byUsername.getFirst().charAt(0) == 's') {
+            try {
+                UserEntity user = byUsername.getSecond();
+                user.setEmail(updateUserDto.getEmail().toLowerCase());
+                user.setUsername(updateUserDto.getUsername().toLowerCase());
+                user.setFullName(updateUserDto.getFullName());
+                userDao.save(user);
+                result = UserDto.toDto(user);
+                
+                status = HttpStatus.OK;
+            } catch (DataIntegrityViolationException e) {
+                status = HttpStatus.BAD_REQUEST;
+            }
+        }
+        
+        return Pair.of(status, Optional.ofNullable(result));
     }
 }
