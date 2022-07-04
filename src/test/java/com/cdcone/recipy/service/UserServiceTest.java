@@ -46,10 +46,11 @@ class UserServiceTest {
     private static final UserEntity creator = mock(UserEntity.class);
     private static final UserEntity follower1 = mock(UserEntity.class);
     private static UserService userService;
+    private static final RoleService ROLE_SERVICE = mock(RoleService.class);
 
     @BeforeAll
     public static void setUp() {
-        userService = new UserService(userRepo, roleRepo, 
+        userService = new UserService(userRepo, ROLE_SERVICE, roleRepo,
                 reactionRepo, recipeRepo, new BCryptPasswordEncoder());
 
         when(signUpDto.getEmail()).thenReturn("test@mail.com");
@@ -275,7 +276,7 @@ class UserServiceTest {
     }
 
     @Test
-    void testFailUnfollowIfNotFollowing(){
+    void testFailUnfollowIfNotFollowing() {
         when(userRepo.findById(2L)).thenReturn(Optional.of(creator));
         when(userRepo.findById(1L)).thenReturn(Optional.of(follower1));
         when(creator.getFollows()).thenReturn(Set.of());
@@ -287,7 +288,7 @@ class UserServiceTest {
     }
 
     @Test
-    void testSuccessUnfollow() throws Exception{
+    void testSuccessUnfollow() throws Exception {
         UserEntity mockFollower = mock(UserEntity.class);
         when(userRepo.findById(2L)).thenReturn(Optional.of(creator));
         when(userRepo.findById(1L)).thenReturn(Optional.of(mockFollower));
@@ -310,39 +311,47 @@ class UserServiceTest {
         assertEquals(1, followerList.size());
         assertEquals("mockuser", followerList.get(0).getUsername());
     }
-    
+
+    @Test
+    void successRequestCreatorRole() {
+        Pair<String, RoleEntity> mockRole = Pair.of("success", mock(RoleEntity.class));
+        UserEntity mockUser = mock(UserEntity.class);
+
+        when(ROLE_SERVICE.getByName("Request")).thenReturn(mockRole);
+        when(userRepo.findByUsername("User")).thenReturn(Optional.of(mockUser));
+
+        assertEquals('s', userService.requestCreatorRole("User").charAt(0));
+    }
+
     @Test
     void testFailUpdateUserIfNotFound() {
         String username = "user1";
         when(userRepo.findByUsername(username)).thenReturn(Optional.empty());
-        
-        Pair<HttpStatus, Optional<UserDto>> result =
-                userService.updateUser(username, mock(UpdateUserDto.class));
-        
+
+        Pair<HttpStatus, Optional<UserDto>> result = userService.updateUser(username, mock(UpdateUserDto.class));
+
         assertEquals(HttpStatus.NOT_FOUND, result.getFirst());
     }
-    
+
     @Test
     void testFailUpdateUserIfAlreadyExist() {
         UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "user3", "user1@mail.com");
         when(userRepo.findByUsername("user1")).thenReturn(Optional.of(follower1));
         when(userRepo.save(any(UserEntity.class)))
                 .thenThrow(DataIntegrityViolationException.class);
-        
-        Pair<HttpStatus, Optional<UserDto>> result = 
-                userService.updateUser("user1", updateUserDto);
-        
+
+        Pair<HttpStatus, Optional<UserDto>> result = userService.updateUser("user1", updateUserDto);
+
         assertEquals(HttpStatus.BAD_REQUEST, result.getFirst());
     }
-    
+
     @Test
     void testSuccessUpdateUser() {
         UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "user3", "user1@mail.com");
         when(userRepo.findByUsername("user1")).thenReturn(Optional.of(follower1));
-        
-        Pair<HttpStatus, Optional<UserDto>> result =
-                userService.updateUser("user1", updateUserDto);
-        
+
+        Pair<HttpStatus, Optional<UserDto>> result = userService.updateUser("user1", updateUserDto);
+
         verify(userRepo).save(any(UserEntity.class));
         assertEquals(HttpStatus.OK, result.getFirst());
         reset(userRepo);

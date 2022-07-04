@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 public class UserService implements UserDetailsService {
 
     private final UserDao userDao;
+    private final RoleService roleService;
     private final RoleDao roleDao;
     private final RecipeReactionRepository reactionRepo;
     private final RecipeRepository recipeRepo;
@@ -234,12 +235,29 @@ public class UserService implements UserDetailsService {
     public Boolean isFollowing(Long creatorId, Long userId) {
         return userDao.isFollowing(creatorId, userId);
     }
-    
+
+    public String requestCreatorRole(String username) {
+        Pair<String, RoleEntity> role = roleService.getByName("Request");
+        Pair<String, UserEntity> user = getByUsername(username);
+
+        if (role.getFirst().charAt(0) == 'f') {
+            return role.getFirst();
+        }
+        if (user.getFirst().charAt(0) == 'f') {
+            return user.getFirst();
+        }
+
+        user.getSecond().getRoles().add(role.getSecond());
+        userDao.save(user.getSecond());
+
+        return "success: requesting creator role";
+    }
+
     public Pair<HttpStatus, Optional<UserDto>> updateUser(String username, UpdateUserDto updateUserDto) {
         UserDto result = null;
         HttpStatus status = HttpStatus.NOT_FOUND;
         Pair<String, UserEntity> byUsername = getByUsername(username);
-        
+
         if (byUsername.getFirst().charAt(0) == 's') {
             try {
                 UserEntity user = byUsername.getSecond();
@@ -248,13 +266,13 @@ public class UserService implements UserDetailsService {
                 user.setFullName(updateUserDto.getFullName());
                 userDao.save(user);
                 result = UserDto.toDto(user);
-                
+
                 status = HttpStatus.OK;
             } catch (DataIntegrityViolationException e) {
                 status = HttpStatus.BAD_REQUEST;
             }
         }
-        
+
         return Pair.of(status, Optional.ofNullable(result));
     }
 }

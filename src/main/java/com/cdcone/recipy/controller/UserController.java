@@ -120,16 +120,27 @@ public class UserController {
         Boolean isFollowing = userService.isFollowing(creatorId, userId);
         return ResponseEntity.ok(new CommonResponse("success", isFollowing));
     }
-    
+
     @GetMapping("{username}/draft-recipes")
     public ResponseEntity<CommonResponse> getDraftRecipes(
             @PathVariable(name = "username") String username,
             @RequestParam(defaultValue = "0") int page) {
-        
+
         PaginatedDto<UserRecipeDto> result = recipeService.getByUsername(username, page, true);
         return ResponseEntity.ok(new CommonResponse(result));
     }
-    
+
+    @GetMapping("{username}/request-creator")
+    public ResponseEntity<CommonResponse> requestCreatorRole(@PathVariable(name = "username") String username) {
+        String result = userService.requestCreatorRole(username);
+
+        if (result.charAt(0) == 's') {
+            return ResponseEntity.ok(new CommonResponse(result));
+        }
+
+        return ResponseEntity.badRequest().body(new CommonResponse(result));
+    }
+
     @GetMapping("{username}/profile")
     public ResponseEntity<CommonResponse> getProfile(@PathVariable("username") String username) {
         Pair<String, UserEntity> byUsername = userService.getByUsername(username);
@@ -141,13 +152,12 @@ public class UserController {
         }
         return ResponseEntity.status(status).body(new CommonResponse(byUsername.getFirst(), result));
     }
-    
+
     @PutMapping("{username}/profile")
     public ResponseEntity<CommonResponse> updateProfile(
             @PathVariable("username") String username,
             @RequestBody UpdateUserDto updateUserDto) {
-        Pair<HttpStatus, Optional<UserDto>> updateUser =
-                userService.updateUser(username, updateUserDto);
+        Pair<HttpStatus, Optional<UserDto>> updateUser = userService.updateUser(username, updateUserDto);
         String msg = "Failed: user not found";
         UserDto result = null;
         HttpStatus status = updateUser.getFirst();
@@ -157,7 +167,7 @@ public class UserController {
         } else if (status.equals(HttpStatus.BAD_REQUEST)) {
             msg = "Failed to update user. Username or email is already exists";
         }
-        
+
         return ResponseEntity.status(status).body(new CommonResponse(msg, result));
     }
 }
