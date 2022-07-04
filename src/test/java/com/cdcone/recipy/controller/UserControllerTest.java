@@ -26,6 +26,7 @@ import com.cdcone.recipy.dtoAccess.UserProfile;
 import com.cdcone.recipy.dtoAccess.UserRecipeDto;
 import com.cdcone.recipy.dtoRequest.FollowUserDto;
 import com.cdcone.recipy.dtoRequest.PaginatedDto;
+import com.cdcone.recipy.entity.UserEntity;
 import com.cdcone.recipy.service.RecipeService;
 import com.cdcone.recipy.service.UserService;
 import com.cdcone.recipy.util.ImageUtil;
@@ -135,7 +136,11 @@ public class UserControllerTest {
                                 "authorName",
                                 1));
 
+<<<<<<< HEAD
                 PaginatedDto<UserRecipeDto> mockResult = new PaginatedDto<>(mockUserRecipe, 0, 1, true, 1);
+=======
+        PaginatedDto<UserRecipeDto> mockResult = new PaginatedDto<>(mockUserRecipe, 0, 1, true, 1);
+>>>>>>> 2889cc3b1219acb9d88c66682d7b056f6368ad0d
 
                 when(RECIPE_SERVICE.getByUsername("any", 0, false))
                                 .thenReturn(mockResult);
@@ -204,6 +209,7 @@ public class UserControllerTest {
                 when(USER_SERVICE.isFollowing(1L, 2L))
                                 .thenReturn(true);
 
+<<<<<<< HEAD
                 assertEquals(HttpStatus.OK,
                                 userController.isFollowing(1L, 2L).getStatusCode());
         }
@@ -215,4 +221,28 @@ public class UserControllerTest {
                 assertEquals(HttpStatus.OK,
                                 userController.requestCreatorRole("any").getStatusCode());
         }
+=======
+        assertEquals(HttpStatus.OK,
+                userController.isFollowing(1L, 2L).getStatusCode());
+    }
+    
+    @Test
+    void successGetProfile() {
+        String username = "user1";
+        UserEntity mockUser = mock(UserEntity.class);
+        when(USER_SERVICE.getByUsername(username))
+                .thenReturn(Pair.of("success: user found", mockUser));
+        
+        assertEquals(HttpStatus.OK, userController.getProfile("user1").getStatusCode());
+    }
+    
+    @Test
+    void failedGetProfileNotFound() {
+        String username = "user1";
+        when(USER_SERVICE.getByUsername(username))
+                .thenReturn(Pair.of("failed: user with username " + username + " not found", mock(UserEntity.class)));
+        
+        assertEquals(HttpStatus.NOT_FOUND, userController.getProfile("user1").getStatusCode());
+    }
+>>>>>>> 2889cc3b1219acb9d88c66682d7b056f6368ad0d
 }

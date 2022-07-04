@@ -3,6 +3,7 @@ package com.cdcone.recipy;
 import com.cdcone.recipy.dtoRequest.AddCommentDto;
 import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
 import com.cdcone.recipy.dtoRequest.RecipeReactionRequestDto;
+import com.cdcone.recipy.dtoRequest.UpdateUserDto;
 import com.cdcone.recipy.util.ImageUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -589,5 +590,44 @@ public class IntegrationTest {
 				.andReturn();
 
 		System.out.println(mr.getResponse().getContentAsString());
+	}
+	
+	@Test
+	void testFailUpdateUserIfAlreadyExist() throws Exception {
+	    String username = "user1";
+	    UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "laptophp", "user1@mail.com");
+	    
+	    mockMvc.perform(put("/api/v1/user/" + username + "/profile")
+	            .contentType(MediaType.APPLICATION_JSON)
+	            .content(om.writeValueAsString(updateUserDto)))
+	            .andExpect(status().isBadRequest())
+	            .andExpect(jsonPath("$.message").value("Failed to update user. Username or email is already exists"))
+	            .andReturn();
+	}
+	
+	@Test
+	void testFailUpdateUserIfNotFound() throws Exception {
+	    String username = "user1123";
+        UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "laptophp", "user1@mail.com");
+        
+        mockMvc.perform(put("/api/v1/user/" + username + "/profile")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(updateUserDto)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Failed: user not found"))
+                .andReturn();
+	}
+	
+	@Test
+	void testSuccessUpdateUser() throws Exception {
+	    String username = "testingggg";
+        UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "useredit", "aaaaa@mail.com");
+        
+        mockMvc.perform(put("/api/v1/user/" + username + "/profile")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(updateUserDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Success: user updated"))
+                .andReturn();
 	}
 }

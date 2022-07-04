@@ -3,6 +3,7 @@ package com.cdcone.recipy.service;
 import com.cdcone.recipy.dtoAccess.*;
 import com.cdcone.recipy.dtoRequest.PaginatedDto;
 import com.cdcone.recipy.dtoRequest.SignUpDto;
+import com.cdcone.recipy.dtoRequest.UpdateUserDto;
 import com.cdcone.recipy.entity.RoleEntity;
 import com.cdcone.recipy.entity.UserEntity;
 import com.cdcone.recipy.repository.RecipeReactionRepository;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
@@ -270,6 +272,7 @@ class UserServiceTest {
 
         verify(follower1).setFollows(anySet());
         verify(userRepo).save(follower1);
+        reset(userRepo);
     }
 
     @Test
@@ -308,6 +311,7 @@ class UserServiceTest {
         assertEquals(1, followerList.size());
         assertEquals("mockuser", followerList.get(0).getUsername());
     }
+<<<<<<< HEAD
 
     @Test
     void successRequestCreatorRole() {
@@ -319,5 +323,43 @@ class UserServiceTest {
         
 
         assertEquals('s', userService.requestCreatorRole("User").charAt(0));
+=======
+    
+    @Test
+    void testFailUpdateUserIfNotFound() {
+        String username = "user1";
+        when(userRepo.findByUsername(username)).thenReturn(Optional.empty());
+        
+        Pair<HttpStatus, Optional<UserDto>> result =
+                userService.updateUser(username, mock(UpdateUserDto.class));
+        
+        assertEquals(HttpStatus.NOT_FOUND, result.getFirst());
+    }
+    
+    @Test
+    void testFailUpdateUserIfAlreadyExist() {
+        UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "user3", "user1@mail.com");
+        when(userRepo.findByUsername("user1")).thenReturn(Optional.of(follower1));
+        when(userRepo.save(any(UserEntity.class)))
+                .thenThrow(DataIntegrityViolationException.class);
+        
+        Pair<HttpStatus, Optional<UserDto>> result = 
+                userService.updateUser("user1", updateUserDto);
+        
+        assertEquals(HttpStatus.BAD_REQUEST, result.getFirst());
+    }
+    
+    @Test
+    void testSuccessUpdateUser() {
+        UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "user3", "user1@mail.com");
+        when(userRepo.findByUsername("user1")).thenReturn(Optional.of(follower1));
+        
+        Pair<HttpStatus, Optional<UserDto>> result =
+                userService.updateUser("user1", updateUserDto);
+        
+        verify(userRepo).save(any(UserEntity.class));
+        assertEquals(HttpStatus.OK, result.getFirst());
+        reset(userRepo);
+>>>>>>> 2889cc3b1219acb9d88c66682d7b056f6368ad0d
     }
 }
