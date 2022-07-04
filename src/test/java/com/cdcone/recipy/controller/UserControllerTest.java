@@ -211,10 +211,18 @@ public class UserControllerTest {
 
     @Test
     void successRequestCreatorRole() {
-        when(USER_SERVICE.requestCreatorRole("any")).thenReturn("success");
+        when(USER_SERVICE.assignRole("any user", "Request")).thenReturn("success");
 
         assertEquals(HttpStatus.OK,
-                userController.requestCreatorRole("any").getStatusCode());
+                userController.requestCreatorRole("any user").getStatusCode());
+    }
+
+    @Test 
+    void successAssignRole(){
+        when(USER_SERVICE.assignRole("any user", "any role")).thenReturn("success");
+
+        assertEquals(HttpStatus.OK,
+                userController.assignRole("any user", "any role").getStatusCode());
     }
 
     @Test
