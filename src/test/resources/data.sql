@@ -9,11 +9,12 @@ INSERT INTO users VALUES (11, 'faristest2@test.com', 'faris test 2', 'passssssss
 INSERT INTO users VALUES (12, 'adimastest@gmail.com', 'adimastest', 'passsssssssssssssssssssssssssssssssssssssssss', NULL, NULL, 'adimastest');
 INSERT INTO users VALUES (16, 'aaaaa@mail.com', 'aaaaaaiai', 'passsssssssssssssssssssssssssssssssssssssssss', NULL, NULL, 'testingggg');
 INSERT INTO users VALUES (17, 'laptophp@gmail.com', 'laptoppp', 'passsssssssssssssssssssssssssssssssssssssssss', NULL, NULL, 'laptophp');
+INSERT INTO users VALUES (18, 'grrrr@gmail.com', 'grrr', 'passsssssssssssssssssssssssssssssssssssssssss', NULL, NULL, 'grrr');
 
-INSERT INTO tags VALUES (1, 'breakfast', 0);
-INSERT INTO tags VALUES (2, 'light meal', 0);
-INSERT INTO tags VALUES (3, 'indonesia seafood', 0);
-INSERT INTO tags VALUES (4, 'western', 0);
+INSERT INTO tags VALUES (1, 'breakfast', 4);
+INSERT INTO tags VALUES (2, 'light meal', 3);
+INSERT INTO tags VALUES (3, 'indonesia seafood', 2);
+INSERT INTO tags VALUES (4, 'western', 1);
 
 INSERT INTO recipes VALUES (1, NULL, NULL, 'string', '2022-06-09', 'string', true, 'string', 'string', 'string', 'string', 0, 1);
 INSERT INTO recipes VALUES (2, NULL, NULL, '<p>This is content</p>', CURRENT_TIMESTAMP, '[{"name":"Ayam","qty":"500gr"},{"name":"Bubur","qty":"500gr"}]', false, 'Bubur Ayam Jogja', 'Bubur Ayam', 'bubur ayam', NULL, 0, 1);
