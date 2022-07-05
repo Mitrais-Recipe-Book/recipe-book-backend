@@ -28,10 +28,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class IntegrationTest {
+class IntegrationTest {
 
 	@Autowired
-	private MockMvc mockMvc;
+	MockMvc mockMvc;
 
 	ObjectMapper om = new ObjectMapper();
 
@@ -695,5 +695,37 @@ public class IntegrationTest {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.message").value("success: data updated"))
 				.andReturn();
+	}
+
+	@Test
+	void testSuccessGetUserRecipesFavoritePaginated() throws Exception {
+		String username = "user1";
+
+		MvcResult mr = mockMvc.perform(get("/api/v1/user/" + username + "/favorite-recipe")
+				.queryParam("isPaginated", "true")
+				.queryParam("page", "0")
+				.queryParam("size", "1"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data retrieved"))
+				.andExpect(jsonPath("$.payload.data").isNotEmpty())
+				.andReturn();
+
+		System.out.println(mr.getResponse().getContentAsString());
+	}
+
+	@Test
+	void testSuccessGetUserRecipesFavoriteNonPaginated() throws Exception {
+		String username = "user1";
+
+		MvcResult mr = mockMvc.perform(get("/api/v1/user/" + username + "/favorite-recipe")
+						.queryParam("isPaginated", "false")
+						.queryParam("page", "0")
+						.queryParam("size", "10"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data retrieved"))
+				.andExpect(jsonPath("$.payload.data").isNotEmpty())
+				.andReturn();
+
+		System.out.println(mr.getResponse().getContentAsString());
 	}
 }

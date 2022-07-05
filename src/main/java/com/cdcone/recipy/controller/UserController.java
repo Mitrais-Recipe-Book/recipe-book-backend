@@ -182,4 +182,19 @@ public class UserController {
 
         return ResponseEntity.status(status).body(new CommonResponse(msg, result));
     }
+
+    @GetMapping("{username}/favorite-recipe")
+    public ResponseEntity<CommonResponse> getUserFavoriteRecipes(
+            @PathVariable("username") String username,
+            @RequestParam(defaultValue = "false") Boolean isPaginated,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+
+        Pair<String, PaginatedDto<UserRecipeDto>> result = recipeService.getUserFavoriteRecipes(username, isPaginated, page, size);
+
+        if (result.getFirst().charAt(0) == 's') {
+            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), result.getSecond()));
+        }
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
+    }
 }
