@@ -679,4 +679,15 @@ public class IntegrationTest {
 				.andExpect(jsonPath("$.message").value("success: data updated"))
 				.andReturn();
 	}
+
+	@Test
+	void testSuccessGetTagsAndView() throws Exception {
+		MvcResult result = mockMvc.perform(get("/api/v1/tag/all"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data retrieved"))
+				.andExpect(jsonPath("$.payload").isArray())
+				.andExpect(jsonPath("$.payload[0].name").value("breakfast"))
+				.andExpect(jsonPath("$.payload[0].views").value(4))
+				.andReturn();
+	}
 }

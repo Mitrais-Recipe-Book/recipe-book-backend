@@ -1,5 +1,6 @@
 package com.cdcone.recipy.service;
 
+import com.cdcone.recipy.dtoAccess.TagDtoAdmin;
 import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.repository.TagDao;
 import org.junit.jupiter.api.BeforeEach;
@@ -170,5 +171,15 @@ class TagServiceTest {
         String result = tagService.addViewCount(1);
         verify(tagDao).save(tag1);
         assertEquals("success: data updated", result);
+    }
+
+    @Test
+    void testSuccessGetAllTagAdmin() {
+        TagDtoAdmin tag1 = mock(TagDtoAdmin.class);
+        TagDtoAdmin tag2 = mock(TagDtoAdmin.class);
+        when(tagDao.findAllViewCount()).thenReturn(Set.of(tag1, tag2));
+
+        Set<TagDtoAdmin> result = tagService.getAllTagsView();
+        assertEquals(2, result.size());
     }
 }
