@@ -732,6 +732,7 @@ public class IntegrationTest {
 				.andExpect(jsonPath("$.message").value("failed: cannot find role with name " + rolename)).andReturn();
 	}
 
+	@Test
 	void testSuccessGetTagsAndView() throws Exception {
 		MvcResult result = mockMvc.perform(get("/api/v1/tag/all"))
 				.andExpect(status().isOk())
