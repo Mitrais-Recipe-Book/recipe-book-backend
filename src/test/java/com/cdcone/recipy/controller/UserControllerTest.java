@@ -219,11 +219,27 @@ public class UserControllerTest {
                 userController.requestCreatorRole("any user").getStatusCode());
     }
 
+    @Test
+    void failedRequestCreatorRole() {
+        when(USER_SERVICE.assignRole("any user", "Request")).thenReturn("failed");
+
+        assertEquals(HttpStatus.BAD_REQUEST,
+                userController.requestCreatorRole("any user").getStatusCode());
+    }
+
     @Test 
     void successAssignRole(){
         when(USER_SERVICE.assignRole("any user", "any role")).thenReturn("success");
 
         assertEquals(HttpStatus.OK,
+                userController.assignRole("any user", "any role").getStatusCode());
+    }
+
+    @Test 
+    void failedAssignRole(){
+        when(USER_SERVICE.assignRole("any user", "any role")).thenReturn("failed");
+
+        assertEquals(HttpStatus.BAD_REQUEST,
                 userController.assignRole("any user", "any role").getStatusCode());
     }
 

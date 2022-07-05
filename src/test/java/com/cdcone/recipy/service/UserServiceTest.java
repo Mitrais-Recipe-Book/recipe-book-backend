@@ -324,6 +324,27 @@ class UserServiceTest {
     }
 
     @Test
+    void failedGetRoleAssignRole(){
+        Pair<String, RoleEntity> mockRole = Pair.of("failed", mock(RoleEntity.class));
+        UserEntity mockUser = mock(UserEntity.class);
+
+        when(ROLE_SERVICE.getByName("any")).thenReturn(mockRole);
+        when(userRepo.findByUsername("User")).thenReturn(Optional.of(mockUser));
+
+        assertEquals('f', userService.assignRole("User", "any").charAt(0));
+    }
+
+    @Test
+    void failedGetUserAssignRole(){
+        Pair<String, RoleEntity> mockRole = Pair.of("success", mock(RoleEntity.class));
+
+        when(ROLE_SERVICE.getByName("any")).thenReturn(mockRole);
+        when(userRepo.findByUsername("User")).thenReturn(Optional.empty());
+
+        assertEquals('f', userService.assignRole("User", "any").charAt(0));
+    }
+
+    @Test
     void testFailUpdateUserIfNotFound() {
         String username = "user1";
         when(userRepo.findByUsername(username)).thenReturn(Optional.empty());

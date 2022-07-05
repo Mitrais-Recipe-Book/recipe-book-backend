@@ -588,44 +588,44 @@ public class IntegrationTest {
 
 		System.out.println(mr.getResponse().getContentAsString());
 	}
-	
+
 	@Test
 	void testFailUpdateUserIfAlreadyExist() throws Exception {
-	    String username = "user1";
-	    UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "laptophp", "user1@mail.com");
-	    
-	    mockMvc.perform(put("/api/v1/user/" + username + "/profile")
-	            .contentType(MediaType.APPLICATION_JSON)
-	            .content(om.writeValueAsString(updateUserDto)))
-	            .andExpect(status().isBadRequest())
-	            .andExpect(jsonPath("$.message").value("Failed to update user. Username or email is already exists"))
-	            .andReturn();
+		String username = "user1";
+		UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "laptophp", "user1@mail.com");
+
+		mockMvc.perform(put("/api/v1/user/" + username + "/profile")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(om.writeValueAsString(updateUserDto)))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("Failed to update user. Username or email is already exists"))
+				.andReturn();
 	}
-	
+
 	@Test
 	void testFailUpdateUserIfNotFound() throws Exception {
-	    String username = "user1123";
-        UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "laptophp", "user1@mail.com");
-        
-        mockMvc.perform(put("/api/v1/user/" + username + "/profile")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(updateUserDto)))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Failed: user not found"))
-                .andReturn();
+		String username = "user1123";
+		UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "laptophp", "user1@mail.com");
+
+		mockMvc.perform(put("/api/v1/user/" + username + "/profile")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(om.writeValueAsString(updateUserDto)))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.message").value("Failed: user not found"))
+				.andReturn();
 	}
-	
+
 	@Test
 	void testSuccessUpdateUser() throws Exception {
-	    String username = "testingggg";
-        UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "useredit", "aaaaa@mail.com");
-        
-        mockMvc.perform(put("/api/v1/user/" + username + "/profile")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(updateUserDto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Success: user updated"))
-                .andReturn();
+		String username = "testingggg";
+		UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "useredit", "aaaaa@mail.com");
+
+		mockMvc.perform(put("/api/v1/user/" + username + "/profile")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(om.writeValueAsString(updateUserDto)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("Success: user updated"))
+				.andReturn();
 	}
 
 	@Test
@@ -636,8 +636,8 @@ public class IntegrationTest {
 		RecipeFavoriteRequestDto requestDto = new RecipeFavoriteRequestDto(username);
 
 		MvcResult mr = mockMvc.perform(post("/api/v1/recipe/" + recipeId + "/favorite")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(om.writeValueAsString(requestDto)))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(om.writeValueAsString(requestDto)))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.message").value("success: data saved"))
 				.andReturn();
@@ -653,8 +653,8 @@ public class IntegrationTest {
 		RecipeFavoriteRequestDto requestDto = new RecipeFavoriteRequestDto(username);
 
 		MvcResult mr = mockMvc.perform(delete("/api/v1/recipe/" + recipeId + "/favorite")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(om.writeValueAsString(requestDto)))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(om.writeValueAsString(requestDto)))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.message").value("success: data deleted"))
 				.andReturn();
@@ -678,6 +678,58 @@ public class IntegrationTest {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.message").value("success: data updated"))
 				.andReturn();
+	}
+
+	@Test
+	void successRequestCreator() throws Exception {
+		String username = "grrr";
+
+		mockMvc.perform(post("/api/v1/user/" + username + "/request-creator"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: " + username + " adding Request"))
+				.andReturn();
+	}
+
+	@Test
+	void failedRequestCreator() throws Exception {
+		String username = "noname";
+
+		mockMvc.perform(post("/api/v1/user/" + username + "/request-creator"))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("failed: user with username " + username + " not found"))
+				.andReturn();
+	}
+
+	@Test
+	void successAssignRole() throws Exception {
+		String username = "grrr";
+		String rolename = "Admin";
+
+		mockMvc.perform(post("/api/v1/user/" + username + "/assign-" + rolename))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: " + username + " adding " + rolename))
+				.andReturn();
+	}
+
+	@Test
+	void failedAssignRoleUserNotFound() throws Exception {
+		String username = "notfound";
+		String rolename = "Admin";
+
+		mockMvc.perform(post("/api/v1/user/" + username + "/assign-" + rolename))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("failed: user with username " + username + " not found"))
+				.andReturn();
+	}
+
+	@Test
+	void failedAssignRoleRoleNotFound() throws Exception {
+		String username = "grrr";
+		String rolename = "notfound";
+
+		mockMvc.perform(post("/api/v1/user/" + username + "/assign-" + rolename))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("failed: cannot find role with name " + rolename)).andReturn();
 	}
 
 	@Test

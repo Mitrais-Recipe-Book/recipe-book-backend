@@ -9,6 +9,7 @@ INSERT INTO users VALUES (11, 'faristest2@test.com', 'faris test 2', 'passssssss
 INSERT INTO users VALUES (12, 'adimastest@gmail.com', 'adimastest', 'passsssssssssssssssssssssssssssssssssssssssss', NULL, NULL, 'adimastest');
 INSERT INTO users VALUES (16, 'aaaaa@mail.com', 'aaaaaaiai', 'passsssssssssssssssssssssssssssssssssssssssss', NULL, NULL, 'testingggg');
 INSERT INTO users VALUES (17, 'laptophp@gmail.com', 'laptoppp', 'passsssssssssssssssssssssssssssssssssssssssss', NULL, NULL, 'laptophp');
+INSERT INTO users VALUES (18, 'grrrr@gmail.com', 'grrr', 'passsssssssssssssssssssssssssssssssssssssssss', NULL, NULL, 'grrr');
 
 INSERT INTO tags VALUES (1, 'breakfast', 4);
 INSERT INTO tags VALUES (2, 'light meal', 3);

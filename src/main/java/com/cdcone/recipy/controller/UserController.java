@@ -139,7 +139,7 @@ public class UserController {
         }
 
         return ResponseEntity.badRequest().body(new CommonResponse(result));
-    }
+    } 
 
     @PostMapping("{username}/assign-{role}")
     public ResponseEntity<CommonResponse> assignRole(@PathVariable(name = "username") String username,
