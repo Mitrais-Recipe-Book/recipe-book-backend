@@ -225,6 +225,18 @@ public class RecipeController {
         return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
     }
 
+    @GetMapping("{id}/favorite")
+    public ResponseEntity<CommonResponse> getRecipeFavorite(@PathVariable(name = "id") long recipeId, @RequestBody RecipeFavoriteRequestDto requestDto) {
+        Pair<String, RecipeFavoriteEntity> result = recipeService.getRecipeFavorite(recipeId, requestDto);
 
-
+        if (result.getFirst().charAt(0) == 's') {
+            RecipeFavoriteEntity response = result.getSecond();
+            RecipeFavoriteResponseDto responseDto = new RecipeFavoriteResponseDto(
+                    response.getRecipe().getId(),
+                    response.getUser().getId(),
+                    response.getTimestamp());
+            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), responseDto));
+        }
+        return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
+    }
 }

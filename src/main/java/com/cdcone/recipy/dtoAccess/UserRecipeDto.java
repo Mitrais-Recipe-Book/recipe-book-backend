@@ -28,6 +28,16 @@ public class UserRecipeDto {
         this.dateCreated = dateCreated.format(DateTimeFormatter.ofPattern("dd MMM yyyy"));
     }
 
+    public UserRecipeDto(long id, String title, String overview, String authorName, int viewCount, LocalDate dateCreated, Set<TagEntity> tags) {
+        this.id = id;
+        this.title = title;
+        this.overview = overview;
+        this.authorName = authorName;
+        this.viewCount = viewCount;
+        this.dateCreated = dateCreated.format(DateTimeFormatter.ofPattern("dd MMM yyyy"));
+        this.tags = tags;
+    }
+
     public void setTags(Set<TagEntity> tags) {
         this.tags = tags;
     }
