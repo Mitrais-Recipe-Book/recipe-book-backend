@@ -1,5 +1,6 @@
 package com.cdcone.recipy.controller;
 
+import com.cdcone.recipy.dtoAccess.TagDtoAdmin;
 import com.cdcone.recipy.dtoRequest.EditTagDto;
 import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.response.CommonResponse;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @CrossOrigin("*")
@@ -76,5 +78,11 @@ public class TagController {
             status = HttpStatus.OK;
         }
         return ResponseEntity.status(status).body(new CommonResponse(result));
+    }
+
+    @GetMapping("all")
+    public ResponseEntity<CommonResponse> getAllWithViewCount() {
+        Set<TagDtoAdmin> result = tagService.getAllTagsView();
+        return ResponseEntity.ok(new CommonResponse("success: data retrieved", result));
     }
 }

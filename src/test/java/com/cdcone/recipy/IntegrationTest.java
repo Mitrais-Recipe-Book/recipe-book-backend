@@ -723,13 +723,22 @@ public class IntegrationTest {
 	}
 
 	@Test
-	void failedAssignRoleRoleNotFound () throws Exception{
+	void failedAssignRoleRoleNotFound() throws Exception {
 		String username = "grrr";
 		String rolename = "notfound";
 
 		mockMvc.perform(post("/api/v1/user/" + username + "/assign-" + rolename))
 				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.message").value("failed: cannot find role with name " + rolename))
+				.andExpect(jsonPath("$.message").value("failed: cannot find role with name " + rolename)).andReturn();
+	}
+
+	void testSuccessGetTagsAndView() throws Exception {
+		MvcResult result = mockMvc.perform(get("/api/v1/tag/all"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data retrieved"))
+				.andExpect(jsonPath("$.payload").isArray())
+				.andExpect(jsonPath("$.payload[0].name").value("breakfast"))
+				.andExpect(jsonPath("$.payload[0].views").value(4))
 				.andReturn();
 	}
 }

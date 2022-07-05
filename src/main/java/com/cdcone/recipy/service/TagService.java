@@ -1,5 +1,6 @@
 package com.cdcone.recipy.service;
 
+import com.cdcone.recipy.dtoAccess.TagDtoAdmin;
 import com.cdcone.recipy.entity.TagEntity;
 import com.cdcone.recipy.repository.TagDao;
 import lombok.RequiredArgsConstructor;
@@ -102,5 +103,9 @@ public class TagService {
             msg = "success: data updated";
         }
         return msg;
+    }
+
+    public Set<TagDtoAdmin> getAllTagsView() {
+        return tagRepository.findAllViewCount();
     }
 }
