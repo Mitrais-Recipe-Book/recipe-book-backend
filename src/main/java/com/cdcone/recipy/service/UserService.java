@@ -236,8 +236,8 @@ public class UserService implements UserDetailsService {
         return userDao.isFollowing(creatorId, userId);
     }
 
-    public String requestCreatorRole(String username) {
-        Pair<String, RoleEntity> role = roleService.getByName("Request");
+    public String assignRole(String username, String rolename) {
+        Pair<String, RoleEntity> role = roleService.getByName(rolename);
         Pair<String, UserEntity> user = getByUsername(username);
 
         if (role.getFirst().charAt(0) == 'f') {
@@ -250,7 +250,7 @@ public class UserService implements UserDetailsService {
         user.getSecond().getRoles().add(role.getSecond());
         userDao.save(user.getSecond());
 
-        return "success: requesting creator role";
+        return "success: " + username + " adding " + rolename;
     }
 
     public Pair<HttpStatus, Optional<UserDto>> updateUser(String username, UpdateUserDto updateUserDto) {
