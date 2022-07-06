@@ -121,11 +121,11 @@ public class UserControllerTest {
     void getAllUsers() {
         PaginatedDto<UserDto> mockResult = mock(PaginatedDto.class);
 
-        when(USER_SERVICE.getAllUsers(0))
+        when(USER_SERVICE.getAllUsers(false, 0, 10))
                 .thenReturn(mockResult);
 
         assertEquals(HttpStatus.OK,
-                userController.getAllUsers(0).getStatusCode());
+                userController.getAllUsers(false, 0, 0).getStatusCode());
     }
 
     @Test

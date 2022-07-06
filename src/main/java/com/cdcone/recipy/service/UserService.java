@@ -162,8 +162,9 @@ public class UserService implements UserDetailsService {
         return outputStream.toByteArray();
     }
 
-    public PaginatedDto<UserDto> getAllUsers(int page) {
-        Pageable pageable = PageRequest.of(page, 10);
+    public PaginatedDto<UserDto> getAllUsers(boolean isPaginated, int page, int size) {
+        Pageable pageable = isPaginated ? PageRequest.of(page, size) : Pageable.unpaged();
+
         Page<UserEntity> allPaged = userDao.findAllPaged(pageable);
         List<UserDto> userDtoList = allPaged.getContent()
                 .stream()
