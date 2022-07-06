@@ -17,9 +17,10 @@ public interface TagDao extends JpaRepository<TagEntity, Integer> {
     Set<TagEntity> findByRecipeId(@Param("recipeId") Long recipeId);
 
     @Query("SELECT NEW com.cdcone.recipy.dtoAccess.TagDtoAdmin " +
-            "(t.id, t.name, t.views, "+
-            "(SELECT COUNT(*) FROM RecipeEntity r LEFT JOIN r.tags) " +
-            ") FROM TagEntity t " +
+            "(t.id, t.name, t.views, COUNT(r.id))" +
+            "FROM RecipeEntity r " +
+            "RIGHT JOIN r.tags t " +
+            "GROUP BY t.id " +
             "ORDER BY t.name DESC")
     Set<TagDtoAdmin> findAllViewCount();
 }
