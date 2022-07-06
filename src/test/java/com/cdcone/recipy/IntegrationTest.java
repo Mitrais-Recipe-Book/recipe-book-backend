@@ -670,8 +670,7 @@ class IntegrationTest {
 		RecipeFavoriteRequestDto requestDto = new RecipeFavoriteRequestDto(username);
 
 		MvcResult mr = mockMvc.perform(get("/api/v1/recipe/" + recipeId + "/favorite")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(om.writeValueAsString(requestDto)))
+						.queryParam("username", username))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.message").value("success: data retrieved"))
 				.andReturn();

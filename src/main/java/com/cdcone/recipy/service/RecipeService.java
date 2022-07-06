@@ -441,8 +441,8 @@ public class RecipeService {
         return Pair.of("failed: data not found", new RecipeFavoriteEntity());
     }
 
-    public Pair<String, RecipeFavoriteEntity> getRecipeFavorite(long recipeId, RecipeFavoriteRequestDto requestDto) {
-        Optional<UserEntity> userOptional = userDao.findByUsername(requestDto.getUsername());
+    public Pair<String, RecipeFavoriteEntity> getRecipeFavorite(long recipeId, String username) {
+        Optional<UserEntity> userOptional = userDao.findByUsername(username);
 
         if(userOptional.isPresent()) {
             Optional<RecipeFavoriteEntity> recipeFavoriteOptional = recipeFavoriteRepository.findByRecipeIdAndUserId(recipeId, userOptional.get().getId());

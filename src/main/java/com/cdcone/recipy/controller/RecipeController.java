@@ -226,8 +226,8 @@ public class RecipeController {
     }
 
     @GetMapping("{id}/favorite")
-    public ResponseEntity<CommonResponse> getRecipeFavorite(@PathVariable(name = "id") long recipeId, @RequestBody RecipeFavoriteRequestDto requestDto) {
-        Pair<String, RecipeFavoriteEntity> result = recipeService.getRecipeFavorite(recipeId, requestDto);
+    public ResponseEntity<CommonResponse> getRecipeFavorite(@PathVariable(name = "id") long recipeId, @RequestParam() String username) {
+        Pair<String, RecipeFavoriteEntity> result = recipeService.getRecipeFavorite(recipeId, username);
 
         if (result.getFirst().charAt(0) == 's') {
             RecipeFavoriteEntity response = result.getSecond();
