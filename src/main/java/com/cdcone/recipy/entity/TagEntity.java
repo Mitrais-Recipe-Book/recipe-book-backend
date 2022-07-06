@@ -27,7 +27,7 @@ public class TagEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @JsonIgnore
+    //@JsonIgnore
     @Column(name = "views", nullable = false)
     private Integer views = 0;
 
