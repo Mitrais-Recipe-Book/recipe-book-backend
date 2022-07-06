@@ -28,10 +28,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class IntegrationTest {
+class IntegrationTest {
 
 	@Autowired
-	private MockMvc mockMvc;
+	MockMvc mockMvc;
 
 	ObjectMapper om = new ObjectMapper();
 
@@ -663,6 +663,23 @@ public class IntegrationTest {
 	}
 
 	@Test
+	void testSuccessGetRecipeFavorite() throws Exception {
+		String username = "user1";
+		String recipeId = "4";
+
+		RecipeFavoriteRequestDto requestDto = new RecipeFavoriteRequestDto(username);
+
+		MvcResult mr = mockMvc.perform(get("/api/v1/recipe/" + recipeId + "/favorite")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(om.writeValueAsString(requestDto)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data retrieved"))
+				.andReturn();
+
+		System.out.println(mr.getResponse().getContentAsString());
+	}
+
+	@Test
 	void testFailAddTagViewIfNotFound() throws Exception {
 		int tagId = 999;
 		mockMvc.perform(put("/api/v1/tag/addview?tagId=" + tagId))
@@ -678,6 +695,39 @@ public class IntegrationTest {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.message").value("success: data updated"))
 				.andReturn();
+	}
+
+	@Test
+	void testSuccessGetUserRecipesFavoritePaginated() throws Exception {
+		String username = "user1";
+
+		MvcResult mr = mockMvc.perform(get("/api/v1/user/" + username + "/favorite-recipe")
+				.queryParam("isPaginated", "true")
+				.queryParam("page", "0")
+				.queryParam("size", "1"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data retrieved"))
+				.andExpect(jsonPath("$.payload.data").isNotEmpty())
+				.andReturn();
+
+		System.out.println(mr.getResponse().getContentAsString());
+	}
+
+	@Test
+	void testSuccessGetUserRecipesFavoriteNonPaginated() throws Exception {
+		String username = "user1";
+
+		MvcResult mr = mockMvc.perform(get("/api/v1/user/" + username + "/favorite-recipe")
+						.queryParam("isPaginated", "false")
+						.queryParam("page", "0")
+						.queryParam("size", "10"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.message").value("success: data retrieved"))
+				.andExpect(jsonPath("$.payload.data").isNotEmpty())
+				.andReturn();
+
+		System.out.println(mr.getResponse().getContentAsString());
+
 	}
 
 	@Test

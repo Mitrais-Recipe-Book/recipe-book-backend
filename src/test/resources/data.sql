@@ -26,6 +26,7 @@ INSERT INTO recipes_reaction VALUES (3, 10, 'LIKED', NULL);
 INSERT INTO recipes_reaction VALUES (3, 11, 'LIKED', NULL);
 
 INSERT INTO recipes_favorite VALUES (3, 1, CURRENT_TIMESTAMP);
+INSERT INTO recipes_favorite VALUES (4, 1, CURRENT_TIMESTAMP);
 
 INSERT INTO recipes_tags VALUES (1, 1);
 INSERT INTO recipes_tags VALUES (1, 3);

@@ -23,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Pair;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -438,5 +439,60 @@ public class RecipeService {
             }
         }
         return Pair.of("failed: data not found", new RecipeFavoriteEntity());
+    }
+
+    public Pair<String, RecipeFavoriteEntity> getRecipeFavorite(long recipeId, RecipeFavoriteRequestDto requestDto) {
+        Optional<UserEntity> userOptional = userDao.findByUsername(requestDto.getUsername());
+
+        if(userOptional.isPresent()) {
+            Optional<RecipeFavoriteEntity> recipeFavoriteOptional = recipeFavoriteRepository.findByRecipeIdAndUserId(recipeId, userOptional.get().getId());
+            if(recipeFavoriteOptional.isPresent()) {
+                return Pair.of("success: data retrieved", recipeFavoriteOptional.get());
+            }
+        }
+        return Pair.of("failed: data not found", new RecipeFavoriteEntity());
+    }
+
+
+    public Pair<String, PaginatedDto<UserRecipeDto>> getUserFavoriteRecipes(String username, Boolean isPaginated, Integer page, Integer size) {
+        Optional<UserEntity> userOptional = userDao.findByUsername(username);
+
+        if(userOptional.isEmpty()) {
+            return Pair.of("failed: data not found", new PaginatedDto<>());
+        }
+
+        Pageable paging;
+        Page<RecipeFavoriteEntity> resultPage;
+        Long userId = userOptional.get().getId();
+
+        if(isPaginated) {
+            paging = PageRequest.of(page, size);
+            resultPage = recipeFavoriteRepository.findByUserId(userId, paging);
+        } else {
+            List<RecipeFavoriteEntity> entityList = recipeFavoriteRepository.findByUserId(userId);
+            resultPage = new PageImpl<>(entityList);
+        }
+
+        List<UserRecipeDto> listDto = resultPage.getContent().stream().map(e-> {
+            RecipeEntity recipe = e.getRecipe();
+            return new UserRecipeDto(
+                    recipe.getId(),
+                    recipe.getTitle(),
+                    recipe.getOverview(),
+                    recipe.getUser().getFullName(),
+                    recipe.getViews(),
+                    recipe.getDateCreated(),
+                    recipe.getTags()
+            );
+        }).collect(Collectors.toList());
+
+        PaginatedDto<UserRecipeDto> result = new PaginatedDto<>(
+                listDto,
+                resultPage.getNumber(),
+                resultPage.getTotalPages(),
+                resultPage.isLast(),
+                resultPage.getTotalElements()
+        );
+        return Pair.of("success: data retrieved", result);
     }
 }
