@@ -10,7 +10,9 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 import com.cdcone.recipy.dtoAccess.RecipeReactionSummaryDto;
+import com.cdcone.recipy.dtoRequest.RecipeFavoriteRequestDto;
 import com.cdcone.recipy.dtoRequest.RecipeReactionRequestDto;
+import com.cdcone.recipy.entity.RecipeFavoriteEntity;
 import com.cdcone.recipy.entity.RecipeReactionEntity;
 import com.cdcone.recipy.response.CommonResponse;
 import org.junit.jupiter.api.BeforeAll;
@@ -376,5 +378,71 @@ public class RecipeControllerTest {
 
         assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
         assertEquals("failed: data not found", result.getBody().getMessage());
+    }
+
+    @Test
+    void successGetRecipeFavorite() {
+        UserEntity user = new UserEntity();
+        user.setId(10L);
+        user.setUsername("user1");
+
+        RecipeEntity recipe = new RecipeEntity();
+        recipe.setId(1L);
+        recipe.setTitle("Recipe 1");
+
+        RecipeFavoriteEntity recipeFavorite = new RecipeFavoriteEntity(user, recipe, LocalDateTime.now());
+
+        when(RECIPE_SERVICE.getRecipeFavorite(1L, "user1")).thenReturn(Pair.of("success: data retrieved", recipeFavorite));
+
+        ResponseEntity<CommonResponse> result = recipeController.getRecipeFavorite(1L, "user1");
+
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals("success: data retrieved", result.getBody().getMessage());
+    }
+
+    @Test
+    void successSaveRecipeFavorite() {
+        UserEntity user = new UserEntity();
+        user.setId(10L);
+        user.setUsername("user1");
+
+        RecipeEntity recipe = new RecipeEntity();
+        recipe.setId(1L);
+        recipe.setTitle("Recipe 1");
+
+        RecipeFavoriteEntity recipeFavorite = new RecipeFavoriteEntity(user, recipe, LocalDateTime.now());
+
+        RecipeFavoriteRequestDto requestDto = new RecipeFavoriteRequestDto("user1");
+
+        when(RECIPE_SERVICE.saveRecipeFavorite(1L, new RecipeFavoriteRequestDto("user1"))).thenReturn(Pair.of("success: data saved", recipeFavorite));
+
+        ResponseEntity<CommonResponse> result = recipeController.saveRecipeFavorite(1L, requestDto);
+
+
+
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals("success: data saved", result.getBody().getMessage());
+    }
+
+    @Test
+    void successDeleteRecipeFavorite() {
+        UserEntity user = new UserEntity();
+        user.setId(10L);
+        user.setUsername("user1");
+
+        RecipeEntity recipe = new RecipeEntity();
+        recipe.setId(1L);
+        recipe.setTitle("Recipe 1");
+
+        RecipeFavoriteEntity recipeFavorite = new RecipeFavoriteEntity(user, recipe, LocalDateTime.now());
+
+        RecipeFavoriteRequestDto requestDto = new RecipeFavoriteRequestDto("user1");
+
+        when(RECIPE_SERVICE.deleteRecipeFavorite(1L, new RecipeFavoriteRequestDto("user1"))).thenReturn(Pair.of("success: data deleted", recipeFavorite));
+
+        ResponseEntity<CommonResponse> result = recipeController.deleteRecipeFavorite(1L, requestDto);
+
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals("success: data deleted", result.getBody().getMessage());
     }
 }
