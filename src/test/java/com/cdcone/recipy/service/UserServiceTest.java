@@ -187,11 +187,10 @@ class UserServiceTest {
         when(mockUser.getEmail()).thenReturn("user@mail.com");
         when(mockUser.getPassword()).thenReturn("password");
         when(mockUser.getRoles()).thenReturn(Set.of(userRole));
-        Pageable pageable = PageRequest.of(0, 10);
         Page<UserEntity> mockResult = new PageImpl<>(List.of(mockUser));
-        when(userRepo.findAllPaged(pageable)).thenReturn(mockResult);
+        when(userRepo.findAllPaged(any(Pageable.class))).thenReturn(mockResult);
 
-        PaginatedDto<UserDto> allUsers = userService.getAllUsers(0);
+        PaginatedDto<UserDto> allUsers = userService.getAllUsers(false, 0, 0);
         assertEquals(1, allUsers.getTotalPages());
         assertEquals(1, allUsers.getData().size());
         assertEquals("user", allUsers.getData().get(0).getUsername());

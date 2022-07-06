@@ -791,4 +791,12 @@ class IntegrationTest {
 				.andExpect(jsonPath("$.payload[0].views").value(4))
 				.andReturn();
 	}
+
+	@Test
+	void testSuccessGetAllUsers() throws Exception {
+		mockMvc.perform(get("/api/v1/user"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.payload.data").isArray())
+				.andReturn();
+	}
 }
