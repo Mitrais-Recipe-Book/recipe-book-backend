@@ -13,10 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.cdcone.recipy.response.CommonResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cdcone.recipy.dtoAccess.FollowerDto;
@@ -260,5 +262,16 @@ public class UserControllerTest {
                 .thenReturn(Pair.of("failed: user with username " + username + " not found", mock(UserEntity.class)));
 
         assertEquals(HttpStatus.NOT_FOUND, userController.getProfile("user1").getStatusCode());
+    }
+
+    @Test
+    void successGetUserFavoriteRecipes() {
+        when(RECIPE_SERVICE.getUserFavoriteRecipes("user1", true, 0, 10))
+                .thenReturn(Pair.of("success: data retrieved", mock(PaginatedDto.class)));
+
+        ResponseEntity<CommonResponse> result = userController.getUserFavoriteRecipes("user1", true, 0 ,10);
+
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals("success: data retrieved", result.getBody().getMessage());
     }
 }
