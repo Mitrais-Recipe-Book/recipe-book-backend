@@ -65,8 +65,11 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<CommonResponse> getAllUsers(@RequestParam(defaultValue = "0") Integer page) {
-        PaginatedDto<UserDto> allUsers = userService.getAllUsers(page);
+    public ResponseEntity<CommonResponse> getAllUsers(
+            @RequestParam(defaultValue = "false") Boolean isPaginated,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        PaginatedDto<UserDto> allUsers = userService.getAllUsers(isPaginated, page, size);
         return ResponseEntity.ok(new CommonResponse(allUsers));
     }
 
@@ -173,7 +176,7 @@ public class UserController {
         String msg = "Failed: user not found";
         UserDto result = null;
         HttpStatus status = updateUser.getFirst();
-        if (status.equals(HttpStatus.OK)) {
+        if (status.equals(HttpStatus.OK) && updateUser.getSecond().isPresent()) {
             msg = "Success: user updated";
             result = updateUser.getSecond().get();
         } else if (status.equals(HttpStatus.BAD_REQUEST)) {
