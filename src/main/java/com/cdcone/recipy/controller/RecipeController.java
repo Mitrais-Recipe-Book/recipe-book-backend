@@ -197,45 +197,30 @@ public class RecipeController {
 
     @PostMapping("{id}/favorite")
     public ResponseEntity<CommonResponse> saveRecipeFavorite(@PathVariable(name = "id") long recipeId, @RequestBody RecipeFavoriteRequestDto requestDto) {
-        Pair<String, RecipeFavoriteEntity> result = recipeService.saveRecipeFavorite(recipeId, requestDto);
+        Pair<String, RecipeFavoriteResponseDto> result = recipeService.saveRecipeFavorite(recipeId, requestDto);
 
         if (result.getFirst().charAt(0) == 's') {
-            RecipeFavoriteEntity response = result.getSecond();
-            RecipeFavoriteResponseDto responseDto = new RecipeFavoriteResponseDto(
-                    response.getRecipe().getId(),
-                    response.getUser().getId(),
-                    response.getTimestamp());
-            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), responseDto));
+            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), result.getSecond()));
         }
         return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
     }
 
     @DeleteMapping("{id}/favorite")
     public ResponseEntity<CommonResponse> deleteRecipeFavorite(@PathVariable(name = "id") long recipeId, @RequestBody RecipeFavoriteRequestDto requestDto) {
-        Pair<String, RecipeFavoriteEntity> result = recipeService.deleteRecipeFavorite(recipeId, requestDto);
+        Pair<String, RecipeFavoriteResponseDto> result = recipeService.deleteRecipeFavorite(recipeId, requestDto);
 
         if (result.getFirst().charAt(0) == 's') {
-            RecipeFavoriteEntity response = result.getSecond();
-            RecipeFavoriteResponseDto responseDto = new RecipeFavoriteResponseDto(
-                    response.getRecipe().getId(),
-                    response.getUser().getId(),
-                    response.getTimestamp());
-            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), responseDto));
+            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), result.getSecond()));
         }
         return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
     }
 
     @GetMapping("{id}/favorite")
     public ResponseEntity<CommonResponse> getRecipeFavorite(@PathVariable(name = "id") long recipeId, @RequestParam() String username) {
-        Pair<String, RecipeFavoriteEntity> result = recipeService.getRecipeFavorite(recipeId, username);
+        Pair<String, RecipeFavoriteResponseDto> result = recipeService.getRecipeFavorite(recipeId, username);
 
         if (result.getFirst().charAt(0) == 's') {
-            RecipeFavoriteEntity response = result.getSecond();
-            RecipeFavoriteResponseDto responseDto = new RecipeFavoriteResponseDto(
-                    response.getRecipe().getId(),
-                    response.getUser().getId(),
-                    response.getTimestamp());
-            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), responseDto));
+            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), result.getSecond()));
         }
         return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
     }

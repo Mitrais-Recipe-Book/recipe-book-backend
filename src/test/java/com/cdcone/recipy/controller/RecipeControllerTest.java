@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+import com.cdcone.recipy.dtoAccess.RecipeFavoriteResponseDto;
 import com.cdcone.recipy.dtoAccess.RecipeReactionSummaryDto;
 import com.cdcone.recipy.dtoRequest.RecipeFavoriteRequestDto;
 import com.cdcone.recipy.dtoRequest.RecipeReactionRequestDto;
@@ -382,17 +383,10 @@ public class RecipeControllerTest {
 
     @Test
     void successGetRecipeFavorite() {
-        UserEntity user = new UserEntity();
-        user.setId(10L);
-        user.setUsername("user1");
 
-        RecipeEntity recipe = new RecipeEntity();
-        recipe.setId(1L);
-        recipe.setTitle("Recipe 1");
+        RecipeFavoriteResponseDto responseDto = new RecipeFavoriteResponseDto(10L, 1L, LocalDateTime.now(), true);
 
-        RecipeFavoriteEntity recipeFavorite = new RecipeFavoriteEntity(user, recipe, LocalDateTime.now());
-
-        when(RECIPE_SERVICE.getRecipeFavorite(1L, "user1")).thenReturn(Pair.of("success: data retrieved", recipeFavorite));
+        when(RECIPE_SERVICE.getRecipeFavorite(1L, "user1")).thenReturn(Pair.of("success: data retrieved", responseDto));
 
         ResponseEntity<CommonResponse> result = recipeController.getRecipeFavorite(1L, "user1");
 
@@ -402,19 +396,11 @@ public class RecipeControllerTest {
 
     @Test
     void successSaveRecipeFavorite() {
-        UserEntity user = new UserEntity();
-        user.setId(10L);
-        user.setUsername("user1");
-
-        RecipeEntity recipe = new RecipeEntity();
-        recipe.setId(1L);
-        recipe.setTitle("Recipe 1");
-
-        RecipeFavoriteEntity recipeFavorite = new RecipeFavoriteEntity(user, recipe, LocalDateTime.now());
+        RecipeFavoriteResponseDto responseDto = new RecipeFavoriteResponseDto(10L, 1L, LocalDateTime.now(), true);
 
         RecipeFavoriteRequestDto requestDto = new RecipeFavoriteRequestDto("user1");
 
-        when(RECIPE_SERVICE.saveRecipeFavorite(1L, new RecipeFavoriteRequestDto("user1"))).thenReturn(Pair.of("success: data saved", recipeFavorite));
+        when(RECIPE_SERVICE.saveRecipeFavorite(1L, new RecipeFavoriteRequestDto("user1"))).thenReturn(Pair.of("success: data saved", responseDto));
 
         ResponseEntity<CommonResponse> result = recipeController.saveRecipeFavorite(1L, requestDto);
 
@@ -426,19 +412,11 @@ public class RecipeControllerTest {
 
     @Test
     void successDeleteRecipeFavorite() {
-        UserEntity user = new UserEntity();
-        user.setId(10L);
-        user.setUsername("user1");
-
-        RecipeEntity recipe = new RecipeEntity();
-        recipe.setId(1L);
-        recipe.setTitle("Recipe 1");
-
-        RecipeFavoriteEntity recipeFavorite = new RecipeFavoriteEntity(user, recipe, LocalDateTime.now());
+        RecipeFavoriteResponseDto responseDto = new RecipeFavoriteResponseDto(10L, 1L, LocalDateTime.now(), false);
 
         RecipeFavoriteRequestDto requestDto = new RecipeFavoriteRequestDto("user1");
 
-        when(RECIPE_SERVICE.deleteRecipeFavorite(1L, new RecipeFavoriteRequestDto("user1"))).thenReturn(Pair.of("success: data deleted", recipeFavorite));
+        when(RECIPE_SERVICE.deleteRecipeFavorite(1L, new RecipeFavoriteRequestDto("user1"))).thenReturn(Pair.of("success: data deleted", responseDto));
 
         ResponseEntity<CommonResponse> result = recipeController.deleteRecipeFavorite(1L, requestDto);
 
