@@ -414,7 +414,7 @@ public class RecipeService {
         return Pair.of("failed: data not found", new RecipeReactionEntity());
     }
 
-    public Pair<String, RecipeFavoriteEntity> saveRecipeFavorite(long recipeId, RecipeFavoriteRequestDto requestDto) {
+    public Pair<String, RecipeFavoriteResponseDto> saveRecipeFavorite(long recipeId, RecipeFavoriteRequestDto requestDto) {
         Optional<UserEntity> userOptional = userDao.findByUsername(requestDto.getUsername());
         Optional<RecipeEntity> recipeOptional = recipeRepository.findById(recipeId);
 
@@ -422,35 +422,60 @@ public class RecipeService {
             RecipeFavoriteEntity entity = new RecipeFavoriteEntity(
                     userOptional.get(),
                     recipeOptional.get(),
-                    LocalDateTime.now());
-            return Pair.of("success: data saved", recipeFavoriteRepository.save(entity));
+                    LocalDateTime.now()
+            );
+
+            entity = recipeFavoriteRepository.save(entity);
+
+            return Pair.of("success: data saved", new RecipeFavoriteResponseDto(
+                    entity.getRecipe().getId(),
+                    entity.getUser().getId(),
+                    entity.getTimestamp(),
+                    true
+            ));
         }
-        return Pair.of("failed: data not found", new RecipeFavoriteEntity());
+        return Pair.of("failed: data not found", new RecipeFavoriteResponseDto());
     }
 
-    public Pair<String, RecipeFavoriteEntity> deleteRecipeFavorite(long recipeId, RecipeFavoriteRequestDto requestDto) {
+    public Pair<String, RecipeFavoriteResponseDto> deleteRecipeFavorite(long recipeId, RecipeFavoriteRequestDto requestDto) {
         Optional<UserEntity> userOptional = userDao.findByUsername(requestDto.getUsername());
 
         if(userOptional.isPresent()) {
             Optional<RecipeFavoriteEntity> recipeFavoriteOptional = recipeFavoriteRepository.findByRecipeIdAndUserId(recipeId, userOptional.get().getId());
             if(recipeFavoriteOptional.isPresent()) {
                 recipeFavoriteRepository.delete(recipeFavoriteOptional.get());
-                return Pair.of("success: data deleted", recipeFavoriteOptional.get());
+                return Pair.of("success: data deleted", new RecipeFavoriteResponseDto(
+                        recipeFavoriteOptional.get().getRecipe().getId(),
+                        recipeFavoriteOptional.get().getUser().getId(),
+                        null,
+                        false
+                ));
             }
         }
-        return Pair.of("failed: data not found", new RecipeFavoriteEntity());
+        return Pair.of("failed: data not found", new RecipeFavoriteResponseDto());
     }
-    public Pair<String, RecipeFavoriteEntity> getRecipeFavorite(long recipeId, String username) {
+    public Pair<String, RecipeFavoriteResponseDto> getRecipeFavorite(long recipeId, String username) {
         Optional<UserEntity> userOptional = userDao.findByUsername(username);
+        Optional<RecipeEntity> recipeOptional = recipeRepository.findById(recipeId);
 
-
-        if(userOptional.isPresent()) {
+        if(userOptional.isPresent() && recipeOptional.isPresent()) {
             Optional<RecipeFavoriteEntity> recipeFavoriteOptional = recipeFavoriteRepository.findByRecipeIdAndUserId(recipeId, userOptional.get().getId());
             if(recipeFavoriteOptional.isPresent()) {
-                return Pair.of("success: data retrieved", recipeFavoriteOptional.get());
+                return Pair.of("success: data retrieved", new RecipeFavoriteResponseDto(
+                        recipeFavoriteOptional.get().getRecipe().getId(),
+                        recipeFavoriteOptional.get().getUser().getId(),
+                        recipeFavoriteOptional.get().getTimestamp(),
+                        true
+                ));
             }
+            return Pair.of("success: data retrieved", new RecipeFavoriteResponseDto(
+                    recipeOptional.get().getId(),
+                    userOptional.get().getId(),
+                    null,
+                    false
+            ));
         }
-        return Pair.of("failed: data not found", new RecipeFavoriteEntity());
+        return Pair.of("failed: data not found", new RecipeFavoriteResponseDto());
     }
 
 
