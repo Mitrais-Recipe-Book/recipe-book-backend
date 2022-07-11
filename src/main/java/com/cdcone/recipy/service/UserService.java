@@ -263,11 +263,9 @@ public class UserService implements UserDetailsService {
             try {
                 UserEntity user = byUsername.getSecond();
                 user.setEmail(updateUserDto.getEmail().toLowerCase());
-                user.setUsername(updateUserDto.getUsername().toLowerCase());
-                user.setFullName(updateUserDto.getFullName());
+                user.setFullName(updateUserDto.getFullName().toLowerCase());
                 userDao.save(user);
                 result = UserDto.toDto(user);
-
                 status = HttpStatus.OK;
             } catch (DataIntegrityViolationException e) {
                 status = HttpStatus.BAD_REQUEST;
