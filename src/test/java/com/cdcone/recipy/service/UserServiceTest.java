@@ -323,8 +323,10 @@ class UserServiceTest {
 
         when(ROLE_SERVICE.getByName("any")).thenReturn(mockRole);
         when(userRepo.findByUsername("User")).thenReturn(Optional.of(mockUser));
+        when(userRepo.save(mockUser)).thenReturn(mockUser);
 
-        assertEquals('s', userService.assignRole("User", "any").charAt(0));
+        assertDoesNotThrow(() -> userService.removeRole("username", "rolename"));
+        assertEquals(mockUser, userService.removeRole("username", "rolename"));
     }
 
     @Test
@@ -335,7 +337,8 @@ class UserServiceTest {
         when(ROLE_SERVICE.getByName("any")).thenReturn(mockRole);
         when(userRepo.findByUsername("User")).thenReturn(Optional.of(mockUser));
 
-        assertEquals('f', userService.assignRole("User", "any").charAt(0));
+        assertThrows(NullPointerException.class,
+                () -> userService.assignRole("User", "any"));
     }
 
     @Test
@@ -345,7 +348,8 @@ class UserServiceTest {
         when(ROLE_SERVICE.getByName("any")).thenReturn(mockRole);
         when(userRepo.findByUsername("User")).thenReturn(Optional.empty());
 
-        assertEquals('f', userService.assignRole("User", "any").charAt(0));
+        assertThrows(NullPointerException.class,
+                () -> userService.assignRole("User", "any"));
     }
 
     @Test

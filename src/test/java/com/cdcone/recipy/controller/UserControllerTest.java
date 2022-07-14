@@ -216,7 +216,7 @@ public class UserControllerTest {
 
     @Test
     void successRequestCreatorRole() {
-        when(USER_SERVICE.assignRole("any user", "Request")).thenReturn("success");
+        when(USER_SERVICE.assignRole("any user", "Request")).thenReturn(mock(UserEntity.class));
 
         assertEquals(HttpStatus.OK,
                 userController.requestCreatorRole("any user").getStatusCode());
@@ -224,23 +224,23 @@ public class UserControllerTest {
 
     @Test
     void failedRequestCreatorRole() {
-        when(USER_SERVICE.assignRole("any user", "Request")).thenReturn("failed");
+        when(USER_SERVICE.assignRole("any user", "Request")).thenThrow(NullPointerException.class);
 
         assertEquals(HttpStatus.BAD_REQUEST,
                 userController.requestCreatorRole("any user").getStatusCode());
     }
 
-    @Test 
-    void successAssignRole(){
-        when(USER_SERVICE.assignRole("any user", "any role")).thenReturn("success");
+    @Test
+    void successAssignRole() {
+        when(USER_SERVICE.assignRole("any user", "any role")).thenReturn(mock(UserEntity.class));
 
         assertEquals(HttpStatus.OK,
                 userController.assignRole("any user", "any role").getStatusCode());
     }
 
-    @Test 
-    void failedAssignRole(){
-        when(USER_SERVICE.assignRole("any user", "any role")).thenReturn("failed");
+    @Test
+    void failedAssignRole() {
+        when(USER_SERVICE.assignRole("any user", "any role")).thenThrow(NullPointerException.class);
 
         assertEquals(HttpStatus.BAD_REQUEST,
                 userController.assignRole("any user", "any role").getStatusCode());
@@ -260,7 +260,8 @@ public class UserControllerTest {
     void failedGetProfileNotFound() {
         String username = "user1";
         when(USER_SERVICE.getByUsername(username))
-                .thenReturn(Pair.of("failed: user with username " + username + " not found", mock(UserEntity.class)));
+                .thenReturn(Pair.of("failed: user with username " + username + " not found",
+                        mock(UserEntity.class)));
 
         assertEquals(HttpStatus.NOT_FOUND, userController.getProfile("user1").getStatusCode());
     }
@@ -270,7 +271,7 @@ public class UserControllerTest {
         when(RECIPE_SERVICE.getUserFavoriteRecipes("user1", true, 0, 10))
                 .thenReturn(Pair.of("success: data retrieved", mock(PaginatedDto.class)));
 
-        ResponseEntity<CommonResponse> result = userController.getUserFavoriteRecipes("user1", true, 0 ,10);
+        ResponseEntity<CommonResponse> result = userController.getUserFavoriteRecipes("user1", true, 0, 10);
 
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals("success: data retrieved", result.getBody().getMessage());
