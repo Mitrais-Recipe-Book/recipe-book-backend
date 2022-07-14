@@ -152,7 +152,12 @@ public class UserController {
     }
 
     @PutMapping("{username}/approve-creator")
+<<<<<<< HEAD
     public ResponseEntity<CommonResponse> approveRequestedRole(@PathVariable(name = "username") String username) {
+=======
+    public ResponseEntity<CommonResponse> approveRequestedRole(@PathVariable(name = "username") String username,
+            @PathVariable(name = "role") String rolename) {
+>>>>>>> 1a611f488a32b183128fbe27528d4a83f228a4d0
         try {
             userService.removeRole(username, "Request");
             UserResponseDto dto = UserResponseDto.toDto(userService.assignRole(username, "Creator"));
