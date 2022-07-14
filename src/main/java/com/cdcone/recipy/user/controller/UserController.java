@@ -181,7 +181,7 @@ public class UserController {
     public ResponseEntity<CommonResponse> removeRole(@PathVariable(name = "username") String username,
             @PathVariable(name = "role") String rolename) {
         try {
-
+            
             UserResponseDto dto = UserResponseDto.toDto(userService.removeRole(username, rolename));
             return ResponseEntity.ok(new CommonResponse("success", dto));
 

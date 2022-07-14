@@ -268,7 +268,7 @@ public class UserService implements UserDetailsService {
         }
 
         user.getSecond().getRoles().remove(role.getSecond());
-        return userDao.save(user.getSecond());
+        return userDao.save(user.getSecond());        
     }
 
     public Pair<HttpStatus, Optional<UserResponseDto>> updateUser(String username, UpdateUserRequestDto updateUserDto) {
