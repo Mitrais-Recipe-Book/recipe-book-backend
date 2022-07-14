@@ -317,7 +317,7 @@ class UserServiceTest {
     }
 
     @Test
-    void successAssignRole(){
+    void successAssignRole() {
         Pair<String, RoleEntity> mockRole = Pair.of("success", mock(RoleEntity.class));
         UserEntity mockUser = mock(UserEntity.class);
 
@@ -328,7 +328,7 @@ class UserServiceTest {
     }
 
     @Test
-    void failedGetRoleAssignRole(){
+    void failedGetRoleAssignRole() {
         Pair<String, RoleEntity> mockRole = Pair.of("failed", mock(RoleEntity.class));
         UserEntity mockUser = mock(UserEntity.class);
 
@@ -339,7 +339,7 @@ class UserServiceTest {
     }
 
     @Test
-    void failedGetUserAssignRole(){
+    void failedGetUserAssignRole() {
         Pair<String, RoleEntity> mockRole = Pair.of("success", mock(RoleEntity.class));
 
         when(ROLE_SERVICE.getByName("any")).thenReturn(mockRole);
@@ -353,7 +353,8 @@ class UserServiceTest {
         String username = "user1";
         when(userRepo.findByUsername(username)).thenReturn(Optional.empty());
 
-        Pair<HttpStatus, Optional<UserResponseDto>> result = userService.updateUser(username, mock(UpdateUserRequestDto.class));
+        Pair<HttpStatus, Optional<UserResponseDto>> result = userService.updateUser(username,
+                mock(UpdateUserRequestDto.class));
 
         assertEquals(HttpStatus.NOT_FOUND, result.getFirst());
     }
@@ -380,5 +381,16 @@ class UserServiceTest {
         verify(userRepo).save(any(UserEntity.class));
         assertEquals(HttpStatus.OK, result.getFirst());
         reset(userRepo);
+    }
+
+    @Test
+    void removeRole_willSuccess_whenUsernameAndRolenameAreFound() {
+        Pair<String, RoleEntity> mockRole = Pair.of("success", mock(RoleEntity.class));
+        UserEntity mockUser = mock(UserEntity.class);
+
+        when(ROLE_SERVICE.getByName("rolename")).thenReturn(mockRole);
+        when(userRepo.findByUsername("username")).thenReturn(Optional.of(mockUser));
+
+        assertDoesNotThrow(() -> userService.removeRole("username", "rolename"));
     }
 }
