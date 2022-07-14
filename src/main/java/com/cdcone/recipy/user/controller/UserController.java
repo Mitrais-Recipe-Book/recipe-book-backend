@@ -149,7 +149,7 @@ public class UserController {
         }
 
         return ResponseEntity.badRequest().body(new CommonResponse(result));
-    } 
+    }
 
     @PostMapping("{username}/assign-{role}")
     public ResponseEntity<CommonResponse> assignRole(@PathVariable(name = "username") String username,
@@ -161,6 +161,19 @@ public class UserController {
         }
 
         return ResponseEntity.badRequest().body(new CommonResponse(result));
+    }
+
+    @DeleteMapping("{username}/remove-{role}")
+    public ResponseEntity<CommonResponse> removeRole(@PathVariable(name = "username") String username,
+            @PathVariable(name = "role") String rolename) {
+        try {
+            
+            UserResponseDto dto = UserResponseDto.toDto(userService.removeRole(username, rolename));
+            return ResponseEntity.ok(new CommonResponse("success", dto));
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new CommonResponse(e.getMessage()));
+        }
     }
 
     @GetMapping("{username}/profile")
@@ -200,7 +213,8 @@ public class UserController {
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
 
-        Pair<String, PaginatedDto<UserRecipeResponseDto>> result = recipeService.getUserFavoriteRecipes(username, isPaginated, page, size);
+        Pair<String, PaginatedDto<UserRecipeResponseDto>> result = recipeService.getUserFavoriteRecipes(username,
+                isPaginated, page, size);
 
         if (result.getFirst().charAt(0) == 's') {
             return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), result.getSecond()));
