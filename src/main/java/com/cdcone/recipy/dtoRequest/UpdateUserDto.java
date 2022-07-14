@@ -8,6 +8,5 @@ import lombok.RequiredArgsConstructor;
 public class UpdateUserDto {
     
     private final String fullName;
-    private final String username;
     private final String email;
 }

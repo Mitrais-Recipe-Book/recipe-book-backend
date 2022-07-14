@@ -355,7 +355,7 @@ class UserServiceTest {
 
     @Test
     void testFailUpdateUserIfAlreadyExist() {
-        UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "user3", "user1@mail.com");
+        UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "user1@mail.com");
         when(userRepo.findByUsername("user1")).thenReturn(Optional.of(follower1));
         when(userRepo.save(any(UserEntity.class)))
                 .thenThrow(DataIntegrityViolationException.class);
@@ -367,7 +367,7 @@ class UserServiceTest {
 
     @Test
     void testSuccessUpdateUser() {
-        UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "user3", "user1@mail.com");
+        UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "user1@mail.com");
         when(userRepo.findByUsername("user1")).thenReturn(Optional.of(follower1));
 
         Pair<HttpStatus, Optional<UserDto>> result = userService.updateUser("user1", updateUserDto);

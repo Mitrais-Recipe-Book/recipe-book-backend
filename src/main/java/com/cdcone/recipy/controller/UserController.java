@@ -180,7 +180,7 @@ public class UserController {
             msg = "Success: user updated";
             result = updateUser.getSecond().get();
         } else if (status.equals(HttpStatus.BAD_REQUEST)) {
-            msg = "Failed to update user. Username or email is already exists";
+            msg = "Failed to update user. Email is already exists";
         }
 
         return ResponseEntity.status(status).body(new CommonResponse(msg, result));

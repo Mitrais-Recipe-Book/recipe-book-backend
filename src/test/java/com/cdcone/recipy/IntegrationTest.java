@@ -592,7 +592,7 @@ class IntegrationTest {
 	@Test
 	void testFailUpdateUserIfAlreadyExist() throws Exception {
 		String username = "user1";
-		UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "laptophp", "user1@mail.com");
+		UpdateUserDto updateUserDto = new UpdateUserDto("laptoppp", "laptophp@gmail.com");
 
 		mockMvc.perform(put("/api/v1/user/" + username + "/profile")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -605,7 +605,7 @@ class IntegrationTest {
 	@Test
 	void testFailUpdateUserIfNotFound() throws Exception {
 		String username = "user1123";
-		UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "laptophp", "user1@mail.com");
+		UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "user1@mail.com");
 
 		mockMvc.perform(put("/api/v1/user/" + username + "/profile")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -618,7 +618,7 @@ class IntegrationTest {
 	@Test
 	void testSuccessUpdateUser() throws Exception {
 		String username = "testingggg";
-		UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "useredit", "aaaaa@mail.com");
+		UpdateUserDto updateUserDto = new UpdateUserDto("user edit", "aaaaa@mail.com");
 
 		mockMvc.perform(put("/api/v1/user/" + username + "/profile")
 				.contentType(MediaType.APPLICATION_JSON)
