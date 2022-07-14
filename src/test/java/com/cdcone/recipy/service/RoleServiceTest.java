@@ -6,11 +6,12 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
+import com.cdcone.recipy.user.service.RoleService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import com.cdcone.recipy.entity.RoleEntity;
-import com.cdcone.recipy.repository.RoleDao;
+import com.cdcone.recipy.user.entity.RoleEntity;
+import com.cdcone.recipy.user.repository.RoleDao;
 
 public class RoleServiceTest {
 

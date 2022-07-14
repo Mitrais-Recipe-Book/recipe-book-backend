@@ -1,8 +1,9 @@
 package com.cdcone.recipy.service;
 
-import com.cdcone.recipy.dtoRequest.SignInDto;
-import com.cdcone.recipy.util.CustomUser;
-import com.cdcone.recipy.util.JwtUtil;
+import com.cdcone.recipy.user.dto.request.SignInRequestDto;
+import com.cdcone.recipy.user.service.AuthService;
+import com.cdcone.recipy.security.CustomUser;
+import com.cdcone.recipy.security.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,7 +32,7 @@ class AuthServiceTest {
 
     @Test
     void testFailToSignIn() {
-        SignInDto mockSignIn = mock(SignInDto.class);
+        SignInRequestDto mockSignIn = mock(SignInRequestDto.class);
         AuthenticationException authenticationException =
                 mock(AuthenticationException.class);
         when(authenticationManager
@@ -43,7 +44,7 @@ class AuthServiceTest {
 
     @Test
     void testSuccessSignIn() {
-        SignInDto mockSignIn = mock(SignInDto.class);
+        SignInRequestDto mockSignIn = mock(SignInRequestDto.class);
         Authentication mockAuth = mock(Authentication.class);
         CustomUser mockUser = mock(CustomUser.class);
         GrantedAuthority userAuthority = mock(GrantedAuthority.class);

@@ -1,38 +1,40 @@
 package com.cdcone.recipy.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import com.cdcone.recipy.dtoAccess.RecipeDtoList;
-import com.cdcone.recipy.dtoAccess.RecipeReactionDto;
-import com.cdcone.recipy.dtoAccess.RecipeReactionSummaryDto;
-import com.cdcone.recipy.dtoAccess.UserRecipeDto;
-import com.cdcone.recipy.dtoRequest.PaginatedDto;
-import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
-import com.cdcone.recipy.dtoRequest.RecipeReactionRequestDto;
-import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
-import com.cdcone.recipy.entity.*;
-import com.cdcone.recipy.repository.RecipeFavoriteRepository;
-import com.cdcone.recipy.repository.RecipeReactionRepository;
-import com.cdcone.recipy.repository.RecipeRepository;
-import com.cdcone.recipy.repository.UserDao;
+import com.cdcone.recipy.dto.response.PaginatedDto;
+import com.cdcone.recipy.recipe.dto.response.*;
+import com.cdcone.recipy.recipe.dto.request.*;
+import com.cdcone.recipy.recipe.entity.*;
+import com.cdcone.recipy.recipe.repository.RecipeFavoriteRepository;
+import com.cdcone.recipy.recipe.repository.RecipeReactionRepository;
+import com.cdcone.recipy.recipe.repository.RecipeRepository;
+import com.cdcone.recipy.user.repository.UserDao;
+import com.cdcone.recipy.recipe.service.RecipeService;
+import com.cdcone.recipy.recipe.service.TagService;
+import com.cdcone.recipy.user.entity.UserEntity;
+import com.cdcone.recipy.user.service.UserService;
 import com.cdcone.recipy.util.ImageUtil;
 
 import io.swagger.v3.core.util.Json;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 
@@ -48,8 +50,8 @@ public class RecipeServiceTest {
     private final UserService USER_SERVICE = mock(UserService.class);
     private final TagService TAG_SERVICE = mock(TagService.class);
 
-    private final RecipeDtoAdd ADD_RECIPE_DTO = mock(RecipeDtoAdd.class);
-    private final RecipeSearchDto RECIPE_SEARCH_DTO = mock(RecipeSearchDto.class);
+    private final RecipeAddRequestDto ADD_RECIPE_DTO = mock(RecipeAddRequestDto.class);
+    private final RecipeSearchRequestDto RECIPE_SEARCH_DTO = mock(RecipeSearchRequestDto.class);
 
     private final RecipeEntity RECIPE_ENTITY = mock(RecipeEntity.class);
 
@@ -185,7 +187,7 @@ public class RecipeServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     void getPopularRecipes() {
-        Set<RecipeDtoList> mockList = (Set<RecipeDtoList>) mock(Set.class);
+        Set<RecipeListResponseDto> mockList = (Set<RecipeListResponseDto>) mock(Set.class);
 
         when(RECIPE_REPOSITORY.getPopularRecipes()).thenReturn(mockList);
 
@@ -196,7 +198,7 @@ public class RecipeServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     void failedGetPopularRecipesNegativeNumber() {
-        Set<RecipeDtoList> mockList = (Set<RecipeDtoList>) mock(Set.class);
+        Set<RecipeListResponseDto> mockList = (Set<RecipeListResponseDto>) mock(Set.class);
 
         when(RECIPE_REPOSITORY.getPopularRecipes()).thenReturn(mockList);
 
@@ -207,7 +209,7 @@ public class RecipeServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     void getDiscoverRecipes() {
-        Set<RecipeDtoList> mockList = (Set<RecipeDtoList>) mock(Set.class);
+        Set<RecipeListResponseDto> mockList = (Set<RecipeListResponseDto>) mock(Set.class);
 
         when(RECIPE_REPOSITORY.getDiscoverRecipes()).thenReturn(mockList);
 
@@ -218,7 +220,7 @@ public class RecipeServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     void failedGetDiscoverRecipesNegativeNumber() {
-        Set<RecipeDtoList> mockList = (Set<RecipeDtoList>) mock(Set.class);
+        Set<RecipeListResponseDto> mockList = (Set<RecipeListResponseDto>) mock(Set.class);
 
         when(RECIPE_REPOSITORY.getDiscoverRecipes()).thenReturn(mockList);
 
@@ -268,10 +270,10 @@ public class RecipeServiceTest {
 
     @Test
     void successGetRecipesByUsername() {
-        UserRecipeDto mockRecipe = mock(UserRecipeDto.class);
-        UserRecipeDto mockRecipe2 = mock(UserRecipeDto.class);
+        UserRecipeResponseDto mockRecipe = mock(UserRecipeResponseDto.class);
+        UserRecipeResponseDto mockRecipe2 = mock(UserRecipeResponseDto.class);
 
-        Page<UserRecipeDto> mockResult = new PageImpl<>(
+        Page<UserRecipeResponseDto> mockResult = new PageImpl<>(
                 List.of(mockRecipe, mockRecipe2));
 
         when(mockRecipe.getAuthorName()).thenReturn("any user");
@@ -280,7 +282,7 @@ public class RecipeServiceTest {
                 .thenReturn(mockResult);
         when(TAG_SERVICE.getByRecipeId(any(Long.class))).thenReturn(Set.of());
 
-        PaginatedDto<UserRecipeDto> result = recipeService.getByUsername("any", 0, false);
+        PaginatedDto<UserRecipeResponseDto> result = recipeService.getByUsername("any", 0, false);
         assertEquals(2, result.getData().size());
         assertEquals(99, result.getData().get(0).getViewCount());
         assertEquals("any user", result.getData().get(0).getAuthorName());
@@ -303,9 +305,9 @@ public class RecipeServiceTest {
         recipe.setId(1L);
         recipe.setTitle("Recipe 1");
 
-        List<RecipeReactionDto> recipeReaction = List.of(
-                new RecipeReactionDto("LIKED", 10L),
-                new RecipeReactionDto("HAPPY", 2L));
+        List<RecipeUserReactionResponseDto> recipeReaction = List.of(
+                new RecipeUserReactionResponseDto("LIKED", 10L),
+                new RecipeUserReactionResponseDto("HAPPY", 2L));
 
         UserEntity user = new UserEntity();
         user.setId(10L);
@@ -323,7 +325,7 @@ public class RecipeServiceTest {
         when(USER_DAO.findByUsername("user1")).thenReturn(Optional.of(user));
         when(RECIPE_REACTION_REPOSITORY.findByRecipeIdAndUserId(1L, 10L)).thenReturn(reactionEntity);
 
-        Pair<String, RecipeReactionSummaryDto> result = recipeService.getRecipeReaction(1L, "user1");
+        Pair<String, RecipeReactionSummaryResponseDto> result = recipeService.getRecipeReaction(1L, "user1");
 
         assertEquals("success: data retrieved", result.getFirst());
         assertEquals("LIKED", result.getSecond().getUserReaction().getReaction());
@@ -415,5 +417,133 @@ public class RecipeServiceTest {
 
         assertEquals('f',
                 recipeService.addCommentToRecipe(1L, new CommentEntity()).charAt(0));
+    }
+
+    @Test
+    void successGetRecipeFavorite() {
+        UserEntity user = new UserEntity();
+        user.setId(10L);
+        user.setUsername("user1");
+
+        RecipeEntity recipe = new RecipeEntity();
+        recipe.setId(1L);
+        recipe.setTitle("Recipe 1");
+
+        RecipeFavoriteEntity recipeFavorite = new RecipeFavoriteEntity(user, recipe, LocalDateTime.now());
+
+        when(USER_DAO.findByUsername("user1")).thenReturn(Optional.of(user));
+        when(RECIPE_REPOSITORY.findById(1L)).thenReturn(Optional.of(recipe));
+        when(RECIPE_FAVORITE_REPOSITORY.findByRecipeIdAndUserId(recipe.getId(), user.getId())).thenReturn(Optional.of(recipeFavorite));
+
+        Pair<String, RecipeFavoriteResponseDto> result = recipeService.getRecipeFavorite(1L, "user1");
+
+        assertEquals("success: data retrieved", result.getFirst());
+        assertEquals(10L, result.getSecond().getUserId());
+        assertEquals(1L, result.getSecond().getRecipeId());
+        assertTrue(result.getSecond().isFavorited());
+
+        Json.prettyPrint(result.getSecond());
+
+    }
+
+    @Test
+    void successSaveRecipeFavorite() {
+        UserEntity user = new UserEntity();
+        user.setId(10L);
+        user.setUsername("user1");
+
+        RecipeEntity recipe = new RecipeEntity();
+        recipe.setId(1L);
+        recipe.setTitle("Recipe 1");
+
+        RecipeFavoriteEntity recipeFavorite = new RecipeFavoriteEntity(user, recipe, LocalDateTime.now());
+
+        when(USER_DAO.findByUsername("user1")).thenReturn(Optional.of(user));
+        when(RECIPE_REPOSITORY.findById(1L)).thenReturn(Optional.of(recipe));
+        when(RECIPE_FAVORITE_REPOSITORY.save(any(RecipeFavoriteEntity.class))).thenReturn(recipeFavorite);
+
+        Pair<String, RecipeFavoriteResponseDto> result = recipeService.saveRecipeFavorite(1L, new RecipeFavoriteRequestDto("user1"));
+
+        assertEquals("success: data saved", result.getFirst());
+        assertEquals(10L, result.getSecond().getUserId());
+        assertEquals(1L, result.getSecond().getRecipeId());
+        assertTrue(result.getSecond().isFavorited());
+
+        Json.prettyPrint(result.getSecond());
+    }
+
+    @Test
+    void successDeleteRecipeFavorite() {
+        UserEntity user = new UserEntity();
+        user.setId(10L);
+        user.setUsername("user1");
+
+        RecipeEntity recipe = new RecipeEntity();
+        recipe.setId(1L);
+        recipe.setTitle("Recipe 1");
+
+        RecipeFavoriteEntity recipeFavorite = new RecipeFavoriteEntity(user, recipe, LocalDateTime.now());
+
+        when(USER_DAO.findByUsername("user1")).thenReturn(Optional.of(user));
+        when(RECIPE_FAVORITE_REPOSITORY.findByRecipeIdAndUserId(recipe.getId(), user.getId())).thenReturn(Optional.of(recipeFavorite));
+
+        Pair<String, RecipeFavoriteResponseDto> result = recipeService.deleteRecipeFavorite(1L, new RecipeFavoriteRequestDto("user1"));
+
+        assertEquals("success: data deleted", result.getFirst());
+        assertEquals(10L, result.getSecond().getUserId());
+        assertEquals(1L, result.getSecond().getRecipeId());
+        assertFalse(result.getSecond().isFavorited());
+
+        Json.prettyPrint(result.getSecond());
+    }
+
+    @Test
+    void successGetUserFavoriteRecipes() {
+
+        UserEntity userCreator = new UserEntity();
+        userCreator.setId(20L);
+        userCreator.setUsername("user2");
+        userCreator.setFullName("USER TWO");
+
+        UserEntity userFavorite = new UserEntity();
+        userFavorite.setId(10L);
+        userFavorite.setUsername("user1");
+
+        RecipeEntity recipe = new RecipeEntity();
+        recipe.setId(1L);
+        recipe.setTitle("Recipe 1");
+        recipe.setOverview("Recipe 1 Overview");
+        recipe.setViews(10);
+        recipe.setDateCreated(LocalDate.now());
+        recipe.setTags(Set.of(new TagEntity("Lunch")));
+        recipe.setUser(userCreator);
+
+        RecipeEntity recipe2 = new RecipeEntity();
+        recipe2.setId(2L);
+        recipe2.setTitle("Recipe 2");
+        recipe2.setOverview("Recipe 2 Overview");
+        recipe2.setViews(20);
+        recipe2.setDateCreated(LocalDate.now());
+        recipe2.setTags(Set.of(new TagEntity("Lunch")));
+        recipe2.setUser(userCreator);
+
+        List<RecipeFavoriteEntity> recipesFavoriteAll = List.of(
+                new RecipeFavoriteEntity(userFavorite, recipe, LocalDateTime.now()), new RecipeFavoriteEntity(userFavorite, recipe2, LocalDateTime.now()));
+
+        when(USER_DAO.findByUsername("user1")).thenReturn(Optional.of(userFavorite));
+        when(RECIPE_FAVORITE_REPOSITORY.findByUserId(userFavorite.getId(), PageRequest.of(0, 10))).thenReturn(new PageImpl<>(recipesFavoriteAll));
+        when(RECIPE_FAVORITE_REPOSITORY.findByUserId(userFavorite.getId())).thenReturn(recipesFavoriteAll);
+
+        Pair<String, PaginatedDto<UserRecipeResponseDto>> result = recipeService.getUserFavoriteRecipes("user1", true, 0, 10);
+
+        assertEquals("success: data retrieved", result.getFirst());
+        assertEquals(2, result.getSecond().getTotalItem());
+        assertEquals(1, result.getSecond().getTotalPages());
+
+        Pair<String, PaginatedDto<UserRecipeResponseDto>> result2 = recipeService.getUserFavoriteRecipes("user1", false, 0, 0);
+
+        assertEquals("success: data retrieved", result2.getFirst());
+        assertEquals(2, result2.getSecond().getTotalItem());
+        assertEquals(1, result2.getSecond().getTotalPages());
     }
 }

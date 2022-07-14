@@ -1,9 +1,15 @@
 package com.cdcone.recipy;
 
-import com.cdcone.recipy.dtoRequest.*;
+import com.cdcone.recipy.recipe.dto.request.AddCommentRequestDto;
+import com.cdcone.recipy.recipe.dto.request.RecipeAddRequestDto;
+import com.cdcone.recipy.recipe.dto.request.RecipeFavoriteRequestDto;
+import com.cdcone.recipy.recipe.dto.request.RecipeReactionRequestDto;
+import com.cdcone.recipy.user.dto.request.UpdateUserRequestDto;
 import com.cdcone.recipy.util.ImageUtil;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -254,7 +260,7 @@ class IntegrationTest {
 
 	@Test
 	void testSuccessAddRecipe() throws Exception {
-		RecipeDtoAdd request = new RecipeDtoAdd();
+		RecipeAddRequestDto request = new RecipeAddRequestDto();
 		request.setTitle("Ayam Bakar");
 		request.setOverview("Ayam Bakar Madiun");
 		request.setTagIds(Set.of(1));
@@ -279,7 +285,7 @@ class IntegrationTest {
 	void testSuccessEditRecipe() throws Exception {
 		int recipeId = 1;
 
-		RecipeDtoAdd request = new RecipeDtoAdd();
+		RecipeAddRequestDto request = new RecipeAddRequestDto();
 		request.setTitle("Soto Goreng");
 		request.setOverview("Soto Goreng Merdeka");
 		request.setTagIds(Set.of(3));
@@ -506,7 +512,7 @@ class IntegrationTest {
 	@Test
 	void testSuccessAddComment() throws Exception {
 		String recipeId = "3";
-		AddCommentDto requestDto = new AddCommentDto("user1", "Horay!");
+		AddCommentRequestDto requestDto = new AddCommentRequestDto("user1", "Horay!");
 
 		String requestbody = om.writeValueAsString(requestDto);
 
@@ -523,7 +529,7 @@ class IntegrationTest {
 	@Test
 	void testFailedAddCommentRecipeNotFound() throws Exception {
 		String recipeId = "10";
-		AddCommentDto requestDto = new AddCommentDto("user1", "Horay!");
+		AddCommentRequestDto requestDto = new AddCommentRequestDto("user1", "Horay!");
 
 		String requestbody = om.writeValueAsString(requestDto);
 
@@ -540,7 +546,7 @@ class IntegrationTest {
 	@Test
 	void testFailedAddCommentUserNotFound() throws Exception {
 		String recipeId = "1";
-		AddCommentDto requestDto = new AddCommentDto("user50", "Horay!");
+		AddCommentRequestDto requestDto = new AddCommentRequestDto("user50", "Horay!");
 
 		String requestbody = om.writeValueAsString(requestDto);
 
@@ -558,7 +564,7 @@ class IntegrationTest {
 	@Test
 	void testFailedAddCommentUnpublishedRecipe() throws Exception {
 		String recipeId = "4";
-		AddCommentDto requestDto = new AddCommentDto("user1", "Horay!");
+		AddCommentRequestDto requestDto = new AddCommentRequestDto("user1", "Horay!");
 
 		String requestbody = om.writeValueAsString(requestDto);
 
@@ -575,7 +581,7 @@ class IntegrationTest {
 	@Test
 	void testFailedAddCommentNoCommentAttached() throws Exception {
 		String recipeId = "2";
-		AddCommentDto requestDto = new AddCommentDto("user1", "");
+		AddCommentRequestDto requestDto = new AddCommentRequestDto("user1", "");
 
 		String requestbody = om.writeValueAsString(requestDto);
 
@@ -592,20 +598,20 @@ class IntegrationTest {
 	@Test
 	void testFailUpdateUserIfAlreadyExist() throws Exception {
 		String username = "user1";
-		UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "laptophp", "user1@mail.com");
+		UpdateUserRequestDto updateUserDto = new UpdateUserRequestDto("laptoppp", "laptophp@gmail.com");
 
 		mockMvc.perform(put("/api/v1/user/" + username + "/profile")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(om.writeValueAsString(updateUserDto)))
 				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.message").value("Failed to update user. Username or email is already exists"))
+				.andExpect(jsonPath("$.message").value("Failed to update user. Email is already exists"))
 				.andReturn();
 	}
 
 	@Test
 	void testFailUpdateUserIfNotFound() throws Exception {
 		String username = "user1123";
-		UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "laptophp", "user1@mail.com");
+		UpdateUserRequestDto updateUserDto = new UpdateUserRequestDto("user 123", "user1@mail.com");
 
 		mockMvc.perform(put("/api/v1/user/" + username + "/profile")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -618,7 +624,7 @@ class IntegrationTest {
 	@Test
 	void testSuccessUpdateUser() throws Exception {
 		String username = "testingggg";
-		UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "useredit", "aaaaa@mail.com");
+		UpdateUserRequestDto updateUserDto = new UpdateUserRequestDto("user edit", "aaaaa@mail.com");
 
 		mockMvc.perform(put("/api/v1/user/" + username + "/profile")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -670,8 +676,7 @@ class IntegrationTest {
 		RecipeFavoriteRequestDto requestDto = new RecipeFavoriteRequestDto(username);
 
 		MvcResult mr = mockMvc.perform(get("/api/v1/recipe/" + recipeId + "/favorite")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(om.writeValueAsString(requestDto)))
+						.queryParam("username", username))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.message").value("success: data retrieved"))
 				.andReturn();
@@ -790,6 +795,14 @@ class IntegrationTest {
 				.andExpect(jsonPath("$.payload").isArray())
 				.andExpect(jsonPath("$.payload[0].name").value("breakfast"))
 				.andExpect(jsonPath("$.payload[0].views").value(4))
+				.andReturn();
+	}
+
+	@Test
+	void testSuccessGetAllUsers() throws Exception {
+		mockMvc.perform(get("/api/v1/user"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.payload.data").isArray())
 				.andReturn();
 	}
 }

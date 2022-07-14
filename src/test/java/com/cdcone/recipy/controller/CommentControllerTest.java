@@ -4,20 +4,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.cdcone.recipy.recipe.controller.CommentController;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 
-import com.cdcone.recipy.dtoAccess.CommentListDto;
-import com.cdcone.recipy.dtoRequest.AddCommentDto;
-import com.cdcone.recipy.service.CommentService;
+import com.cdcone.recipy.recipe.dto.response.CommentListResponseDto;
+import com.cdcone.recipy.recipe.dto.request.AddCommentRequestDto;
+import com.cdcone.recipy.recipe.service.CommentService;
 
 public class CommentControllerTest {
 
     private static final CommentService COMMENT_SERVICE = mock(CommentService.class);
-    private final AddCommentDto ADD_COMMENT_DTO = mock(AddCommentDto.class);
+    private final AddCommentRequestDto ADD_COMMENT_DTO = mock(AddCommentRequestDto.class);
 
     private static CommentController commentController;
 
@@ -47,7 +48,7 @@ public class CommentControllerTest {
     @Test
     @SuppressWarnings("unchecked")
     void getComment() {
-        Pair<String, Page<CommentListDto>> mockResult = Pair.of("success", mock(Page.class));
+        Pair<String, Page<CommentListResponseDto>> mockResult = Pair.of("success", mock(Page.class));
 
         when(COMMENT_SERVICE.getComment(1L, 0)).thenReturn(mockResult);
 
@@ -57,7 +58,7 @@ public class CommentControllerTest {
     @Test
     @SuppressWarnings("unchecked")
     void failGetComment() {
-        Pair<String, Page<CommentListDto>> mockResult = Pair.of("failed", mock(Page.class));
+        Pair<String, Page<CommentListResponseDto>> mockResult = Pair.of("failed", mock(Page.class));
 
         when(COMMENT_SERVICE.getComment(1L, 0)).thenReturn(mockResult);
 
