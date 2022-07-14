@@ -167,8 +167,10 @@ public class UserController {
     public ResponseEntity<CommonResponse> removeRole(@PathVariable(name = "username") String username,
             @PathVariable(name = "role") String rolename) {
         try {
-            userService.removeRole(username, rolename);
-            return ResponseEntity.ok(new CommonResponse("success"));
+            
+            UserResponseDto dto = UserResponseDto.toDto(userService.removeRole(username, rolename));
+            return ResponseEntity.ok(new CommonResponse("success", dto));
+
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new CommonResponse(e.getMessage()));
         }

@@ -258,7 +258,7 @@ public class UserService implements UserDetailsService {
         return "success: " + username + " adding " + rolename;
     }
 
-    public void removeRole(String username, String rolename) throws NullPointerException {
+    public UserEntity removeRole(String username, String rolename) throws NullPointerException {
         Pair<String, RoleEntity> role = roleService.getByName(rolename);
         Pair<String, UserEntity> user = getByUsername(username);
 
@@ -270,7 +270,7 @@ public class UserService implements UserDetailsService {
         }
 
         user.getSecond().getRoles().remove(role.getSecond());
-        userDao.save(user.getSecond());
+        return userDao.save(user.getSecond());        
     }
 
     public Pair<HttpStatus, Optional<UserResponseDto>> updateUser(String username, UpdateUserRequestDto updateUserDto) {

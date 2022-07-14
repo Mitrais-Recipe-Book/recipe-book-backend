@@ -390,7 +390,9 @@ class UserServiceTest {
 
         when(ROLE_SERVICE.getByName("rolename")).thenReturn(mockRole);
         when(userRepo.findByUsername("username")).thenReturn(Optional.of(mockUser));
+        when(userRepo.save(mockUser)).thenReturn(mockUser);
 
         assertDoesNotThrow(() -> userService.removeRole("username", "rolename"));
+        assertEquals(mockUser, userService.removeRole("username", "rolename"));
     }
 }
