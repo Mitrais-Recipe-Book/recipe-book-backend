@@ -142,32 +142,46 @@ public class UserController {
 
     @PostMapping("{username}/request-creator")
     public ResponseEntity<CommonResponse> requestCreatorRole(@PathVariable(name = "username") String username) {
-        String result = userService.assignRole(username, "Request");
+        try {
+            UserResponseDto dto = UserResponseDto.toDto(userService.assignRole(username, "Request"));
+            return ResponseEntity.ok(new CommonResponse("success", dto));
 
-        if (result.charAt(0) == 's') {
-            return ResponseEntity.ok(new CommonResponse(result));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new CommonResponse(e.getMessage()));
         }
+    }
 
-        return ResponseEntity.badRequest().body(new CommonResponse(result));
+    @PutMapping("{username}/approve-{role}")
+    public ResponseEntity<CommonResponse> approveRequestedRole(@PathVariable(name = "username") String username,
+            @PathVariable(name = "role") String rolename) {
+        try {
+            userService.removeRole(username, "Request");
+            UserResponseDto dto = UserResponseDto.toDto(userService.assignRole(username, rolename));
+            return ResponseEntity.ok(new CommonResponse("success", dto));
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new CommonResponse(e.getMessage()));
+        }
     }
 
     @PostMapping("{username}/assign-{role}")
     public ResponseEntity<CommonResponse> assignRole(@PathVariable(name = "username") String username,
             @PathVariable(name = "role") String rolename) {
-        String result = userService.assignRole(username, rolename);
 
-        if (result.charAt(0) == 's') {
-            return ResponseEntity.ok(new CommonResponse(result));
+        try {
+            UserResponseDto dto = UserResponseDto.toDto(userService.assignRole(username, rolename));
+            return ResponseEntity.ok(new CommonResponse("success", dto));
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new CommonResponse(e.getMessage()));
         }
-
-        return ResponseEntity.badRequest().body(new CommonResponse(result));
     }
 
     @DeleteMapping("{username}/remove-{role}")
     public ResponseEntity<CommonResponse> removeRole(@PathVariable(name = "username") String username,
             @PathVariable(name = "role") String rolename) {
         try {
-            
+
             UserResponseDto dto = UserResponseDto.toDto(userService.removeRole(username, rolename));
             return ResponseEntity.ok(new CommonResponse("success", dto));
 

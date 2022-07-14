@@ -241,21 +241,19 @@ public class UserService implements UserDetailsService {
         return userDao.isFollowing(creatorId, userId);
     }
 
-    public String assignRole(String username, String rolename) {
+    public UserEntity assignRole(String username, String rolename) throws NullPointerException {
         Pair<String, RoleEntity> role = roleService.getByName(rolename);
         Pair<String, UserEntity> user = getByUsername(username);
 
         if (role.getFirst().charAt(0) == 'f') {
-            return role.getFirst();
+            throw new NullPointerException("failed: " + rolename + " not found");
         }
         if (user.getFirst().charAt(0) == 'f') {
-            return user.getFirst();
+            throw new NullPointerException("failed: " + username + " not found");
         }
 
         user.getSecond().getRoles().add(role.getSecond());
-        userDao.save(user.getSecond());
-
-        return "success: " + username + " adding " + rolename;
+        return userDao.save(user.getSecond());
     }
 
     public UserEntity removeRole(String username, String rolename) throws NullPointerException {
@@ -270,7 +268,7 @@ public class UserService implements UserDetailsService {
         }
 
         user.getSecond().getRoles().remove(role.getSecond());
-        return userDao.save(user.getSecond());        
+        return userDao.save(user.getSecond());
     }
 
     public Pair<HttpStatus, Optional<UserResponseDto>> updateUser(String username, UpdateUserRequestDto updateUserDto) {
