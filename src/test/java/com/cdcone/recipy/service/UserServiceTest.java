@@ -4,6 +4,7 @@ import com.cdcone.recipy.user.dto.repository.FollowerDto;
 import com.cdcone.recipy.recipe.dto.response.FollowingListResponseDto;
 import com.cdcone.recipy.dto.response.PhotoResponseDto;
 import com.cdcone.recipy.dto.response.PaginatedDto;
+import com.cdcone.recipy.user.dto.request.ChangePasswordRequestDto;
 import com.cdcone.recipy.user.dto.request.SignUpRequestDto;
 import com.cdcone.recipy.user.dto.request.UpdateUserRequestDto;
 import com.cdcone.recipy.user.dto.repository.UserProfile;
@@ -12,6 +13,7 @@ import com.cdcone.recipy.user.entity.RoleEntity;
 import com.cdcone.recipy.user.entity.UserEntity;
 import com.cdcone.recipy.recipe.repository.RecipeReactionRepository;
 import com.cdcone.recipy.recipe.repository.RecipeRepository;
+import com.cdcone.recipy.error.PasswordNotMatchException;
 import com.cdcone.recipy.user.repository.RoleDao;
 import com.cdcone.recipy.user.repository.UserDao;
 import com.cdcone.recipy.user.service.RoleService;
@@ -268,6 +270,7 @@ class UserServiceTest {
 
     @Test
     void testSuccessAddFollow() throws Exception {
+        reset(userRepo);
         when(userRepo.findById(2L)).thenReturn(Optional.of(creator));
         when(userRepo.findById(1L)).thenReturn(Optional.of(follower1));
         when(creator.getFollows()).thenReturn(Set.of());
@@ -276,7 +279,6 @@ class UserServiceTest {
 
         verify(follower1).setFollows(anySet());
         verify(userRepo).save(follower1);
-        reset(userRepo);
     }
 
     @Test
@@ -377,6 +379,7 @@ class UserServiceTest {
 
     @Test
     void testSuccessUpdateUser() {
+        reset(userRepo);
         UpdateUserRequestDto updateUserDto = new UpdateUserRequestDto("user 123", "user1@mail.com");
         when(userRepo.findByUsername("user1")).thenReturn(Optional.of(follower1));
 
@@ -384,7 +387,6 @@ class UserServiceTest {
 
         verify(userRepo).save(any(UserEntity.class));
         assertEquals(HttpStatus.OK, result.getFirst());
-        reset(userRepo);
     }
 
     @Test
@@ -398,5 +400,69 @@ class UserServiceTest {
 
         assertDoesNotThrow(() -> userService.removeRole("username", "rolename"));
         assertEquals(mockUser, userService.removeRole("username", "rolename"));
+    }
+
+    //method_will<expectedResult>_when<params>
+    @Test
+    void changePassword_willThrowError_whenOldPasswordNotMatch() {
+        String username = "user1";
+        String oldPassword = "old_password";
+        String newPassword = "new_password";
+        String confirmPassword = "new_password";
+
+        ChangePasswordRequestDto requestBody =
+                new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
+        UserEntity mockUser = mock(UserEntity.class);
+        when(mockUser.getPassword()).thenReturn("original_password");
+        when(userRepo.findByUsername(username)).thenReturn(Optional.of(mockUser));
+
+        PasswordNotMatchException result = assertThrows(PasswordNotMatchException.class,
+                () -> userService.changePassword(username, requestBody));
+
+        assertEquals("Password does not match.", result.getMessage());
+    }
+
+    @Test
+    void changePassword_willThrowError_whenConfirmPasswordNotMatch() {
+        String username = "user1";
+        String oldPassword = "original_password";
+        String newPassword = "new_password";
+        String confirmPassword = "confirm_password";
+
+        UserEntity mockUser = mock(UserEntity.class);
+        ChangePasswordRequestDto requestBody =
+                new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
+        when(mockUser.getPassword()).thenReturn("original_password");
+        when(userRepo.findByUsername(username)).thenReturn(Optional.of(mockUser));
+
+        PasswordNotMatchException result = assertThrows(PasswordNotMatchException.class,
+                () -> userService.changePassword(username, requestBody));
+
+        assertEquals("Password does not match.", result.getMessage());
+    }
+
+    @Test
+    void changePassword_willReturnUserResponseDto_whenPasswordMatch() {
+        String username = "user1";
+        String originalPassword = "original_password";
+        String oldPassword = "original_password";
+        String newPassword = "new_password";
+        String confirmPassword = "new_password";
+        String email = "user1@mail.com";
+
+        ChangePasswordRequestDto requestBody =
+                new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
+        UserEntity mockUser = new UserEntity(email, username, originalPassword, "user 1");
+        mockUser.setId(11L);
+        mockUser.setRoles(Set.of(userRole));
+
+        when(userRepo.findByUsername(username)).thenReturn(Optional.of(mockUser));
+
+        UserResponseDto result = userService
+                .changePassword(username, requestBody);
+
+        assertNotNull(result);
+        verify(userRepo).save(mockUser);
+        assertEquals("user1@mail.com", result.getEmail());
     }
 }

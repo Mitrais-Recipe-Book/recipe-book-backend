@@ -1,19 +1,23 @@
 package com.cdcone.recipy.user.entity;
 
 import com.cdcone.recipy.recipe.entity.RecipeEntity;
-import lombok.Data;
 
 import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.Type;
 
 import java.util.List;
 import java.util.Set;
 
-@Data
-@Entity()
+@Setter
+@Getter
+@Entity
+@NoArgsConstructor
 @Table(name = "users")
 public class UserEntity {
 
@@ -59,4 +63,11 @@ public class UserEntity {
         inverseJoinColumns = @JoinColumn(name = "creator_id", referencedColumnName = "id")
     )
     private Set<UserEntity> follows;
+
+    public UserEntity(String email, String username, String password, String fullName) {
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.fullName = fullName;
+    }
 }

@@ -6,6 +6,7 @@ import com.cdcone.recipy.dto.response.PhotoResponseDto;
 import com.cdcone.recipy.recipe.dto.response.UserRecipeResponseDto;
 import com.cdcone.recipy.dto.response.PaginatedDto;
 import com.cdcone.recipy.user.dto.repository.UserProfile;
+import com.cdcone.recipy.user.dto.request.ChangePasswordRequestDto;
 import com.cdcone.recipy.user.dto.request.FollowUserRequestDto;
 import com.cdcone.recipy.user.dto.request.UpdateUserRequestDto;
 import com.cdcone.recipy.user.dto.response.UserResponseDto;
@@ -234,5 +235,14 @@ public class UserController {
             return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), result.getSecond()));
         }
         return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
+    }
+
+    @PutMapping("{username}/profile/change-password")
+    public ResponseEntity<CommonResponse> changePassword(
+            @PathVariable("username") String username,
+            @RequestBody ChangePasswordRequestDto changePasswordRequestDto) {
+        UserResponseDto userResponseDto = userService
+                .changePassword(username, changePasswordRequestDto);
+        return ResponseEntity.ok(new CommonResponse(userResponseDto));
     }
 }

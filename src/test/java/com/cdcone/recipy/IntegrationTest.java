@@ -4,6 +4,7 @@ import com.cdcone.recipy.recipe.dto.request.AddCommentRequestDto;
 import com.cdcone.recipy.recipe.dto.request.RecipeAddRequestDto;
 import com.cdcone.recipy.recipe.dto.request.RecipeFavoriteRequestDto;
 import com.cdcone.recipy.recipe.dto.request.RecipeReactionRequestDto;
+import com.cdcone.recipy.user.dto.request.ChangePasswordRequestDto;
 import com.cdcone.recipy.user.dto.request.UpdateUserRequestDto;
 import com.cdcone.recipy.util.ImageUtil;
 
@@ -803,6 +804,53 @@ class IntegrationTest {
 		mockMvc.perform(get("/api/v1/user"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.payload.data").isArray())
+				.andReturn();
+	}
+
+	@Test
+	void changePassword_willReturnBadRequest_whenOldPasswordNotMatch() throws Exception {
+		String username = "user1";
+		String oldPassword = "wrong_old_password";
+		String newPassword = "new_password";
+		ChangePasswordRequestDto requestDto =
+				new ChangePasswordRequestDto(oldPassword, newPassword, newPassword);
+
+		mockMvc.perform(put("/api/v1/user/" + username + "/profile/change-password")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(om.writeValueAsBytes(requestDto)))
+				.andExpect(status().isBadRequest())
+				.andReturn();
+	}
+
+	@Test
+	void changePassword_willReturnBadRequest_whenConfirmPasswordNotMatch() throws Exception {
+		String username = "user1";
+		String oldPassword = "user123";
+		String newPassword = "new_password";
+		String confirmPassword = "confirm_password";
+		ChangePasswordRequestDto requestDto =
+				new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
+
+		mockMvc.perform(put("/api/v1/user/" + username + "/profile/change-password")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(om.writeValueAsBytes(requestDto)))
+				.andExpect(status().isBadRequest())
+				.andReturn();
+	}
+
+	@Test
+	void changePassword_willReturnOk_whenPasswordMatch() throws Exception {
+		String username = "user1";
+		String oldPassword = "user123";
+		String newPassword = "new_password";
+		String confirmPassword = "new_password";
+		ChangePasswordRequestDto requestDto =
+				new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
+
+		mockMvc.perform(put("/api/v1/user/" + username + "/profile/change-password")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(om.writeValueAsBytes(requestDto)))
+				.andExpect(status().isBadRequest())
 				.andReturn();
 	}
 }
