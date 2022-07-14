@@ -1,23 +1,28 @@
 package com.cdcone.recipy.service;
 
-import com.cdcone.recipy.dtoAccess.*;
-import com.cdcone.recipy.dtoRequest.PaginatedDto;
-import com.cdcone.recipy.dtoRequest.SignUpDto;
-import com.cdcone.recipy.dtoRequest.UpdateUserDto;
-import com.cdcone.recipy.entity.RoleEntity;
-import com.cdcone.recipy.entity.UserEntity;
-import com.cdcone.recipy.repository.RecipeReactionRepository;
-import com.cdcone.recipy.repository.RecipeRepository;
-import com.cdcone.recipy.repository.RoleDao;
-import com.cdcone.recipy.repository.UserDao;
-import com.cdcone.recipy.util.CustomUser;
+import com.cdcone.recipy.user.dto.repository.FollowerDto;
+import com.cdcone.recipy.recipe.dto.response.FollowingListResponseDto;
+import com.cdcone.recipy.dto.response.PhotoResponseDto;
+import com.cdcone.recipy.dto.response.PaginatedDto;
+import com.cdcone.recipy.user.dto.request.SignUpRequestDto;
+import com.cdcone.recipy.user.dto.request.UpdateUserRequestDto;
+import com.cdcone.recipy.user.dto.repository.UserProfile;
+import com.cdcone.recipy.user.dto.response.UserResponseDto;
+import com.cdcone.recipy.user.entity.RoleEntity;
+import com.cdcone.recipy.user.entity.UserEntity;
+import com.cdcone.recipy.recipe.repository.RecipeReactionRepository;
+import com.cdcone.recipy.recipe.repository.RecipeRepository;
+import com.cdcone.recipy.user.repository.RoleDao;
+import com.cdcone.recipy.user.repository.UserDao;
+import com.cdcone.recipy.user.service.RoleService;
+import com.cdcone.recipy.user.service.UserService;
+import com.cdcone.recipy.security.CustomUser;
 import com.cdcone.recipy.util.ImageUtil;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
@@ -42,7 +47,7 @@ class UserServiceTest {
     private static final RecipeReactionRepository reactionRepo = mock(RecipeReactionRepository.class);
     private static final RecipeRepository recipeRepo = mock(RecipeRepository.class);
     private static final RoleEntity userRole = mock(RoleEntity.class);
-    private static final SignUpDto signUpDto = mock(SignUpDto.class);
+    private static final SignUpRequestDto SIGN_UP_REQUEST_DTO = mock(SignUpRequestDto.class);
     private static final UserEntity creator = mock(UserEntity.class);
     private static final UserEntity follower1 = mock(UserEntity.class);
     private static UserService userService;
@@ -53,9 +58,9 @@ class UserServiceTest {
         userService = new UserService(userRepo, ROLE_SERVICE, roleRepo,
                 reactionRepo, recipeRepo, new BCryptPasswordEncoder());
 
-        when(signUpDto.getEmail()).thenReturn("test@mail.com");
-        when(signUpDto.getUsername()).thenReturn("test");
-        when(signUpDto.getFullName()).thenReturn("test test");
+        when(SIGN_UP_REQUEST_DTO.getEmail()).thenReturn("test@mail.com");
+        when(SIGN_UP_REQUEST_DTO.getUsername()).thenReturn("test");
+        when(SIGN_UP_REQUEST_DTO.getFullName()).thenReturn("test test");
         when(follower1.getUsername()).thenReturn("follower1");
         when(follower1.getFullName()).thenReturn("Follower 1");
         when(userRole.getId()).thenReturn(1L);
@@ -65,10 +70,10 @@ class UserServiceTest {
     @Test
     void testSuccessAddUser() {
         UserEntity mockUser = mock(UserEntity.class);
-        when(signUpDto.getPassword()).thenReturn("password");
+        when(SIGN_UP_REQUEST_DTO.getPassword()).thenReturn("password");
         when(roleRepo.findByName("User")).thenReturn(Optional.of(userRole));
         when(userRepo.save(any(UserEntity.class))).thenReturn(mockUser);
-        Pair<Optional<UserDto>, String> addUserSuccess = userService.addUser(signUpDto);
+        Pair<Optional<UserResponseDto>, String> addUserSuccess = userService.addUser(SIGN_UP_REQUEST_DTO);
         verify(userRepo).save(any(UserEntity.class));
         assertEquals("Success", addUserSuccess.getSecond());
     }
@@ -76,18 +81,18 @@ class UserServiceTest {
     @Test
     void testFailToAddUserIfPasswordLessThanSixCharacters() {
         UserEntity mockUser = mock(UserEntity.class);
-        when(signUpDto.getPassword()).thenReturn("s");
+        when(SIGN_UP_REQUEST_DTO.getPassword()).thenReturn("s");
         when(userRepo.save(any(UserEntity.class))).thenReturn(mockUser);
-        Pair<Optional<UserDto>, String> addUserFailed = userService.addUser(signUpDto);
+        Pair<Optional<UserResponseDto>, String> addUserFailed = userService.addUser(SIGN_UP_REQUEST_DTO);
         assertEquals("Password must be equal or more than 8 characters", addUserFailed.getSecond());
     }
 
     @Test
     void testFailToAddUserIfUsernameAlreadyExists() {
-        when(signUpDto.getPassword()).thenReturn("password");
+        when(SIGN_UP_REQUEST_DTO.getPassword()).thenReturn("password");
         when(roleRepo.findByName("User")).thenReturn(Optional.of(userRole));
         when(userRepo.save(any())).thenThrow(DataIntegrityViolationException.class);
-        Pair<Optional<UserDto>, String> addUserFailed = userService.addUser(signUpDto);
+        Pair<Optional<UserResponseDto>, String> addUserFailed = userService.addUser(SIGN_UP_REQUEST_DTO);
         assertEquals("Failed to create user. Username or email is already exists",
                 addUserFailed.getSecond());
         reset(userRepo);
@@ -96,10 +101,10 @@ class UserServiceTest {
     @Test
     void testFailToAddUserIfRoleUserIsNotPresent() {
         UserEntity mockUser = mock(UserEntity.class);
-        when(signUpDto.getPassword()).thenReturn("password");
+        when(SIGN_UP_REQUEST_DTO.getPassword()).thenReturn("password");
         when(roleRepo.findByName("User")).thenReturn(Optional.empty());
         when(userRepo.save(any(UserEntity.class))).thenReturn(mockUser);
-        Pair<Optional<UserDto>, String> addUserFailed = userService.addUser(signUpDto);
+        Pair<Optional<UserResponseDto>, String> addUserFailed = userService.addUser(SIGN_UP_REQUEST_DTO);
         assertEquals("Role User not found", addUserFailed.getSecond());
     }
 
@@ -190,7 +195,7 @@ class UserServiceTest {
         Page<UserEntity> mockResult = new PageImpl<>(List.of(mockUser));
         when(userRepo.findAllPaged(any(Pageable.class))).thenReturn(mockResult);
 
-        PaginatedDto<UserDto> allUsers = userService.getAllUsers(false, 0, 0);
+        PaginatedDto<UserResponseDto> allUsers = userService.getAllUsers(false, 0, 0);
         assertEquals(1, allUsers.getTotalPages());
         assertEquals(1, allUsers.getData().size());
         assertEquals("user", allUsers.getData().get(0).getUsername());
@@ -202,7 +207,7 @@ class UserServiceTest {
         when(userRepo.findById(1L)).thenReturn(Optional.of(mockUser));
         when(mockUser.getFollows()).thenReturn(Set.of(follower1));
 
-        List<FollowingListDto> followList = userService.getFollowList(1L);
+        List<FollowingListResponseDto> followList = userService.getFollowList(1L);
 
         assertEquals(1, followList.size());
         assertEquals("follower1", followList.get(0).getUsername());
@@ -254,9 +259,9 @@ class UserServiceTest {
     @Test
     void testSuccessGetUserPhoto() {
         byte[] photo = new byte[] { 80 };
-        PhotoDto mockPhoto = new PhotoDto("PNG", photo);
+        PhotoResponseDto mockPhoto = new PhotoResponseDto("PNG", photo);
         when(userRepo.getProfilePhoto("user")).thenReturn(mockPhoto);
-        PhotoDto userPhoto = userService.getUserPhoto("user");
+        PhotoResponseDto userPhoto = userService.getUserPhoto("user");
         assertEquals("PNG", userPhoto.getType());
         assertEquals(photo, userPhoto.getPhoto());
     }
@@ -348,29 +353,29 @@ class UserServiceTest {
         String username = "user1";
         when(userRepo.findByUsername(username)).thenReturn(Optional.empty());
 
-        Pair<HttpStatus, Optional<UserDto>> result = userService.updateUser(username, mock(UpdateUserDto.class));
+        Pair<HttpStatus, Optional<UserResponseDto>> result = userService.updateUser(username, mock(UpdateUserRequestDto.class));
 
         assertEquals(HttpStatus.NOT_FOUND, result.getFirst());
     }
 
     @Test
     void testFailUpdateUserIfAlreadyExist() {
-        UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "user1@mail.com");
+        UpdateUserRequestDto updateUserDto = new UpdateUserRequestDto("user 123", "user1@mail.com");
         when(userRepo.findByUsername("user1")).thenReturn(Optional.of(follower1));
         when(userRepo.save(any(UserEntity.class)))
                 .thenThrow(DataIntegrityViolationException.class);
 
-        Pair<HttpStatus, Optional<UserDto>> result = userService.updateUser("user1", updateUserDto);
+        Pair<HttpStatus, Optional<UserResponseDto>> result = userService.updateUser("user1", updateUserDto);
 
         assertEquals(HttpStatus.BAD_REQUEST, result.getFirst());
     }
 
     @Test
     void testSuccessUpdateUser() {
-        UpdateUserDto updateUserDto = new UpdateUserDto("user 123", "user1@mail.com");
+        UpdateUserRequestDto updateUserDto = new UpdateUserRequestDto("user 123", "user1@mail.com");
         when(userRepo.findByUsername("user1")).thenReturn(Optional.of(follower1));
 
-        Pair<HttpStatus, Optional<UserDto>> result = userService.updateUser("user1", updateUserDto);
+        Pair<HttpStatus, Optional<UserResponseDto>> result = userService.updateUser("user1", updateUserDto);
 
         verify(userRepo).save(any(UserEntity.class));
         assertEquals(HttpStatus.OK, result.getFirst());

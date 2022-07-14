@@ -7,12 +7,13 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
+import com.cdcone.recipy.user.controller.RolesController;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import com.cdcone.recipy.entity.RoleEntity;
-import com.cdcone.recipy.service.RoleService;
+import com.cdcone.recipy.user.entity.RoleEntity;
+import com.cdcone.recipy.user.service.RoleService;
 
 public class RoleControllerTest {
 

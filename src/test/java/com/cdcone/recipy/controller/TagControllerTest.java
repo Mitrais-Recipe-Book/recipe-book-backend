@@ -8,21 +8,22 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Map;
 
+import com.cdcone.recipy.recipe.controller.TagController;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 
-import com.cdcone.recipy.dtoRequest.EditTagDto;
-import com.cdcone.recipy.entity.TagEntity;
-import com.cdcone.recipy.service.TagService;
+import com.cdcone.recipy.recipe.dto.request.EditTagRequestDto;
+import com.cdcone.recipy.recipe.entity.TagEntity;
+import com.cdcone.recipy.recipe.service.TagService;
 
 
 public class TagControllerTest {
     private static final TagService TAG_SERVICE = mock(TagService.class);
 
     private static final TagEntity TAG_ENTITY = mock(TagEntity.class);
-    private static final EditTagDto EDIT_TAG_DTO = mock(EditTagDto.class);
+    private static final EditTagRequestDto EDIT_TAG_DTO = mock(EditTagRequestDto.class);
 
     private static TagController tagController;
     

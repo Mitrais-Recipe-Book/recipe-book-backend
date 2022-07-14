@@ -1,8 +1,9 @@
 package com.cdcone.recipy.service;
 
-import com.cdcone.recipy.dtoAccess.TagDtoAdmin;
-import com.cdcone.recipy.entity.TagEntity;
-import com.cdcone.recipy.repository.TagDao;
+import com.cdcone.recipy.recipe.dto.response.TagAdminResponseDto;
+import com.cdcone.recipy.recipe.entity.TagEntity;
+import com.cdcone.recipy.recipe.repository.TagDao;
+import com.cdcone.recipy.recipe.service.TagService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -175,11 +176,11 @@ class TagServiceTest {
 
     @Test
     void testSuccessGetAllTagAdmin() {
-        TagDtoAdmin tag1 = mock(TagDtoAdmin.class);
-        TagDtoAdmin tag2 = mock(TagDtoAdmin.class);
+        TagAdminResponseDto tag1 = mock(TagAdminResponseDto.class);
+        TagAdminResponseDto tag2 = mock(TagAdminResponseDto.class);
         when(tagDao.findAllViewCount()).thenReturn(Set.of(tag1, tag2));
 
-        Set<TagDtoAdmin> result = tagService.getAllTagsView();
+        Set<TagAdminResponseDto> result = tagService.getAllTagsView();
         assertEquals(2, result.size());
     }
 }

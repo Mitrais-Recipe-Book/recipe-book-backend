@@ -8,24 +8,25 @@ import static org.mockito.Mockito.when;
 import java.util.Map;
 import java.util.Optional;
 
+import com.cdcone.recipy.user.controller.AuthController;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 
-import com.cdcone.recipy.dtoAccess.UserDto;
-import com.cdcone.recipy.dtoRequest.SignInDto;
-import com.cdcone.recipy.dtoRequest.SignUpDto;
-import com.cdcone.recipy.service.AuthService;
-import com.cdcone.recipy.service.UserService;
+import com.cdcone.recipy.user.dto.response.UserResponseDto;
+import com.cdcone.recipy.user.dto.request.SignInRequestDto;
+import com.cdcone.recipy.user.dto.request.SignUpRequestDto;
+import com.cdcone.recipy.user.service.AuthService;
+import com.cdcone.recipy.user.service.UserService;
 
 public class AuthControllerTest {
 
     private static final UserService USER_SERVICE = mock(UserService.class);
     private static final AuthService AUTH_SERVICE = mock(AuthService.class);
 
-    private static final SignUpDto SIGN_UP_DTO = mock(SignUpDto.class);
-    private static final SignInDto SIGN_IN_DTO = mock(SignInDto.class);
+    private static final SignUpRequestDto SIGN_UP_DTO = mock(SignUpRequestDto.class);
+    private static final SignInRequestDto SIGN_IN_DTO = mock(SignInRequestDto.class);
 
     private static AuthController authController;
 
@@ -37,7 +38,7 @@ public class AuthControllerTest {
 
     @Test
     void signUp() {
-        Pair<Optional<UserDto>, String> mockResult = Pair.of(Optional.of(mock(UserDto.class)), "any");
+        Pair<Optional<UserResponseDto>, String> mockResult = Pair.of(Optional.of(mock(UserResponseDto.class)), "any");
 
         when(USER_SERVICE.addUser(SIGN_UP_DTO))
                 .thenReturn(mockResult);
@@ -47,7 +48,7 @@ public class AuthControllerTest {
 
     @Test
     void failedSignUp() {
-        Pair<Optional<UserDto>, String> mockResult = Pair.of(Optional.empty(), "any");
+        Pair<Optional<UserResponseDto>, String> mockResult = Pair.of(Optional.empty(), "any");
 
         when(USER_SERVICE.addUser(SIGN_UP_DTO))
                 .thenReturn(mockResult);
