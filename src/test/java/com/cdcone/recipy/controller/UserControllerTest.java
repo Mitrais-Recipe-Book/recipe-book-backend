@@ -37,243 +37,243 @@ import com.cdcone.recipy.util.ImageUtil;
 
 public class UserControllerTest {
 
-        private static final UserProfile USER_PROFILE = mock(UserProfile.class);
+    private static final UserProfile USER_PROFILE = mock(UserProfile.class);
 
-        private static final UserService USER_SERVICE = mock(UserService.class);
-        private static final RecipeService RECIPE_SERVICE = mock(RecipeService.class);
+    private static final UserService USER_SERVICE = mock(UserService.class);
+    private static final RecipeService RECIPE_SERVICE = mock(RecipeService.class);
 
-        private static UserController userController;
+    private static UserController userController;
 
-        @BeforeAll
-        static void init() {
-                userController = new UserController(USER_SERVICE, RECIPE_SERVICE);
-        }
+    @BeforeAll
+    static void init() {
+        userController = new UserController(USER_SERVICE, RECIPE_SERVICE);
+    }
 
-        @Test
-        void getByUsername() {
-                Optional<UserProfile> mockResult = Optional.of(USER_PROFILE);
+    @Test
+    void getByUsername() {
+        Optional<UserProfile> mockResult = Optional.of(USER_PROFILE);
 
-                when(USER_SERVICE.findByUsername("any"))
-                                .thenReturn(mockResult);
+        when(USER_SERVICE.findByUsername("any"))
+                .thenReturn(mockResult);
 
-                assertEquals(HttpStatus.OK,
-                                userController.getByUsername("any").getStatusCode());
-        }
+        assertEquals(HttpStatus.OK,
+                userController.getByUsername("any").getStatusCode());
+    }
 
-        @Test
-        void failGetByUsername() {
-                Optional<UserProfile> mockResult = Optional.empty();
+    @Test
+    void failGetByUsername() {
+        Optional<UserProfile> mockResult = Optional.empty();
 
-                when(USER_SERVICE.findByUsername("any"))
-                                .thenReturn(mockResult);
+        when(USER_SERVICE.findByUsername("any"))
+                .thenReturn(mockResult);
 
-                assertNotEquals(HttpStatus.OK,
-                                userController.getByUsername("any").getStatusCode());
-        }
+        assertNotEquals(HttpStatus.OK,
+                userController.getByUsername("any").getStatusCode());
+    }
 
-        @Test
-        void getProfilePhoto() throws IOException {
-                PhotoResponseDto mockResult = mock(PhotoResponseDto.class);
+    @Test
+    void getProfilePhoto() throws IOException {
+        PhotoResponseDto mockResult = mock(PhotoResponseDto.class);
 
-                when(mockResult.getPhoto()).thenReturn(ImageUtil.randomImage());
-                when(mockResult.getType()).thenReturn("image/png");
-                when(USER_SERVICE.getUserPhoto("any")).thenReturn(mockResult);
+        when(mockResult.getPhoto()).thenReturn(ImageUtil.randomImage());
+        when(mockResult.getType()).thenReturn("image/png");
+        when(USER_SERVICE.getUserPhoto("any")).thenReturn(mockResult);
 
-                assertEquals(HttpStatus.OK,
-                                userController.getProfilePhoto("any").getStatusCode());
-        }
+        assertEquals(HttpStatus.OK,
+                userController.getProfilePhoto("any").getStatusCode());
+    }
 
-        @Test
-        void failGetProfilePhoto() {
-                PhotoResponseDto mockResult = mock(PhotoResponseDto.class);
+    @Test
+    void failGetProfilePhoto() {
+        PhotoResponseDto mockResult = mock(PhotoResponseDto.class);
 
-                when(mockResult.getPhoto()).thenReturn(null);
-                when(mockResult.getType()).thenReturn(null);
-                when(USER_SERVICE.getUserPhoto("any")).thenReturn(mockResult);
+        when(mockResult.getPhoto()).thenReturn(null);
+        when(mockResult.getType()).thenReturn(null);
+        when(USER_SERVICE.getUserPhoto("any")).thenReturn(mockResult);
 
-                assertNotEquals(HttpStatus.OK,
-                                userController.getProfilePhoto("any").getStatusCode());
-        }
+        assertNotEquals(HttpStatus.OK,
+                userController.getProfilePhoto("any").getStatusCode());
+    }
 
-        @Test
-        void saveProfilePhoto() {
-                Pair<Boolean, String> mockResult = Pair.of(true, "any");
-                MultipartFile mockPhoto = mock(MultipartFile.class);
+    @Test
+    void saveProfilePhoto() {
+        Pair<Boolean, String> mockResult = Pair.of(true, "any");
+        MultipartFile mockPhoto = mock(MultipartFile.class);
 
-                when(USER_SERVICE.saveProfilePhoto(mockPhoto, "any"))
-                                .thenReturn(mockResult);
+        when(USER_SERVICE.saveProfilePhoto(mockPhoto, "any"))
+                .thenReturn(mockResult);
 
-                assertEquals(HttpStatus.OK,
-                                userController.saveProfilePhoto("any", mockPhoto).getStatusCode());
-        }
+        assertEquals(HttpStatus.OK,
+                userController.saveProfilePhoto("any", mockPhoto).getStatusCode());
+    }
 
-        @Test
-        void failSaveProfilePhoto() {
-                Pair<Boolean, String> mockResult = Pair.of(false, "any");
-                MultipartFile mockPhoto = mock(MultipartFile.class);
+    @Test
+    void failSaveProfilePhoto() {
+        Pair<Boolean, String> mockResult = Pair.of(false, "any");
+        MultipartFile mockPhoto = mock(MultipartFile.class);
 
-                when(USER_SERVICE.saveProfilePhoto(mockPhoto, "any"))
-                                .thenReturn(mockResult);
+        when(USER_SERVICE.saveProfilePhoto(mockPhoto, "any"))
+                .thenReturn(mockResult);
 
-                assertNotEquals(HttpStatus.OK,
-                                userController.saveProfilePhoto("any", mockPhoto).getStatusCode());
-        }
+        assertNotEquals(HttpStatus.OK,
+                userController.saveProfilePhoto("any", mockPhoto).getStatusCode());
+    }
 
-        @Test
-        @SuppressWarnings("unchecked")
-        void getAllUsers() {
-                PaginatedDto<UserResponseDto> mockResult = mock(PaginatedDto.class);
+    @Test
+    @SuppressWarnings("unchecked")
+    void getAllUsers() {
+        PaginatedDto<UserResponseDto> mockResult = mock(PaginatedDto.class);
 
-                when(USER_SERVICE.getAllUsers(false, 0, 10))
-                                .thenReturn(mockResult);
+        when(USER_SERVICE.getAllUsers(false, 0, 10))
+                .thenReturn(mockResult);
 
-                assertEquals(HttpStatus.OK,
-                                userController.getAllUsers(false, 0, 0).getStatusCode());
-        }
+        assertEquals(HttpStatus.OK,
+                userController.getAllUsers(false, 0, 0).getStatusCode());
+    }
 
-        @Test
-        void getRecipesByUsername() {
-                List<UserRecipeResponseDto> mockUserRecipe = new ArrayList<>();
-                mockUserRecipe.add(new UserRecipeResponseDto(1,
-                                "title",
-                                "overview",
-                                "authorName",
-                                1,
-                                LocalDate.now()));
+    @Test
+    void getRecipesByUsername() {
+        List<UserRecipeResponseDto> mockUserRecipe = new ArrayList<>();
+        mockUserRecipe.add(new UserRecipeResponseDto(1,
+                "title",
+                "overview",
+                "authorName",
+                1,
+                LocalDate.now()));
 
-                PaginatedDto<UserRecipeResponseDto> mockResult = new PaginatedDto<>(mockUserRecipe, 0, 1, true, 1);
+        PaginatedDto<UserRecipeResponseDto> mockResult = new PaginatedDto<>(mockUserRecipe, 0, 1, true, 1);
 
-                when(RECIPE_SERVICE.getByUsername("any", 0, false))
-                                .thenReturn(mockResult);
-                assertEquals(HttpStatus.OK,
-                                userController.getRecipesByUsername("any", 0).getStatusCode());
-        }
+        when(RECIPE_SERVICE.getByUsername("any", 0, false))
+                .thenReturn(mockResult);
+        assertEquals(HttpStatus.OK,
+                userController.getRecipesByUsername("any", 0).getStatusCode());
+    }
 
-        @Test
-        void followCreator() throws Exception {
-                doNothing().when(USER_SERVICE).addFollow(1L, 2L);
+    @Test
+    void followCreator() throws Exception {
+        doNothing().when(USER_SERVICE).addFollow(1L, 2L);
 
-                assertEquals(HttpStatus.OK,
-                                userController.followCreator(new FollowUserRequestDto(1L, 2L)).getStatusCode());
-        }
+        assertEquals(HttpStatus.OK,
+                userController.followCreator(new FollowUserRequestDto(1L, 2L)).getStatusCode());
+    }
 
-        @Test
-        void failedFollowCreator() throws Exception {
-                doThrow(Exception.class).when(USER_SERVICE).addFollow(1L, 2L);
+    @Test
+    void failedFollowCreator() throws Exception {
+        doThrow(Exception.class).when(USER_SERVICE).addFollow(1L, 2L);
 
-                assertNotEquals(HttpStatus.OK,
-                                userController.followCreator(new FollowUserRequestDto(1L, 2L)).getStatusCode());
-        }
+        assertNotEquals(HttpStatus.OK,
+                userController.followCreator(new FollowUserRequestDto(1L, 2L)).getStatusCode());
+    }
 
-        @Test
-        void unfollowCreator() throws Exception {
-                doNothing().when(USER_SERVICE).unFollow(1L, 2L);
+    @Test
+    void unfollowCreator() throws Exception {
+        doNothing().when(USER_SERVICE).unFollow(1L, 2L);
 
-                assertEquals(HttpStatus.OK,
-                                userController.unfollowCreator(new FollowUserRequestDto(1L, 2L)).getStatusCode());
-        }
+        assertEquals(HttpStatus.OK,
+                userController.unfollowCreator(new FollowUserRequestDto(1L, 2L)).getStatusCode());
+    }
 
-        @Test
-        void failedUnfollowCreator() throws Exception {
-                doThrow(Exception.class).when(USER_SERVICE).unFollow(1L, 2L);
+    @Test
+    void failedUnfollowCreator() throws Exception {
+        doThrow(Exception.class).when(USER_SERVICE).unFollow(1L, 2L);
 
-                assertNotEquals(HttpStatus.OK,
-                                userController.unfollowCreator(new FollowUserRequestDto(1L, 2L)).getStatusCode());
-        }
+        assertNotEquals(HttpStatus.OK,
+                userController.unfollowCreator(new FollowUserRequestDto(1L, 2L)).getStatusCode());
+    }
 
-        @Test
-        @SuppressWarnings("unchecked")
-        void getFollowList() {
-                List<FollowingListResponseDto> mockResult = mock(List.class);
+    @Test
+    @SuppressWarnings("unchecked")
+    void getFollowList() {
+        List<FollowingListResponseDto> mockResult = mock(List.class);
 
-                when(USER_SERVICE.getFollowList(1L))
-                                .thenReturn(mockResult);
+        when(USER_SERVICE.getFollowList(1L))
+                .thenReturn(mockResult);
 
-                assertEquals(HttpStatus.OK,
-                                userController.getFollowList(1L).getStatusCode());
-        }
+        assertEquals(HttpStatus.OK,
+                userController.getFollowList(1L).getStatusCode());
+    }
 
-        @Test
-        @SuppressWarnings("unchecked")
-        void getFollowerList() {
-                List<FollowerDto> mockResult = mock(List.class);
+    @Test
+    @SuppressWarnings("unchecked")
+    void getFollowerList() {
+        List<FollowerDto> mockResult = mock(List.class);
 
-                when(USER_SERVICE.getFollowerList(1L))
-                                .thenReturn(mockResult);
+        when(USER_SERVICE.getFollowerList(1L))
+                .thenReturn(mockResult);
 
-                assertEquals(HttpStatus.OK,
-                                userController.getFollowerList(1L).getStatusCode());
-        }
+        assertEquals(HttpStatus.OK,
+                userController.getFollowerList(1L).getStatusCode());
+    }
 
-        @Test
-        void isFollowing() {
-                when(USER_SERVICE.isFollowing(1L, 2L))
-                                .thenReturn(true);
+    @Test
+    void isFollowing() {
+        when(USER_SERVICE.isFollowing(1L, 2L))
+                .thenReturn(true);
 
-                assertEquals(HttpStatus.OK,
-                                userController.isFollowing(1L, 2L).getStatusCode());
-        }
+        assertEquals(HttpStatus.OK,
+                userController.isFollowing(1L, 2L).getStatusCode());
+    }
 
-        @Test
-        void successRequestCreatorRole() {
-                when(USER_SERVICE.assignRole("any user", "Request")).thenReturn(mock(UserEntity.class));
+    @Test
+    void successRequestCreatorRole() {
+        when(USER_SERVICE.assignRole("any user", "Request")).thenReturn(mock(UserEntity.class));
 
-                assertEquals(HttpStatus.OK,
-                                userController.requestCreatorRole("any user").getStatusCode());
-        }
+        assertEquals(HttpStatus.OK,
+                userController.requestCreatorRole("any user").getStatusCode());
+    }
 
-        @Test
-        void failedRequestCreatorRole() {
-                when(USER_SERVICE.assignRole("any user", "Request")).thenThrow(NullPointerException.class);
+    @Test
+    void failedRequestCreatorRole() {
+        when(USER_SERVICE.assignRole("any user", "Request")).thenThrow(NullPointerException.class);
 
-                assertEquals(HttpStatus.BAD_REQUEST,
-                                userController.requestCreatorRole("any user").getStatusCode());
-        }
+        assertEquals(HttpStatus.BAD_REQUEST,
+                userController.requestCreatorRole("any user").getStatusCode());
+    }
 
-        @Test
-        void successAssignRole() {
-                when(USER_SERVICE.assignRole("any user", "any role")).thenReturn(mock(UserEntity.class));
+    @Test
+    void successAssignRole() {
+        when(USER_SERVICE.assignRole("any user", "any role")).thenReturn(mock(UserEntity.class));
 
-                assertEquals(HttpStatus.OK,
-                                userController.assignRole("any user", "any role").getStatusCode());
-        }
+        assertEquals(HttpStatus.OK,
+                userController.assignRole("any user", "any role").getStatusCode());
+    }
 
-        @Test
-        void failedAssignRole() {
-                when(USER_SERVICE.assignRole("any user", "any role")).thenThrow(NullPointerException.class);
+    @Test
+    void failedAssignRole() {
+        when(USER_SERVICE.assignRole("any user", "any role")).thenThrow(NullPointerException.class);
 
-                assertEquals(HttpStatus.BAD_REQUEST,
-                                userController.assignRole("any user", "any role").getStatusCode());
-        }
+        assertEquals(HttpStatus.BAD_REQUEST,
+                userController.assignRole("any user", "any role").getStatusCode());
+    }
 
-        @Test
-        void successGetProfile() {
-                String username = "user1";
-                UserEntity mockUser = mock(UserEntity.class);
-                when(USER_SERVICE.getByUsername(username))
-                                .thenReturn(Pair.of("success: user found", mockUser));
+    @Test
+    void successGetProfile() {
+        String username = "user1";
+        UserEntity mockUser = mock(UserEntity.class);
+        when(USER_SERVICE.getByUsername(username))
+                .thenReturn(Pair.of("success: user found", mockUser));
 
-                assertEquals(HttpStatus.OK, userController.getProfile("user1").getStatusCode());
-        }
+        assertEquals(HttpStatus.OK, userController.getProfile("user1").getStatusCode());
+    }
 
-        @Test
-        void failedGetProfileNotFound() {
-                String username = "user1";
-                when(USER_SERVICE.getByUsername(username))
-                                .thenReturn(Pair.of("failed: user with username " + username + " not found",
-                                                mock(UserEntity.class)));
+    @Test
+    void failedGetProfileNotFound() {
+        String username = "user1";
+        when(USER_SERVICE.getByUsername(username))
+                .thenReturn(Pair.of("failed: user with username " + username + " not found",
+                        mock(UserEntity.class)));
 
-                assertEquals(HttpStatus.NOT_FOUND, userController.getProfile("user1").getStatusCode());
-        }
+        assertEquals(HttpStatus.NOT_FOUND, userController.getProfile("user1").getStatusCode());
+    }
 
-        @Test
-        void successGetUserFavoriteRecipes() {
-                when(RECIPE_SERVICE.getUserFavoriteRecipes("user1", true, 0, 10))
-                                .thenReturn(Pair.of("success: data retrieved", mock(PaginatedDto.class)));
+    @Test
+    void successGetUserFavoriteRecipes() {
+        when(RECIPE_SERVICE.getUserFavoriteRecipes("user1", true, 0, 10))
+                .thenReturn(Pair.of("success: data retrieved", mock(PaginatedDto.class)));
 
-                ResponseEntity<CommonResponse> result = userController.getUserFavoriteRecipes("user1", true, 0, 10);
+        ResponseEntity<CommonResponse> result = userController.getUserFavoriteRecipes("user1", true, 0, 10);
 
-                assertEquals(HttpStatus.OK, result.getStatusCode());
-                assertEquals("success: data retrieved", result.getBody().getMessage());
-        }
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals("success: data retrieved", result.getBody().getMessage());
+    }
 }
