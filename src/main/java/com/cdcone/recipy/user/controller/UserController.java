@@ -151,7 +151,7 @@ public class UserController {
         }
     }
 
-    @PutMapping("{username}/approve-{role}")
+    @PutMapping("{username}/approve-creator")
     public ResponseEntity<CommonResponse> approveRequestedRole(@PathVariable(name = "username") String username,
             @PathVariable(name = "role") String rolename) {
         try {
