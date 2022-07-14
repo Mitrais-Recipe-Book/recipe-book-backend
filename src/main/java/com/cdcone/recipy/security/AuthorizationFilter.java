@@ -1,7 +1,6 @@
 package com.cdcone.recipy.security;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.cdcone.recipy.util.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;

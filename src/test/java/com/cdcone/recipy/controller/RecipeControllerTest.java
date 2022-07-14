@@ -9,13 +9,13 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-import com.cdcone.recipy.dtoAccess.RecipeFavoriteResponseDto;
-import com.cdcone.recipy.dtoAccess.RecipeReactionSummaryDto;
-import com.cdcone.recipy.dtoRequest.RecipeFavoriteRequestDto;
-import com.cdcone.recipy.dtoRequest.RecipeReactionRequestDto;
-import com.cdcone.recipy.entity.RecipeFavoriteEntity;
-import com.cdcone.recipy.entity.RecipeReactionEntity;
-import com.cdcone.recipy.response.CommonResponse;
+import com.cdcone.recipy.recipe.controller.RecipeController;
+import com.cdcone.recipy.recipe.dto.response.RecipeFavoriteResponseDto;
+import com.cdcone.recipy.recipe.dto.response.RecipeReactionSummaryResponseDto;
+import com.cdcone.recipy.recipe.dto.request.RecipeFavoriteRequestDto;
+import com.cdcone.recipy.recipe.dto.request.RecipeReactionRequestDto;
+import com.cdcone.recipy.recipe.entity.RecipeReactionEntity;
+import com.cdcone.recipy.dto.response.CommonResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -26,20 +26,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.cdcone.recipy.dtoAccess.RecipeDtoList;
-import com.cdcone.recipy.dtoRequest.RecipeDtoAdd;
-import com.cdcone.recipy.dtoRequest.RecipeSearchDto;
-import com.cdcone.recipy.entity.RecipeEntity;
-import com.cdcone.recipy.entity.UserEntity;
-import com.cdcone.recipy.service.RecipeService;
+import com.cdcone.recipy.recipe.dto.response.RecipeListResponseDto;
+import com.cdcone.recipy.recipe.dto.request.RecipeAddRequestDto;
+import com.cdcone.recipy.recipe.dto.request.RecipeSearchRequestDto;
+import com.cdcone.recipy.recipe.entity.RecipeEntity;
+import com.cdcone.recipy.user.entity.UserEntity;
+import com.cdcone.recipy.recipe.service.RecipeService;
 import com.cdcone.recipy.util.ImageUtil;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RecipeControllerTest {
     private static final RecipeService RECIPE_SERVICE = mock(RecipeService.class);
 
-    private final RecipeDtoAdd RECIPE_DTO_ADD = mock(RecipeDtoAdd.class);
-    private final RecipeSearchDto RECIPE_SEARCH_DTO = mock(RecipeSearchDto.class);
+    private final RecipeAddRequestDto RECIPE_DTO_ADD = mock(RecipeAddRequestDto.class);
+    private final RecipeSearchRequestDto RECIPE_SEARCH_DTO = mock(RecipeSearchRequestDto.class);
 
     private final RecipeEntity RECIPE_ENTITY = mock(RecipeEntity.class);
 
@@ -91,7 +91,7 @@ public class RecipeControllerTest {
     @Test
     @SuppressWarnings("unchecked")
     void getPublishedRecipes() {
-        Page<RecipeDtoList> mockPage = (Page<RecipeDtoList>) mock(Page.class);
+        Page<RecipeListResponseDto> mockPage = (Page<RecipeListResponseDto>) mock(Page.class);
 
         when(RECIPE_SERVICE.getPublishedRecipes(RECIPE_SEARCH_DTO))
                 .thenReturn(Pair.of("success", mockPage));
@@ -103,7 +103,7 @@ public class RecipeControllerTest {
     @Test
     @SuppressWarnings("unchecked")
     void failGetPublishedRecipes() {
-        Page<RecipeDtoList> mockPage = (Page<RecipeDtoList>) mock(Page.class);
+        Page<RecipeListResponseDto> mockPage = (Page<RecipeListResponseDto>) mock(Page.class);
 
         when(RECIPE_SERVICE.getPublishedRecipes(RECIPE_SEARCH_DTO))
                 .thenReturn(Pair.of("failed", mockPage));
@@ -174,7 +174,7 @@ public class RecipeControllerTest {
     @Test
     @SuppressWarnings("unchecked")
     void getPopularRecipes() {
-        Set<RecipeDtoList> mockResult = (Set<RecipeDtoList>) mock(Set.class);
+        Set<RecipeListResponseDto> mockResult = (Set<RecipeListResponseDto>) mock(Set.class);
 
         when(RECIPE_SERVICE.getPopularRecipes(1))
                 .thenReturn(Pair.of("success", mockResult));
@@ -186,7 +186,7 @@ public class RecipeControllerTest {
     @Test
     @SuppressWarnings("unchecked")
     void failedGetPopularRecipes() {
-        Set<RecipeDtoList> mockResult = (Set<RecipeDtoList>) mock(Set.class);
+        Set<RecipeListResponseDto> mockResult = (Set<RecipeListResponseDto>) mock(Set.class);
 
         when(RECIPE_SERVICE.getPopularRecipes(1))
                 .thenReturn(Pair.of("failed", mockResult));
@@ -198,7 +198,7 @@ public class RecipeControllerTest {
     @Test
     @SuppressWarnings("unchecked")
     void getDiscoverRecipes() {
-        Set<RecipeDtoList> mockResult = (Set<RecipeDtoList>) mock(Set.class);
+        Set<RecipeListResponseDto> mockResult = (Set<RecipeListResponseDto>) mock(Set.class);
 
         when(RECIPE_SERVICE.getDiscoverRecipes(1))
                 .thenReturn(Pair.of("success", mockResult));
@@ -210,7 +210,7 @@ public class RecipeControllerTest {
     @Test
     @SuppressWarnings("unchecked")
     void failedGetDiscoverRecipes() {
-        Set<RecipeDtoList> mockResult = (Set<RecipeDtoList>) mock(Set.class);
+        Set<RecipeListResponseDto> mockResult = (Set<RecipeListResponseDto>) mock(Set.class);
 
         when(RECIPE_SERVICE.getDiscoverRecipes(1))
                 .thenReturn(Pair.of("failed", mockResult));
@@ -221,7 +221,7 @@ public class RecipeControllerTest {
 
     @Test
     void deleteRecipe() {
-        RecipeDtoList mockResult = mock(RecipeDtoList.class);
+        RecipeListResponseDto mockResult = mock(RecipeListResponseDto.class);
 
         when(RECIPE_SERVICE.deleteRecipe(1L))
                 .thenReturn(Pair.of("success", mockResult));
@@ -232,7 +232,7 @@ public class RecipeControllerTest {
 
     @Test
     void failedDeleteRecipe() {
-        RecipeDtoList mockResult = mock(RecipeDtoList.class);
+        RecipeListResponseDto mockResult = mock(RecipeListResponseDto.class);
 
         when(RECIPE_SERVICE.deleteRecipe(1L))
                 .thenReturn(Pair.of("failed", mockResult));
@@ -274,7 +274,7 @@ public class RecipeControllerTest {
     @Test
     void successGetRecipeReaction() {
         when(RECIPE_SERVICE.getRecipeReaction(1L, "user1")).thenReturn(
-                Pair.of("success: data retrieved", mock(RecipeReactionSummaryDto.class)));
+                Pair.of("success: data retrieved", mock(RecipeReactionSummaryResponseDto.class)));
 
         ResponseEntity<CommonResponse> result = recipeController.getRecipeReaction(1L, "user1");
 
@@ -285,7 +285,7 @@ public class RecipeControllerTest {
     @Test
     void failGetRecipeReaction() {
         when(RECIPE_SERVICE.getRecipeReaction(1L, "user1")).thenReturn(
-                Pair.of("failed: data not found", mock(RecipeReactionSummaryDto.class)));
+                Pair.of("failed: data not found", mock(RecipeReactionSummaryResponseDto.class)));
 
         ResponseEntity<CommonResponse> result = recipeController.getRecipeReaction(1L, "user1");
 

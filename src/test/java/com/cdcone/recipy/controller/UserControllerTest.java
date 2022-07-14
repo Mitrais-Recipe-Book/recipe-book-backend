@@ -13,7 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import com.cdcone.recipy.response.CommonResponse;
+import com.cdcone.recipy.dto.response.CommonResponse;
+import com.cdcone.recipy.user.controller.UserController;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.util.Pair;
@@ -21,17 +22,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.cdcone.recipy.dtoAccess.FollowerDto;
-import com.cdcone.recipy.dtoAccess.FollowingListDto;
-import com.cdcone.recipy.dtoAccess.PhotoDto;
-import com.cdcone.recipy.dtoAccess.UserDto;
-import com.cdcone.recipy.dtoAccess.UserProfile;
-import com.cdcone.recipy.dtoAccess.UserRecipeDto;
-import com.cdcone.recipy.dtoRequest.FollowUserDto;
-import com.cdcone.recipy.dtoRequest.PaginatedDto;
-import com.cdcone.recipy.entity.UserEntity;
-import com.cdcone.recipy.service.RecipeService;
-import com.cdcone.recipy.service.UserService;
+import com.cdcone.recipy.user.dto.repository.FollowerDto;
+import com.cdcone.recipy.recipe.dto.response.FollowingListResponseDto;
+import com.cdcone.recipy.dto.response.PhotoResponseDto;
+import com.cdcone.recipy.user.dto.response.UserResponseDto;
+import com.cdcone.recipy.user.dto.repository.UserProfile;
+import com.cdcone.recipy.recipe.dto.response.UserRecipeResponseDto;
+import com.cdcone.recipy.user.dto.request.FollowUserRequestDto;
+import com.cdcone.recipy.dto.response.PaginatedDto;
+import com.cdcone.recipy.user.entity.UserEntity;
+import com.cdcone.recipy.recipe.service.RecipeService;
+import com.cdcone.recipy.user.service.UserService;
 import com.cdcone.recipy.util.ImageUtil;
 
 public class UserControllerTest {
@@ -72,7 +73,7 @@ public class UserControllerTest {
 
     @Test
     void getProfilePhoto() throws IOException {
-        PhotoDto mockResult = mock(PhotoDto.class);
+        PhotoResponseDto mockResult = mock(PhotoResponseDto.class);
 
         when(mockResult.getPhoto()).thenReturn(ImageUtil.randomImage());
         when(mockResult.getType()).thenReturn("image/png");
@@ -84,7 +85,7 @@ public class UserControllerTest {
 
     @Test
     void failGetProfilePhoto() {
-        PhotoDto mockResult = mock(PhotoDto.class);
+        PhotoResponseDto mockResult = mock(PhotoResponseDto.class);
 
         when(mockResult.getPhoto()).thenReturn(null);
         when(mockResult.getType()).thenReturn(null);
@@ -121,7 +122,7 @@ public class UserControllerTest {
     @Test
     @SuppressWarnings("unchecked")
     void getAllUsers() {
-        PaginatedDto<UserDto> mockResult = mock(PaginatedDto.class);
+        PaginatedDto<UserResponseDto> mockResult = mock(PaginatedDto.class);
 
         when(USER_SERVICE.getAllUsers(false, 0, 10))
                 .thenReturn(mockResult);
@@ -132,15 +133,15 @@ public class UserControllerTest {
 
     @Test
     void getRecipesByUsername() {
-        List<UserRecipeDto> mockUserRecipe = new ArrayList<>();
-        mockUserRecipe.add(new UserRecipeDto(1,
+        List<UserRecipeResponseDto> mockUserRecipe = new ArrayList<>();
+        mockUserRecipe.add(new UserRecipeResponseDto(1,
                 "title",
                 "overview",
                 "authorName",
                 1,
                 LocalDate.now()));
 
-        PaginatedDto<UserRecipeDto> mockResult = new PaginatedDto<>(mockUserRecipe, 0, 1, true, 1);
+        PaginatedDto<UserRecipeResponseDto> mockResult = new PaginatedDto<>(mockUserRecipe, 0, 1, true, 1);
 
         when(RECIPE_SERVICE.getByUsername("any", 0, false))
                 .thenReturn(mockResult);
@@ -153,7 +154,7 @@ public class UserControllerTest {
         doNothing().when(USER_SERVICE).addFollow(1L, 2L);
 
         assertEquals(HttpStatus.OK,
-                userController.followCreator(new FollowUserDto(1L, 2L)).getStatusCode());
+                userController.followCreator(new FollowUserRequestDto(1L, 2L)).getStatusCode());
     }
 
     @Test
@@ -161,7 +162,7 @@ public class UserControllerTest {
         doThrow(Exception.class).when(USER_SERVICE).addFollow(1L, 2L);
 
         assertNotEquals(HttpStatus.OK,
-                userController.followCreator(new FollowUserDto(1L, 2L)).getStatusCode());
+                userController.followCreator(new FollowUserRequestDto(1L, 2L)).getStatusCode());
     }
 
     @Test
@@ -169,7 +170,7 @@ public class UserControllerTest {
         doNothing().when(USER_SERVICE).unFollow(1L, 2L);
 
         assertEquals(HttpStatus.OK,
-                userController.unfollowCreator(new FollowUserDto(1L, 2L)).getStatusCode());
+                userController.unfollowCreator(new FollowUserRequestDto(1L, 2L)).getStatusCode());
     }
 
     @Test
@@ -177,13 +178,13 @@ public class UserControllerTest {
         doThrow(Exception.class).when(USER_SERVICE).unFollow(1L, 2L);
 
         assertNotEquals(HttpStatus.OK,
-                userController.unfollowCreator(new FollowUserDto(1L, 2L)).getStatusCode());
+                userController.unfollowCreator(new FollowUserRequestDto(1L, 2L)).getStatusCode());
     }
 
     @Test
     @SuppressWarnings("unchecked")
     void getFollowList() {
-        List<FollowingListDto> mockResult = mock(List.class);
+        List<FollowingListResponseDto> mockResult = mock(List.class);
 
         when(USER_SERVICE.getFollowList(1L))
                 .thenReturn(mockResult);

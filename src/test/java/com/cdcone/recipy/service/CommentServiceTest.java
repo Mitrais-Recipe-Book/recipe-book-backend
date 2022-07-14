@@ -5,16 +5,19 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.cdcone.recipy.recipe.service.CommentService;
+import com.cdcone.recipy.recipe.service.RecipeService;
+import com.cdcone.recipy.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.util.Pair;
 
-import com.cdcone.recipy.dtoAccess.CommentListDto;
-import com.cdcone.recipy.dtoRequest.AddCommentDto;
-import com.cdcone.recipy.entity.CommentEntity;
-import com.cdcone.recipy.entity.UserEntity;
-import com.cdcone.recipy.repository.CommentRepository;
+import com.cdcone.recipy.recipe.dto.response.CommentListResponseDto;
+import com.cdcone.recipy.recipe.dto.request.AddCommentRequestDto;
+import com.cdcone.recipy.recipe.entity.CommentEntity;
+import com.cdcone.recipy.user.entity.UserEntity;
+import com.cdcone.recipy.recipe.repository.CommentRepository;
 
 public class CommentServiceTest {
 
@@ -27,7 +30,7 @@ public class CommentServiceTest {
     private final UserEntity USER_ENTITY = mock(UserEntity.class);
     private final CommentEntity COMMENT_ENTITY = mock(CommentEntity.class);
 
-    private final AddCommentDto ADD_COMMENT_DTO = mock(AddCommentDto.class);
+    private final AddCommentRequestDto ADD_COMMENT_DTO = mock(AddCommentRequestDto.class);
 
     @BeforeEach
     void init() {
@@ -74,7 +77,7 @@ public class CommentServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     void getComment() {
-        Page<CommentListDto> mockResult = mock(Page.class);
+        Page<CommentListResponseDto> mockResult = mock(Page.class);
         when(COMMENT_REPOSITORY.getComments(any(), any()))
                 .thenReturn(mockResult);
 
@@ -85,7 +88,7 @@ public class CommentServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     void failedGetComment() {
-        Page<CommentListDto> mockResult = mock(Page.class);
+        Page<CommentListResponseDto> mockResult = mock(Page.class);
         when(COMMENT_REPOSITORY.getComments(any(), any()))
                 .thenReturn(mockResult);
 
