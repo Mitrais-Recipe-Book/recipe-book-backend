@@ -270,20 +270,24 @@ public class RecipeServiceTest {
 
     @Test
     void successGetRecipesByUsername() {
-        UserRecipeResponseDto mockRecipe = mock(UserRecipeResponseDto.class);
-        UserRecipeResponseDto mockRecipe2 = mock(UserRecipeResponseDto.class);
+        UserEntity user = new UserEntity("any@mail.com", "any", "password", "any user");
+        RecipeEntity recipe = new RecipeEntity();
+        recipe.setTitle("recipe");
+        recipe.setOverview("overview");
+        recipe.setTags(Set.of());
+        recipe.setViews(99);
+        recipe.setId(1L);
+        recipe.setDateCreated(LocalDate.now());
+        recipe.setUser(user);
 
-        Page<UserRecipeResponseDto> mockResult = new PageImpl<>(
-                List.of(mockRecipe, mockRecipe2));
+        Page<RecipeEntity> mockResult = new PageImpl<>(
+                List.of(recipe));
 
-        when(mockRecipe.getAuthorName()).thenReturn("any user");
-        when(mockRecipe.getViewCount()).thenReturn(99);
-        when(RECIPE_REPOSITORY.findByUsername(any(String.class), any(Boolean.class), any(Pageable.class)))
+        when(RECIPE_REPOSITORY.findByUserUsernameAndIsDraftIs(any(String.class), any(Boolean.class), any(Pageable.class)))
                 .thenReturn(mockResult);
-        when(TAG_SERVICE.getByRecipeId(any(Long.class))).thenReturn(Set.of());
 
         PaginatedDto<UserRecipeResponseDto> result = recipeService.getByUsername("any", 0, false);
-        assertEquals(2, result.getData().size());
+        assertEquals(1, result.getData().size());
         assertEquals(99, result.getData().get(0).getViewCount());
         assertEquals("any user", result.getData().get(0).getAuthorName());
     }

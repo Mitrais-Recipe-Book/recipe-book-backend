@@ -88,10 +88,6 @@ public class TagService {
         return null;
     }
 
-    public Set<TagEntity> getByRecipeId(Long recipeId) {
-        return tagRepository.findByRecipeId(recipeId);
-    }
-
     public String addViewCount(int tagId) {
         String msg = "failed: tag not found";
         Optional<TagEntity> tagById = tagRepository.findById(tagId);

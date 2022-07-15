@@ -145,16 +145,6 @@ class TagServiceTest {
         assertEquals("dinner", deleteTag.getName());
     }
 
-    @Test
-    void testSuccessGetTagByRecipeId() {
-        when(tagDao.findByRecipeId(11L)).thenReturn(Set.of(tag1, tag2));
-
-        var byRecipeId = tagService.getByRecipeId(11L);
-        assertNotNull(byRecipeId);
-        assertEquals(2, byRecipeId.size());
-        assertTrue(byRecipeId.contains(tag1));
-        assertTrue(byRecipeId.contains(tag2));
-    }
 
     @Test
     void testFailAddViewCountIfNotFound() {
