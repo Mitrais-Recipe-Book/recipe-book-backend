@@ -235,9 +235,6 @@ public class UserController {
         }
         return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
     }
-<<<<<<< HEAD
-}
-=======
 
     @PutMapping("{username}/profile/change-password")
     public ResponseEntity<CommonResponse> changePassword(
@@ -248,4 +245,3 @@ public class UserController {
         return ResponseEntity.ok(new CommonResponse(userResponseDto));
     }
 }
->>>>>>> fd66fb2d8d56992d9def6087764ffb57259b8c6a
