@@ -465,4 +465,9 @@ class UserServiceTest {
         verify(userRepo).save(mockUser);
         assertEquals("user1@mail.com", result.getEmail());
     }
+
+    @Test
+    void getUserWithRequestRole_willReturnPaginatedListOfUserEntityWithRole(){
+
+    }
 }

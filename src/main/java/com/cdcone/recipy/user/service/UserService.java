@@ -114,7 +114,7 @@ public class UserService implements UserDetailsService {
         Optional<UserEntity> result = userDao.findByUsername(username);
 
         if (result.isEmpty()) {
-            return Pair.of("failed: user with username " + username + " not found", new UserEntity());
+            throw new EntityNotFoundException(username);
         }
 
         return Pair.of("success: user found", result.get());
@@ -250,34 +250,32 @@ public class UserService implements UserDetailsService {
         return userDao.isFollowing(creatorId, userId);
     }
 
-    public UserEntity assignRole(String username, String rolename) throws NullPointerException {
+    public UserEntity assignRole(String username, String rolename) {
         Pair<String, RoleEntity> role = roleService.getByName(rolename);
         Pair<String, UserEntity> user = getByUsername(username);
-
-        if (role.getFirst().charAt(0) == 'f') {
-            throw new NullPointerException("failed: " + rolename + " not found");
-        }
-        if (user.getFirst().charAt(0) == 'f') {
-            throw new NullPointerException("failed: " + username + " not found");
-        }
 
         user.getSecond().getRoles().add(role.getSecond());
         return userDao.save(user.getSecond());
     }
 
-    public UserEntity removeRole(String username, String rolename) throws NullPointerException {
+    public UserEntity removeRole(String username, String rolename) {
         Pair<String, RoleEntity> role = roleService.getByName(rolename);
         Pair<String, UserEntity> user = getByUsername(username);
 
-        if (role.getFirst().charAt(0) == 'f') {
-            throw new NullPointerException("failed: " + rolename + " not found");
-        }
-        if (user.getFirst().charAt(0) == 'f') {
-            throw new NullPointerException("failed: " + username + " not found");
-        }
-
         user.getSecond().getRoles().remove(role.getSecond());
-        return userDao.save(user.getSecond());        
+        return userDao.save(user.getSecond());
+    }
+
+    public PaginatedDto<UserEntity> getUsersWithRoleRequest(int page) {
+        String rolename = "Request";
+
+        Pageable pageable = PageRequest.of(page, 10);
+        Page<UserEntity> result = userDao.getUsersWithRole(rolename, pageable);
+        return new PaginatedDto<>(result.getContent(),
+                result.getNumber(),
+                result.getTotalPages(),
+                result.isLast(),
+                result.getTotalElements());
     }
 
     public Pair<HttpStatus, Optional<UserResponseDto>> updateUser(String username, UpdateUserRequestDto updateUserDto) {

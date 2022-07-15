@@ -27,7 +27,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     protected ResponseEntity<CommonResponse> handleEntityNotFound(
             EntityNotFoundException e) {
-        CommonResponse body = new CommonResponse(e.getMessage() + " not found.");
+        CommonResponse body = new CommonResponse("failed: " + e.getMessage() + " not found");
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
@@ -39,14 +39,14 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
             WebRequest request) {
         ex.printStackTrace();
         return new ResponseEntity<>(
-                new CommonResponse("Invalid Request Body", null),
+                new CommonResponse("failed: invalid Request Body", null),
                 HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     protected ResponseEntity<CommonResponse> handleMaxUploadSizeExceeded(
             MaxUploadSizeExceededException e) {
-        String msg = "Uploaded file is too large.";
+        String msg = "failed: uploaded file is too large.";
         return ResponseEntity.badRequest().body(new CommonResponse(msg));
     }
 }
