@@ -4,6 +4,7 @@ import com.cdcone.recipy.user.dto.repository.FollowerDto;
 import com.cdcone.recipy.recipe.dto.response.FollowingListResponseDto;
 import com.cdcone.recipy.dto.response.PhotoResponseDto;
 import com.cdcone.recipy.dto.response.PaginatedDto;
+import com.cdcone.recipy.user.dto.request.ChangePasswordRequestDto;
 import com.cdcone.recipy.user.dto.request.SignUpRequestDto;
 import com.cdcone.recipy.user.dto.request.UpdateUserRequestDto;
 import com.cdcone.recipy.user.dto.repository.UserProfile;
@@ -12,6 +13,7 @@ import com.cdcone.recipy.user.entity.RoleEntity;
 import com.cdcone.recipy.user.entity.UserEntity;
 import com.cdcone.recipy.recipe.repository.RecipeReactionRepository;
 import com.cdcone.recipy.recipe.repository.RecipeRepository;
+import com.cdcone.recipy.error.PasswordNotMatchException;
 import com.cdcone.recipy.user.repository.RoleDao;
 import com.cdcone.recipy.user.repository.UserDao;
 import com.cdcone.recipy.security.CustomUser;
@@ -30,6 +32,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
+import javax.persistence.EntityNotFoundException;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -146,7 +150,7 @@ public class UserService implements UserDetailsService {
                     byte[] resizedPhoto = resizePhoto(original);
                     UserEntity user = byUsername.get();
                     user.setProfilePhoto(resizedPhoto);
-                    user.setProfilePhotoType(photo.getContentType());
+                    user.setProfilePhotoType("image/jpeg");
                     userDao.save(user);
                     msg = "Success";
                     uploadedPhoto = true;
@@ -162,7 +166,12 @@ public class UserService implements UserDetailsService {
 
     private byte[] resizePhoto(BufferedImage original) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ImageIO.write(original, "jpg", outputStream);
+        BufferedImage newImage = new BufferedImage(
+                original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics = newImage.createGraphics();
+        graphics.drawImage(original, 0, 0, Color.WHITE, null);
+        ImageIO.write(newImage, "jpg", outputStream);
+        graphics.dispose();
         return outputStream.toByteArray();
     }
 
@@ -290,5 +299,27 @@ public class UserService implements UserDetailsService {
         }
 
         return Pair.of(status, Optional.ofNullable(result));
+    }
+
+    public UserResponseDto changePassword(
+            String username,
+            ChangePasswordRequestDto request) {
+        Optional<UserEntity> byUsername = userDao.findByUsername(username);
+
+        if (byUsername.isEmpty()) {
+            throw new EntityNotFoundException(username);
+        }
+
+        UserEntity user = byUsername.get();
+
+        if (!request.getOldPassword().equals(user.getPassword())
+                || !request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new PasswordNotMatchException();
+        }
+
+        user.setPassword(request.getNewPassword());
+        userDao.save(user);
+
+        return UserResponseDto.toDto(user);
     }
 }
