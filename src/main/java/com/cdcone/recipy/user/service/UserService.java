@@ -33,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import javax.persistence.EntityNotFoundException;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -149,7 +150,7 @@ public class UserService implements UserDetailsService {
                     byte[] resizedPhoto = resizePhoto(original);
                     UserEntity user = byUsername.get();
                     user.setProfilePhoto(resizedPhoto);
-                    user.setProfilePhotoType(photo.getContentType());
+                    user.setProfilePhotoType("image/jpeg");
                     userDao.save(user);
                     msg = "Success";
                     uploadedPhoto = true;
@@ -165,7 +166,12 @@ public class UserService implements UserDetailsService {
 
     private byte[] resizePhoto(BufferedImage original) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ImageIO.write(original, "jpg", outputStream);
+        BufferedImage newImage = new BufferedImage(
+                original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics = newImage.createGraphics();
+        graphics.drawImage(original, 0, 0, Color.WHITE, null);
+        ImageIO.write(newImage, "jpg", outputStream);
+        graphics.dispose();
         return outputStream.toByteArray();
     }
 
