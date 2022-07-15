@@ -26,7 +26,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     protected ResponseEntity<CommonResponse> handleEntityNotFound(
             EntityNotFoundException e) {
-        CommonResponse body = new CommonResponse(e.getMessage());
+        CommonResponse body = new CommonResponse(e.getMessage() + " not found.");
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 

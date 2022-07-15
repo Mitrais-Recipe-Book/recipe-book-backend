@@ -301,7 +301,7 @@ public class UserService implements UserDetailsService {
         Optional<UserEntity> byUsername = userDao.findByUsername(username);
 
         if (byUsername.isEmpty()) {
-            throw new EntityNotFoundException(username + " not found.");
+            throw new EntityNotFoundException(username);
         }
 
         UserEntity user = byUsername.get();
