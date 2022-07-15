@@ -4,6 +4,7 @@ import com.cdcone.recipy.user.dto.repository.FollowerDto;
 import com.cdcone.recipy.recipe.dto.response.FollowingListResponseDto;
 import com.cdcone.recipy.dto.response.PhotoResponseDto;
 import com.cdcone.recipy.dto.response.PaginatedDto;
+import com.cdcone.recipy.user.dto.request.ChangePasswordRequestDto;
 import com.cdcone.recipy.user.dto.request.SignUpRequestDto;
 import com.cdcone.recipy.user.dto.request.UpdateUserRequestDto;
 import com.cdcone.recipy.user.dto.repository.UserProfile;
@@ -12,6 +13,7 @@ import com.cdcone.recipy.user.entity.RoleEntity;
 import com.cdcone.recipy.user.entity.UserEntity;
 import com.cdcone.recipy.recipe.repository.RecipeReactionRepository;
 import com.cdcone.recipy.recipe.repository.RecipeRepository;
+import com.cdcone.recipy.error.PasswordNotMatchException;
 import com.cdcone.recipy.user.repository.RoleDao;
 import com.cdcone.recipy.user.repository.UserDao;
 import com.cdcone.recipy.security.CustomUser;
@@ -30,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
+import javax.persistence.EntityNotFoundException;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -290,5 +293,27 @@ public class UserService implements UserDetailsService {
         }
 
         return Pair.of(status, Optional.ofNullable(result));
+    }
+
+    public UserResponseDto changePassword(
+            String username,
+            ChangePasswordRequestDto request) {
+        Optional<UserEntity> byUsername = userDao.findByUsername(username);
+
+        if (byUsername.isEmpty()) {
+            throw new EntityNotFoundException(username);
+        }
+
+        UserEntity user = byUsername.get();
+
+        if (!request.getOldPassword().equals(user.getPassword())
+                || !request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new PasswordNotMatchException();
+        }
+
+        user.setPassword(request.getNewPassword());
+        userDao.save(user);
+
+        return UserResponseDto.toDto(user);
     }
 }
