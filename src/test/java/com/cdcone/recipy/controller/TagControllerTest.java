@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.cdcone.recipy.recipe.controller.TagController;
+import com.cdcone.recipy.recipe.dto.response.TagResponseDto;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.util.Pair;
@@ -33,9 +34,8 @@ public class TagControllerTest {
     }
     
     @Test
-    @SuppressWarnings("unchecked")
     void getAll(){
-        Pair<String, List<TagEntity>> mockResult = Pair.of("success", mock(List.class));
+        Pair<String, List<TagResponseDto>> mockResult = Pair.of("success", List.of());
 
         when(TAG_SERVICE.getAllTags()).thenReturn(mockResult);
 

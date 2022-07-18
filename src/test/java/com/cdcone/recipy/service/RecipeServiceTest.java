@@ -126,8 +126,8 @@ public class RecipeServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     void getPublishedRecipes() {
-        List<TagEntity> mockTag = mock(List.class);
-        Pair<String, List<TagEntity>> mockService = Pair.of("success:", mockTag);
+        List<TagResponseDto> mockTag = List.of();
+        Pair<String, List<TagResponseDto>> mockService = Pair.of("success:", mockTag);
 
         when(RECIPE_REPOSITORY.getPublishedRecipes(any(), any(), any(), any()))
                 .thenReturn(mock(Page.class));
@@ -138,10 +138,9 @@ public class RecipeServiceTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void failedGetPublishedRecipesIllegalPageRequest() {
-        List<TagEntity> mockTag = mock(List.class);
-        Pair<String, List<TagEntity>> mockService = Pair.of("success:", mockTag);
+        List<TagResponseDto> mockTag = List.of();
+        Pair<String, List<TagResponseDto>> mockService = Pair.of("success:", mockTag);
 
         when(RECIPE_REPOSITORY.getPublishedRecipes(any(), any(), any(), any()))
                 .thenThrow(IllegalArgumentException.class);

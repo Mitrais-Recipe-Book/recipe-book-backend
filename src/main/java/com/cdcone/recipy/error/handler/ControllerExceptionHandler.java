@@ -49,4 +49,10 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         String msg = "Uploaded file is too large.";
         return ResponseEntity.badRequest().body(new CommonResponse(msg));
     }
+
+    @ExceptionHandler(TagInUseException.class)
+    protected ResponseEntity<CommonResponse> handleTagDeleteInUse(TagInUseException e) {
+        return ResponseEntity.badRequest().body(
+                new CommonResponse(e.getMessage()));
+    }
 }

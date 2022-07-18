@@ -142,7 +142,7 @@ public class RecipeService {
 
     public Pair<String, Page<RecipeListResponseDto>> getPublishedRecipes(RecipeSearchRequestDto dto) {
         if (dto.getTagId() == null || dto.getTagId().isEmpty()) {
-            Pair<String, List<TagEntity>> tagResult = tagService.getAllTags();
+            Pair<String, List<TagResponseDto>> tagResult = tagService.getAllTags();
 
             Set<Integer> allTags = tagResult.getSecond()
                     .stream()
