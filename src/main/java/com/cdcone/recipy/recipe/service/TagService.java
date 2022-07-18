@@ -3,6 +3,7 @@ package com.cdcone.recipy.recipe.service;
 import com.cdcone.recipy.error.handler.TagInUseException;
 import com.cdcone.recipy.recipe.dto.response.TagAdminResponseDto;
 import com.cdcone.recipy.recipe.dto.response.TagResponseDto;
+import com.cdcone.recipy.recipe.entity.RecipeEntity;
 import com.cdcone.recipy.recipe.entity.TagEntity;
 import com.cdcone.recipy.recipe.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
@@ -116,6 +117,12 @@ public class TagService {
 
     public List<TagAdminResponseDto> getAllTagsView() {
         List<TagEntity> allTags = tagRepository.findAllByOrderByNameAsc();
+        allTags.forEach(it -> {
+            List<RecipeEntity> recipeList = it.getRecipes().stream()
+                    .filter(r -> !r.isDraft())
+                    .collect(Collectors.toList());
+            it.setRecipes(recipeList);
+        });
         return allTags.stream().map(it ->
                 new TagAdminResponseDto(
                         it.getId(),
