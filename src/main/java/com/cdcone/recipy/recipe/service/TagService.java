@@ -1,24 +1,32 @@
 package com.cdcone.recipy.recipe.service;
 
+import com.cdcone.recipy.error.handler.TagInUseException;
 import com.cdcone.recipy.recipe.dto.response.TagAdminResponseDto;
+import com.cdcone.recipy.recipe.dto.response.TagResponseDto;
+import com.cdcone.recipy.recipe.entity.RecipeEntity;
 import com.cdcone.recipy.recipe.entity.TagEntity;
-import com.cdcone.recipy.recipe.repository.TagDao;
+import com.cdcone.recipy.recipe.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class TagService {
 
-    private final TagDao tagRepository;
+    private final TagRepository tagRepository;
 
-    public Pair<String, List<TagEntity>> getAllTags() {
-        return Pair.of("success: data retrieved", tagRepository.findAll());
+    public Pair<String, List<TagResponseDto>> getAllTags() {
+        List<TagResponseDto> tagResponseDtoList = tagRepository.findAll().stream()
+                .map(it -> new TagResponseDto(it.getId(), it.getName()))
+                .collect(Collectors.toList());
+        return Pair.of("success: data retrieved", tagResponseDtoList);
     }
 
     public Pair<String, TagEntity> saveTag(String name) {
@@ -79,17 +87,19 @@ public class TagService {
     }
 
     public TagEntity deleteTag(int tagId) {
-        Optional<TagEntity> byId = tagRepository.findById(tagId);
-        if (byId.isPresent()) {
-            TagEntity toBeDeleted = byId.get();
+        Pair<TagEntity, String> tag = getById(tagId);
+
+        if (tag.getSecond().charAt(0) != 's') {
+            throw new EntityNotFoundException("failed: tag ");
+        }
+
+        try {
+            TagEntity toBeDeleted = tag.getFirst();
             tagRepository.delete(toBeDeleted);
             return toBeDeleted;
+        } catch (DataIntegrityViolationException e) {
+            throw new TagInUseException();
         }
-        return null;
-    }
-
-    public Set<TagEntity> getByRecipeId(Long recipeId) {
-        return tagRepository.findByRecipeId(recipeId);
     }
 
     public String addViewCount(int tagId) {
@@ -105,7 +115,20 @@ public class TagService {
         return msg;
     }
 
-    public Set<TagAdminResponseDto> getAllTagsView() {
-        return tagRepository.findAllViewCount();
+    public List<TagAdminResponseDto> getAllTagsView() {
+        List<TagEntity> allTags = tagRepository.findAllByOrderByNameAsc();
+        allTags.forEach(it -> {
+            List<RecipeEntity> recipeList = it.getRecipes().stream()
+                    .filter(r -> !r.isDraft())
+                    .collect(Collectors.toList());
+            it.setRecipes(recipeList);
+        });
+        return allTags.stream().map(it ->
+                new TagAdminResponseDto(
+                        it.getId(),
+                        it.getName(),
+                        it.getViews(),
+                        it.getRecipes().size()
+                )).collect(Collectors.toList());
     }
 }
