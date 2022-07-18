@@ -1,18 +1,16 @@
 package com.cdcone.recipy.recipe.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+import java.util.List;
+
+@Getter
+@Setter
 @NoArgsConstructor
 @Entity()
 @Table(name = "tags", uniqueConstraints = {
@@ -27,9 +25,12 @@ public class TagEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @JsonIgnore
     @Column(name = "views", nullable = false)
     private Integer views = 0;
+
+    @JsonBackReference
+    @ManyToMany(mappedBy = "tags")
+    private List<RecipeEntity> recipes;
 
     public TagEntity(String name) {
         this.name = name;

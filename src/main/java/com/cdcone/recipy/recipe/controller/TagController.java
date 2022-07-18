@@ -2,6 +2,7 @@ package com.cdcone.recipy.recipe.controller;
 
 import com.cdcone.recipy.recipe.dto.response.TagAdminResponseDto;
 import com.cdcone.recipy.recipe.dto.request.EditTagRequestDto;
+import com.cdcone.recipy.recipe.dto.response.TagResponseDto;
 import com.cdcone.recipy.recipe.entity.TagEntity;
 import com.cdcone.recipy.dto.response.CommonResponse;
 import com.cdcone.recipy.recipe.service.TagService;
@@ -25,13 +26,8 @@ public class TagController {
 
     @GetMapping
     public ResponseEntity<CommonResponse> getAll() {
-        Pair<String, List<TagEntity>> result = tagService.getAllTags();
-
-        if (result.getFirst().charAt(0) == 's'){
-            return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), result.getSecond()));
-        }
-
-        return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
+        Pair<String, List<TagResponseDto>> result = tagService.getAllTags();
+        return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), result.getSecond()));
     }
 
     @PostMapping
@@ -82,7 +78,7 @@ public class TagController {
 
     @GetMapping("all")
     public ResponseEntity<CommonResponse> getAllWithViewCount() {
-        Set<TagAdminResponseDto> result = tagService.getAllTagsView();
+        List<TagAdminResponseDto> result = tagService.getAllTagsView();
         return ResponseEntity.ok(new CommonResponse("success: data retrieved", result));
     }
 }
