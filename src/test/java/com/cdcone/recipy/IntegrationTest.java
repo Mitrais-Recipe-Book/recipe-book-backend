@@ -737,7 +737,7 @@ class IntegrationTest {
 	}
 
 	@Test
-	void successRequestCreator() throws Exception {
+	void requestCreatorRole_willSuccess_whenUsernameFound() throws Exception {
 		String username = "grrr";
 
 		mockMvc.perform(post("/api/v1/user/" + username + "/request-creator"))
@@ -747,7 +747,7 @@ class IntegrationTest {
 	}
 
 	@Test
-	void failedRequestCreator() throws Exception {
+	void requestCreatorRole_willFail_whenUsernameNotfound() throws Exception {
 		String username = "noname";
 
 		mockMvc.perform(post("/api/v1/user/" + username + "/request-creator"))
@@ -757,7 +757,7 @@ class IntegrationTest {
 	}
 
 	@Test
-	void successAssignRole() throws Exception {
+	void assignRole_willSuccess_whenUsernameAndRolenameAreFound() throws Exception {
 		String username = "grrr";
 		String rolename = "Admin";
 
@@ -768,7 +768,7 @@ class IntegrationTest {
 	}
 
 	@Test
-	void failedAssignRoleUserNotFound() throws Exception {
+	void assignRole_willFail_whenUsernameNotFound() throws Exception {
 		String username = "notfound";
 		String rolename = "Admin";
 
@@ -779,7 +779,7 @@ class IntegrationTest {
 	}
 
 	@Test
-	void failedAssignRoleRoleNotFound() throws Exception {
+	void assignRole_willFail_whenRolenameNotFound() throws Exception {
 		String username = "grrr";
 		String rolename = "notfound";
 
@@ -850,4 +850,5 @@ class IntegrationTest {
 				.andExpect(status().isBadRequest())
 				.andReturn();
 	}
+
 }
