@@ -90,7 +90,7 @@ public class TagService {
         Pair<TagEntity, String> tag = getById(tagId);
 
         if (tag.getSecond().charAt(0) != 's') {
-            throw new EntityNotFoundException("failed: tag ");
+            throw new EntityNotFoundException("tag");
         }
 
         try {
