@@ -11,13 +11,13 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "recipes_favorite")
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
 @ToString
+@Table(name = "recipes_viewed")
 @IdClass(UserRecipeId.class)
-public class RecipeFavoriteEntity {
+public class RecipeViewedEntity {
 
     @Id
     @ManyToOne
@@ -32,7 +32,7 @@ public class RecipeFavoriteEntity {
     @Column(name = "timestamp")
     private LocalDateTime timestamp;
 
-    public RecipeFavoriteEntity(UserEntity user, RecipeEntity recipe, LocalDateTime timestamp) {
+    public RecipeViewedEntity(UserEntity user, RecipeEntity recipe, LocalDateTime timestamp) {
         this.user = user;
         this.recipe = recipe;
         this.timestamp = timestamp;

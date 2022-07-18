@@ -9,14 +9,14 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import com.cdcone.recipy.user.entity.RoleEntity;
-import com.cdcone.recipy.user.repository.RoleDao;
+import com.cdcone.recipy.user.repository.RoleRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class RoleService {
-    private final RoleDao roleRepository;
+    private final RoleRepository roleRepository;
 
     public String add(String name) {
         try {

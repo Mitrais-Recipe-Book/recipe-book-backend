@@ -7,13 +7,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
+import javax.persistence.EntityNotFoundException;
 
 import com.cdcone.recipy.dto.response.PaginatedDto;
 import com.cdcone.recipy.recipe.dto.response.*;
 import com.cdcone.recipy.recipe.dto.request.*;
 import com.cdcone.recipy.recipe.entity.*;
 import com.cdcone.recipy.recipe.repository.RecipeFavoriteRepository;
-import com.cdcone.recipy.user.repository.UserDao;
+import com.cdcone.recipy.recipe.repository.RecipeViewedRepository;
+import com.cdcone.recipy.user.dto.repository.UserProfile;
+import com.cdcone.recipy.user.repository.UserRepository;
 import com.cdcone.recipy.recipe.repository.RecipeReactionRepository;
 import com.cdcone.recipy.recipe.repository.RecipeRepository;
 
@@ -37,12 +40,13 @@ public class RecipeService {
     private final RecipeRepository recipeRepository;
     private final RecipeReactionRepository recipeReactionRepository;
     private final RecipeFavoriteRepository recipeFavoriteRepository;
-    private final UserDao userDao;
+    private final RecipeViewedService recipeViewedService;
+    private final UserRepository userRepository;
     private final UserService userService;
     private final TagService tagService;
 
     private Pair<String, Set<TagEntity>> findMultipleTags(Set<Integer> idTags) {
-        Set<TagEntity> tagEntities = new HashSet<TagEntity>();
+        Set<TagEntity> tagEntities = new HashSet<>();
         for (Integer id : idTags) {
             Pair<TagEntity, String> tag = tagService.getById(id);
 
@@ -243,13 +247,13 @@ public class RecipeService {
     }
 
     public Pair<String, RecipeEntity> getById(Long recipeId) {
-        RecipeEntity result = recipeRepository.findById(recipeId).orElse(null);
+        Optional<RecipeEntity> result = recipeRepository.findById(recipeId);
 
-        if (result == null) {
-            return Pair.of("failed: cannot find recipe with id " + recipeId, new RecipeEntity());
+        if (result.isEmpty()) {
+            throw new EntityNotFoundException("recipe");
         }
 
-        return Pair.of("success: data retrieved", result);
+        return Pair.of("success: data retrieved", result.get());
     }
 
     public String addViewer(Long recipeId) {
@@ -358,7 +362,7 @@ public class RecipeService {
 
             RecipeReactionResponseDto userReaction = null;
             if (!username.isBlank()) {
-                Optional<UserEntity> userOptional = userDao.findByUsername(username);
+                Optional<UserEntity> userOptional = userRepository.findByUsername(username);
                 if (userOptional.isPresent()) {
                     RecipeReactionEntity userReactionEntity = recipeReactionRepository
                             .findByRecipeIdAndUserId(recipe.getId(), userOptional.get().getId());
@@ -383,7 +387,7 @@ public class RecipeService {
     }
 
     public Pair<String, RecipeReactionEntity> saveRecipeReaction(long recipeId, RecipeReactionRequestDto requestDto) {
-        Optional<UserEntity> userOptional = userDao.findByUsername(requestDto.getUsername());
+        Optional<UserEntity> userOptional = userRepository.findByUsername(requestDto.getUsername());
         Optional<RecipeEntity> recipeOptional = recipeRepository.findById(recipeId);
 
         try {
@@ -402,7 +406,7 @@ public class RecipeService {
     }
 
     public Pair<String, RecipeReactionEntity> deleteRecipeReaction(long recipeId, RecipeReactionRequestDto requestDto) {
-        Optional<UserEntity> userOptional = userDao.findByUsername(requestDto.getUsername());
+        Optional<UserEntity> userOptional = userRepository.findByUsername(requestDto.getUsername());
 
         if (userOptional.isPresent()) {
             Optional<RecipeReactionEntity> reactionOptional = recipeReactionRepository
@@ -417,7 +421,7 @@ public class RecipeService {
     }
 
     public Pair<String, RecipeFavoriteResponseDto> saveRecipeFavorite(long recipeId, RecipeFavoriteRequestDto requestDto) {
-        Optional<UserEntity> userOptional = userDao.findByUsername(requestDto.getUsername());
+        Optional<UserEntity> userOptional = userRepository.findByUsername(requestDto.getUsername());
         Optional<RecipeEntity> recipeOptional = recipeRepository.findById(recipeId);
 
         if (userOptional.isPresent() && recipeOptional.isPresent()) {
@@ -440,7 +444,7 @@ public class RecipeService {
     }
 
     public Pair<String, RecipeFavoriteResponseDto> deleteRecipeFavorite(long recipeId, RecipeFavoriteRequestDto requestDto) {
-        Optional<UserEntity> userOptional = userDao.findByUsername(requestDto.getUsername());
+        Optional<UserEntity> userOptional = userRepository.findByUsername(requestDto.getUsername());
 
         if(userOptional.isPresent()) {
             Optional<RecipeFavoriteEntity> recipeFavoriteOptional = recipeFavoriteRepository.findByRecipeIdAndUserId(recipeId, userOptional.get().getId());
@@ -457,7 +461,7 @@ public class RecipeService {
         return Pair.of("failed: data not found", new RecipeFavoriteResponseDto());
     }
     public Pair<String, RecipeFavoriteResponseDto> getRecipeFavorite(long recipeId, String username) {
-        Optional<UserEntity> userOptional = userDao.findByUsername(username);
+        Optional<UserEntity> userOptional = userRepository.findByUsername(username);
         Optional<RecipeEntity> recipeOptional = recipeRepository.findById(recipeId);
 
         if(userOptional.isPresent() && recipeOptional.isPresent()) {
@@ -482,7 +486,7 @@ public class RecipeService {
 
 
     public Pair<String, PaginatedDto<UserRecipeResponseDto>> getUserFavoriteRecipes(String username, Boolean isPaginated, Integer page, Integer size) {
-        Optional<UserEntity> userOptional = userDao.findByUsername(username);
+        Optional<UserEntity> userOptional = userRepository.findByUsername(username);
 
         if(userOptional.isEmpty()) {
             return Pair.of("failed: data not found", new PaginatedDto<>());
@@ -521,5 +525,47 @@ public class RecipeService {
                 resultPage.getTotalElements()
         );
         return Pair.of("success: data retrieved", result);
+    }
+
+    public PaginatedDto<RecipeListResponseDto> getRecipeViewed(String username, Boolean isPaginated, Integer page, Integer size) {
+        Optional<UserProfile> user = userService.findByUsername(username);
+        if(user.isEmpty()) {
+            throw new EntityNotFoundException("user");
+        }
+
+        Page<RecipeViewedEntity> resultPage;
+        if(isPaginated) {
+            resultPage = recipeViewedService.findByUserId(user.get().getId(), page, size);
+        } else {
+            resultPage = new PageImpl<>(recipeViewedService.findByUserId(user.get().getId()));
+        }
+
+        List<RecipeListResponseDto> listDto = resultPage.getContent().stream()
+                .map(rv-> {
+                    RecipeListResponseDto dto = new RecipeListResponseDto(
+                            rv.getRecipe().getId(),
+                            rv.getRecipe().getTitle(),
+                            rv.getRecipe().getOverview(),
+                            rv.getRecipe().getViews());
+                    AuthorResponseDto author = new AuthorResponseDto(rv.getUser().getUsername(),
+                            rv.getUser().getFullName(),
+                            userService.getFollowerCountById(rv.getUser().getId()));
+                    dto.setAuthor(author);
+                    return dto;
+                }).collect(Collectors.toList());
+
+        return new PaginatedDto<>(
+                listDto,
+                resultPage.getNumber(),
+                resultPage.getTotalPages(),
+                resultPage.isLast(),
+                resultPage.getTotalElements()
+        );
+    }
+
+    public RecipeViewedEntity saveViewedRecipe(RecipeViewedRequestDto requestDto) {
+        Pair<String, UserEntity> user = userService.getByUsername(requestDto.getUsername());
+        Pair<String, RecipeEntity> recipe = getById(requestDto.getRecipeId());
+        return recipeViewedService.save(recipe.getSecond(), user.getSecond());
     }
 }

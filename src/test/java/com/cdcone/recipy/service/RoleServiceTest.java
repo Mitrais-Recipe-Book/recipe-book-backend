@@ -11,13 +11,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.cdcone.recipy.user.entity.RoleEntity;
-import com.cdcone.recipy.user.repository.RoleDao;
+import com.cdcone.recipy.user.repository.RoleRepository;
 
 public class RoleServiceTest {
 
     private static RoleService roleService;
 
-    private static RoleDao roleRepository = mock(RoleDao.class);
+    private static RoleRepository roleRepository = mock(RoleRepository.class);
 
     private static final RoleEntity ROLE_ENTITY = mock(RoleEntity.class); 
 

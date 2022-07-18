@@ -16,6 +16,7 @@ import com.cdcone.recipy.recipe.service.RecipeService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -219,12 +220,26 @@ public class RecipeController {
     }
 
     @GetMapping("{id}/favorite")
-    public ResponseEntity<CommonResponse> getRecipeFavorite(@PathVariable(name = "id") long recipeId, @RequestParam() String username) {
+    public ResponseEntity<CommonResponse> getRecipeFavorite(@PathVariable(name = "id") long recipeId, @RequestParam String username) {
         Pair<String, RecipeFavoriteResponseDto> result = recipeService.getRecipeFavorite(recipeId, username);
 
         if (result.getFirst().charAt(0) == 's') {
             return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), result.getSecond()));
         }
         return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
+    }
+
+    @GetMapping("/viewed")
+    public ResponseEntity<CommonResponse> getRecipeViewed(
+            @RequestParam String username,
+            @RequestParam(defaultValue = "false") Boolean isPaginated,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        return ResponseEntity.ok().body(new CommonResponse("success", recipeService.getRecipeViewed(username, isPaginated, page, size)));
+    }
+
+    @PostMapping("/viewed")
+    public ResponseEntity<CommonResponse> saveViewedRecipe(@RequestBody RecipeViewedRequestDto requestDto) {
+        return ResponseEntity.ok().body(new CommonResponse("success", new RecipeViewedResponseDto(recipeService.saveViewedRecipe(requestDto))));
     }
 }
