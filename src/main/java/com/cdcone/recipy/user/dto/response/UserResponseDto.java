@@ -3,12 +3,12 @@ package com.cdcone.recipy.user.dto.response;
 import com.cdcone.recipy.user.entity.RoleEntity;
 import com.cdcone.recipy.user.entity.UserEntity;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Data
+@Getter
 @AllArgsConstructor
 public class UserResponseDto {
 

@@ -9,6 +9,8 @@ import com.cdcone.recipy.user.dto.repository.UserProfile;
 import com.cdcone.recipy.user.dto.request.FollowUserRequestDto;
 import com.cdcone.recipy.user.dto.request.UpdateUserRequestDto;
 import com.cdcone.recipy.user.dto.response.UserResponseDto;
+import com.cdcone.recipy.user.dto.request.ChangePasswordRequestDto;
+import com.cdcone.recipy.user.entity.RoleEntity;
 import com.cdcone.recipy.user.entity.UserEntity;
 import com.cdcone.recipy.dto.response.CommonResponse;
 import com.cdcone.recipy.recipe.service.RecipeService;
@@ -24,6 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin("*")
@@ -142,25 +146,53 @@ public class UserController {
 
     @PostMapping("{username}/request-creator")
     public ResponseEntity<CommonResponse> requestCreatorRole(@PathVariable(name = "username") String username) {
-        String result = userService.assignRole(username, "Request");
+        try {
+            UserResponseDto dto = UserResponseDto.toDto(userService.assignRole(username, "Request"));
+            return ResponseEntity.ok(new CommonResponse("success", dto));
 
-        if (result.charAt(0) == 's') {
-            return ResponseEntity.ok(new CommonResponse(result));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new CommonResponse(e.getMessage()));
         }
+    }
 
-        return ResponseEntity.badRequest().body(new CommonResponse(result));
-    } 
+    @PutMapping("{username}/approve-creator")
+    public ResponseEntity<CommonResponse> approveRequestedRole(@PathVariable(name = "username") String username) {
+        userService.removeRole(username, "Request");
+        UserResponseDto dto = UserResponseDto.toDto(userService.assignRole(username, "Creator"));
+        return ResponseEntity.ok(new CommonResponse("success", dto));
+
+    }
 
     @PostMapping("{username}/assign-{role}")
     public ResponseEntity<CommonResponse> assignRole(@PathVariable(name = "username") String username,
             @PathVariable(name = "role") String rolename) {
-        String result = userService.assignRole(username, rolename);
 
-        if (result.charAt(0) == 's') {
-            return ResponseEntity.ok(new CommonResponse(result));
-        }
+        UserResponseDto dto = UserResponseDto.toDto(userService.assignRole(username, rolename));
+        return ResponseEntity.ok(new CommonResponse("success", dto));
+    }
 
-        return ResponseEntity.badRequest().body(new CommonResponse(result));
+    @DeleteMapping("{username}/remove-{role}")
+    public ResponseEntity<CommonResponse> removeRole(@PathVariable(name = "username") String username,
+            @PathVariable(name = "role") String rolename) {
+
+        UserResponseDto dto = UserResponseDto.toDto(userService.removeRole(username, rolename));
+        return ResponseEntity.ok(new CommonResponse("success", dto));
+    }
+
+    @GetMapping("/role-request/{page}")
+    public ResponseEntity<CommonResponse> getAllUserWithRequestRole(
+            @RequestParam int page) {
+        PaginatedDto<UserEntity> result = userService.getUsersWithRoleRequest(page);
+        PaginatedDto<UserResponseDto> dto = new PaginatedDto<>(result.getData().stream()
+                .map(i -> new UserResponseDto(i.getId(),
+                        i.getEmail(),
+                        i.getUsername(),
+                        i.getFullName(),
+                        i.getRoles().stream().map(RoleEntity::getName).collect(Collectors.toSet())))
+                .collect(Collectors.toList()),
+                result.getCurrentPage(), result.getTotalPages(), result.isIslast(), result.getTotalItem());
+
+        return ResponseEntity.ok(new CommonResponse(dto));
     }
 
     @GetMapping("{username}/profile")
@@ -200,11 +232,21 @@ public class UserController {
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
 
-        Pair<String, PaginatedDto<UserRecipeResponseDto>> result = recipeService.getUserFavoriteRecipes(username, isPaginated, page, size);
+        Pair<String, PaginatedDto<UserRecipeResponseDto>> result = recipeService.getUserFavoriteRecipes(username,
+                isPaginated, page, size);
 
         if (result.getFirst().charAt(0) == 's') {
             return ResponseEntity.ok().body(new CommonResponse(result.getFirst(), result.getSecond()));
         }
         return ResponseEntity.badRequest().body(new CommonResponse(result.getFirst()));
+    }
+
+    @PutMapping("{username}/profile/change-password")
+    public ResponseEntity<CommonResponse> changePassword(
+            @PathVariable("username") String username,
+            @RequestBody ChangePasswordRequestDto changePasswordRequestDto) {
+        UserResponseDto userResponseDto = userService
+                .changePassword(username, changePasswordRequestDto);
+        return ResponseEntity.ok(new CommonResponse(userResponseDto));
     }
 }

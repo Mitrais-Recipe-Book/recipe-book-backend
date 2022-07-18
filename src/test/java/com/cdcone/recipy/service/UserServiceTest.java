@@ -4,6 +4,7 @@ import com.cdcone.recipy.user.dto.repository.FollowerDto;
 import com.cdcone.recipy.recipe.dto.response.FollowingListResponseDto;
 import com.cdcone.recipy.dto.response.PhotoResponseDto;
 import com.cdcone.recipy.dto.response.PaginatedDto;
+import com.cdcone.recipy.user.dto.request.ChangePasswordRequestDto;
 import com.cdcone.recipy.user.dto.request.SignUpRequestDto;
 import com.cdcone.recipy.user.dto.request.UpdateUserRequestDto;
 import com.cdcone.recipy.user.dto.repository.UserProfile;
@@ -12,6 +13,7 @@ import com.cdcone.recipy.user.entity.RoleEntity;
 import com.cdcone.recipy.user.entity.UserEntity;
 import com.cdcone.recipy.recipe.repository.RecipeReactionRepository;
 import com.cdcone.recipy.recipe.repository.RecipeRepository;
+import com.cdcone.recipy.error.PasswordNotMatchException;
 import com.cdcone.recipy.user.repository.RoleDao;
 import com.cdcone.recipy.user.repository.UserDao;
 import com.cdcone.recipy.user.service.RoleService;
@@ -268,6 +270,7 @@ class UserServiceTest {
 
     @Test
     void testSuccessAddFollow() throws Exception {
+        reset(userRepo);
         when(userRepo.findById(2L)).thenReturn(Optional.of(creator));
         when(userRepo.findById(1L)).thenReturn(Optional.of(follower1));
         when(creator.getFollows()).thenReturn(Set.of());
@@ -276,7 +279,6 @@ class UserServiceTest {
 
         verify(follower1).setFollows(anySet());
         verify(userRepo).save(follower1);
-        reset(userRepo);
     }
 
     @Test
@@ -317,35 +319,39 @@ class UserServiceTest {
     }
 
     @Test
-    void successAssignRole(){
+    void successAssignRole() {
         Pair<String, RoleEntity> mockRole = Pair.of("success", mock(RoleEntity.class));
         UserEntity mockUser = mock(UserEntity.class);
 
         when(ROLE_SERVICE.getByName("any")).thenReturn(mockRole);
         when(userRepo.findByUsername("User")).thenReturn(Optional.of(mockUser));
+        when(userRepo.save(mockUser)).thenReturn(mockUser);
 
-        assertEquals('s', userService.assignRole("User", "any").charAt(0));
+        assertDoesNotThrow(() -> userService.removeRole("username", "rolename"));
+        assertEquals(mockUser, userService.removeRole("username", "rolename"));
     }
 
     @Test
-    void failedGetRoleAssignRole(){
+    void failedGetRoleAssignRole() {
         Pair<String, RoleEntity> mockRole = Pair.of("failed", mock(RoleEntity.class));
         UserEntity mockUser = mock(UserEntity.class);
 
         when(ROLE_SERVICE.getByName("any")).thenReturn(mockRole);
         when(userRepo.findByUsername("User")).thenReturn(Optional.of(mockUser));
 
-        assertEquals('f', userService.assignRole("User", "any").charAt(0));
+        assertThrows(NullPointerException.class,
+                () -> userService.assignRole("User", "any"));
     }
 
     @Test
-    void failedGetUserAssignRole(){
+    void failedGetUserAssignRole() {
         Pair<String, RoleEntity> mockRole = Pair.of("success", mock(RoleEntity.class));
 
         when(ROLE_SERVICE.getByName("any")).thenReturn(mockRole);
         when(userRepo.findByUsername("User")).thenReturn(Optional.empty());
 
-        assertEquals('f', userService.assignRole("User", "any").charAt(0));
+        assertThrows(NullPointerException.class,
+                () -> userService.assignRole("User", "any"));
     }
 
     @Test
@@ -353,7 +359,8 @@ class UserServiceTest {
         String username = "user1";
         when(userRepo.findByUsername(username)).thenReturn(Optional.empty());
 
-        Pair<HttpStatus, Optional<UserResponseDto>> result = userService.updateUser(username, mock(UpdateUserRequestDto.class));
+        Pair<HttpStatus, Optional<UserResponseDto>> result = userService.updateUser(username,
+                mock(UpdateUserRequestDto.class));
 
         assertEquals(HttpStatus.NOT_FOUND, result.getFirst());
     }
@@ -372,6 +379,8 @@ class UserServiceTest {
 
     @Test
     void testSuccessUpdateUser() {
+        reset(userRepo);
+
         UpdateUserRequestDto updateUserDto = new UpdateUserRequestDto("user 123", "user1@mail.com");
         when(userRepo.findByUsername("user1")).thenReturn(Optional.of(follower1));
 
@@ -379,6 +388,87 @@ class UserServiceTest {
 
         verify(userRepo).save(any(UserEntity.class));
         assertEquals(HttpStatus.OK, result.getFirst());
-        reset(userRepo);
+    }
+
+    @Test
+    void removeRole_willSuccess_whenUsernameAndRolenameAreFound() {
+        Pair<String, RoleEntity> mockRole = Pair.of("success", mock(RoleEntity.class));
+        UserEntity mockUser = mock(UserEntity.class);
+
+        when(ROLE_SERVICE.getByName("rolename")).thenReturn(mockRole);
+        when(userRepo.findByUsername("username")).thenReturn(Optional.of(mockUser));
+        when(userRepo.save(mockUser)).thenReturn(mockUser);
+
+        assertDoesNotThrow(() -> userService.removeRole("username", "rolename"));
+        assertEquals(mockUser, userService.removeRole("username", "rolename"));
+    }
+
+    //method_will<expectedResult>_when<params>
+    @Test
+    void changePassword_willThrowError_whenOldPasswordNotMatch() {
+        String username = "user1";
+        String oldPassword = "old_password";
+        String newPassword = "new_password";
+        String confirmPassword = "new_password";
+
+        ChangePasswordRequestDto requestBody =
+                new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
+        UserEntity mockUser = mock(UserEntity.class);
+        when(mockUser.getPassword()).thenReturn("original_password");
+        when(userRepo.findByUsername(username)).thenReturn(Optional.of(mockUser));
+
+        PasswordNotMatchException result = assertThrows(PasswordNotMatchException.class,
+                () -> userService.changePassword(username, requestBody));
+
+        assertEquals("Password does not match.", result.getMessage());
+    }
+
+    @Test
+    void changePassword_willThrowError_whenConfirmPasswordNotMatch() {
+        String username = "user1";
+        String oldPassword = "original_password";
+        String newPassword = "new_password";
+        String confirmPassword = "confirm_password";
+
+        UserEntity mockUser = mock(UserEntity.class);
+        ChangePasswordRequestDto requestBody =
+                new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
+        when(mockUser.getPassword()).thenReturn("original_password");
+        when(userRepo.findByUsername(username)).thenReturn(Optional.of(mockUser));
+
+        PasswordNotMatchException result = assertThrows(PasswordNotMatchException.class,
+                () -> userService.changePassword(username, requestBody));
+
+        assertEquals("Password does not match.", result.getMessage());
+    }
+
+    @Test
+    void changePassword_willReturnUserResponseDto_whenPasswordMatch() {
+        String username = "user1";
+        String originalPassword = "original_password";
+        String oldPassword = "original_password";
+        String newPassword = "new_password";
+        String confirmPassword = "new_password";
+        String email = "user1@mail.com";
+
+        ChangePasswordRequestDto requestBody =
+                new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
+        UserEntity mockUser = new UserEntity(email, username, originalPassword, "user 1");
+        mockUser.setId(11L);
+        mockUser.setRoles(Set.of(userRole));
+
+        when(userRepo.findByUsername(username)).thenReturn(Optional.of(mockUser));
+
+        UserResponseDto result = userService
+                .changePassword(username, requestBody);
+
+        assertNotNull(result);
+        verify(userRepo).save(mockUser);
+        assertEquals("user1@mail.com", result.getEmail());
+    }
+
+    @Test
+    void getUserWithRequestRole_willReturnPaginatedListOfUserEntityWithRole(){
+
     }
 }

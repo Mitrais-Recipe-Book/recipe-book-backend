@@ -14,7 +14,7 @@ import javax.websocket.server.PathParam;
 import java.util.List;
 import java.util.Optional;
 
-public interface UserDao extends JpaRepository<UserEntity, Long> {        
+public interface UserDao extends JpaRepository<UserEntity, Long> {
 
     Optional<UserEntity> findByUsername(String username);
 
@@ -44,4 +44,9 @@ public interface UserDao extends JpaRepository<UserEntity, Long> {
     @Query(value = "SELECT EXISTS(SELECT uf FROM users_follows uf " +
             "WHERE uf.creator_id = :creator_id AND uf.user_id = :user_id)", nativeQuery = true)
     Boolean isFollowing(@Param("creator_id") Long creatorId, @Param("user_id") Long userId);
+
+    @Query(value = "SELECT u FROM UserEntity u " +
+            "LEFT JOIN u.roles r " +
+            "WHERE r.name LIKE CONCAT('%',:rolename,'%')")
+    Page<UserEntity> getUsersWithRole(@PathParam("rolename") String rolename, Pageable pageable);
 }
