@@ -21,10 +21,12 @@ import com.cdcone.recipy.user.service.UserService;
 import com.cdcone.recipy.security.CustomUser;
 import com.cdcone.recipy.util.ImageUtil;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
@@ -37,6 +39,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import javax.persistence.EntityNotFoundException;
 
 import static org.mockito.Mockito.*;
 
@@ -319,12 +323,12 @@ class UserServiceTest {
     }
 
     @Test
-    void successAssignRole() {
+    void assignRole_willSuccess_whenUsernameAndRolenameAreFound() {
         Pair<String, RoleEntity> mockRole = Pair.of("success", mock(RoleEntity.class));
         UserEntity mockUser = mock(UserEntity.class);
 
-        when(ROLE_SERVICE.getByName("any")).thenReturn(mockRole);
-        when(userRepo.findByUsername("User")).thenReturn(Optional.of(mockUser));
+        when(ROLE_SERVICE.getByName("rolename")).thenReturn(mockRole);
+        when(userRepo.findByUsername("username")).thenReturn(Optional.of(mockUser));
         when(userRepo.save(mockUser)).thenReturn(mockUser);
 
         assertDoesNotThrow(() -> userService.removeRole("username", "rolename"));
@@ -332,26 +336,25 @@ class UserServiceTest {
     }
 
     @Test
-    void failedGetRoleAssignRole() {
-        Pair<String, RoleEntity> mockRole = Pair.of("failed", mock(RoleEntity.class));
+    void assignRole_willFail_whenRoleNotFound() {
         UserEntity mockUser = mock(UserEntity.class);
 
-        when(ROLE_SERVICE.getByName("any")).thenReturn(mockRole);
-        when(userRepo.findByUsername("User")).thenReturn(Optional.of(mockUser));
+        when(ROLE_SERVICE.getByName("rolename")).thenThrow(EntityNotFoundException.class);
+        when(userRepo.findByUsername("username")).thenReturn(Optional.of(mockUser));
 
-        assertThrows(NullPointerException.class,
-                () -> userService.assignRole("User", "any"));
+        assertThrows(EntityNotFoundException.class,
+                () -> userService.assignRole("username", "rolename"));
     }
 
     @Test
-    void failedGetUserAssignRole() {
+    void assignRole_willFail_whenUsernameNotFound() {
         Pair<String, RoleEntity> mockRole = Pair.of("success", mock(RoleEntity.class));
 
-        when(ROLE_SERVICE.getByName("any")).thenReturn(mockRole);
-        when(userRepo.findByUsername("User")).thenReturn(Optional.empty());
+        when(ROLE_SERVICE.getByName("rolename")).thenReturn(mockRole);
+        when(userRepo.findByUsername("username")).thenThrow(EntityNotFoundException.class);
 
-        assertThrows(NullPointerException.class,
-                () -> userService.assignRole("User", "any"));
+        assertThrows(EntityNotFoundException.class,
+                () -> userService.assignRole("username", "rolename"));
     }
 
     @Test
@@ -402,7 +405,7 @@ class UserServiceTest {
         assertEquals(mockUser, userService.removeRole("username", "rolename"));
     }
 
-    //method_will<expectedResult>_when<params>
+    // method_will<expectedResult>_when<params>
     @Test
     void changePassword_willThrowError_whenOldPasswordNotMatch() {
         String username = "user1";
@@ -410,8 +413,7 @@ class UserServiceTest {
         String newPassword = "new_password";
         String confirmPassword = "new_password";
 
-        ChangePasswordRequestDto requestBody =
-                new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
+        ChangePasswordRequestDto requestBody = new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
         UserEntity mockUser = mock(UserEntity.class);
         when(mockUser.getPassword()).thenReturn("original_password");
         when(userRepo.findByUsername(username)).thenReturn(Optional.of(mockUser));
@@ -430,8 +432,7 @@ class UserServiceTest {
         String confirmPassword = "confirm_password";
 
         UserEntity mockUser = mock(UserEntity.class);
-        ChangePasswordRequestDto requestBody =
-                new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
+        ChangePasswordRequestDto requestBody = new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
         when(mockUser.getPassword()).thenReturn("original_password");
         when(userRepo.findByUsername(username)).thenReturn(Optional.of(mockUser));
 
@@ -450,8 +451,7 @@ class UserServiceTest {
         String confirmPassword = "new_password";
         String email = "user1@mail.com";
 
-        ChangePasswordRequestDto requestBody =
-                new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
+        ChangePasswordRequestDto requestBody = new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
         UserEntity mockUser = new UserEntity(email, username, originalPassword, "user 1");
         mockUser.setId(11L);
         mockUser.setRoles(Set.of(userRole));
@@ -467,7 +467,13 @@ class UserServiceTest {
     }
 
     @Test
-    void getUserWithRequestRole_willReturnPaginatedListOfUserEntityWithRole(){
+    void getUserWithRequestRole_willReturnPaginatedListOfUserEntityWithRole() {
+        UserEntity mockEntity = mock(UserEntity.class);
+        Page<UserEntity> mockResult = new PageImpl<>(List.of(mockEntity));
 
+        when(userRepo.getUsersWithRole("Request", PageRequest.of(0, 10)))
+                .thenReturn(mockResult);
+
+        assertEquals(mockResult.getContent(), userService.getUsersWithRoleRequest(0).getData());
     }
 }

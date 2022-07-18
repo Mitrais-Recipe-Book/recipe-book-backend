@@ -1,6 +1,6 @@
 package com.cdcone.recipy.recipe.service;
 
-import com.cdcone.recipy.error.handler.TagInUseException;
+import com.cdcone.recipy.error.TagInUseException;
 import com.cdcone.recipy.recipe.dto.response.TagAdminResponseDto;
 import com.cdcone.recipy.recipe.dto.response.TagResponseDto;
 import com.cdcone.recipy.recipe.entity.RecipeEntity;
