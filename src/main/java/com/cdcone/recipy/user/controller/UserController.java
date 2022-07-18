@@ -26,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @RestController
@@ -146,17 +145,12 @@ public class UserController {
 
     @PostMapping("{username}/request-creator")
     public ResponseEntity<CommonResponse> requestCreatorRole(@PathVariable(name = "username") String username) {
-        try {
             UserResponseDto dto = UserResponseDto.toDto(userService.assignRole(username, "Request"));
             return ResponseEntity.ok(new CommonResponse("success", dto));
-
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new CommonResponse(e.getMessage()));
-        }
     }
 
     @PutMapping("{username}/approve-creator")
-    public ResponseEntity<CommonResponse> approveRequestedRole(@PathVariable(name = "username") String username) {
+    public ResponseEntity<CommonResponse> approveCreatorRole(@PathVariable(name = "username") String username) {
         userService.removeRole(username, "Request");
         UserResponseDto dto = UserResponseDto.toDto(userService.assignRole(username, "Creator"));
         return ResponseEntity.ok(new CommonResponse("success", dto));
