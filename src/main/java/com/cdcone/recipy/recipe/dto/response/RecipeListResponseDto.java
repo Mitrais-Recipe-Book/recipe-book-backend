@@ -1,5 +1,6 @@
 package com.cdcone.recipy.recipe.dto.response;
 
+import com.cdcone.recipy.recipe.entity.RecipeEntity;
 import com.cdcone.recipy.user.entity.UserEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

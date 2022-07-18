@@ -14,8 +14,8 @@ import com.cdcone.recipy.user.entity.UserEntity;
 import com.cdcone.recipy.recipe.repository.RecipeReactionRepository;
 import com.cdcone.recipy.recipe.repository.RecipeRepository;
 import com.cdcone.recipy.error.PasswordNotMatchException;
-import com.cdcone.recipy.user.repository.RoleDao;
-import com.cdcone.recipy.user.repository.UserDao;
+import com.cdcone.recipy.user.repository.RoleRepository;
+import com.cdcone.recipy.user.repository.UserRepository;
 import com.cdcone.recipy.user.service.RoleService;
 import com.cdcone.recipy.user.service.UserService;
 import com.cdcone.recipy.security.CustomUser;
@@ -44,8 +44,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserServiceTest {
 
-    private static final UserDao userRepo = mock(UserDao.class);
-    private static final RoleDao roleRepo = mock(RoleDao.class);
+    private static final UserRepository userRepo = mock(UserRepository.class);
+    private static final RoleRepository roleRepo = mock(RoleRepository.class);
     private static final RecipeReactionRepository reactionRepo = mock(RecipeReactionRepository.class);
     private static final RecipeRepository recipeRepo = mock(RecipeRepository.class);
     private static final RoleEntity userRole = mock(RoleEntity.class);
@@ -380,6 +380,7 @@ class UserServiceTest {
     @Test
     void testSuccessUpdateUser() {
         reset(userRepo);
+
         UpdateUserRequestDto updateUserDto = new UpdateUserRequestDto("user 123", "user1@mail.com");
         when(userRepo.findByUsername("user1")).thenReturn(Optional.of(follower1));
 

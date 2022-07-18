@@ -13,9 +13,10 @@ import com.cdcone.recipy.user.entity.RoleEntity;
 import com.cdcone.recipy.user.entity.UserEntity;
 import com.cdcone.recipy.recipe.repository.RecipeReactionRepository;
 import com.cdcone.recipy.recipe.repository.RecipeRepository;
+
 import com.cdcone.recipy.error.PasswordNotMatchException;
-import com.cdcone.recipy.user.repository.RoleDao;
-import com.cdcone.recipy.user.repository.UserDao;
+import com.cdcone.recipy.user.repository.RoleRepository;
+import com.cdcone.recipy.user.repository.UserRepository;
 import com.cdcone.recipy.security.CustomUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -47,16 +48,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
-    private final UserDao userDao;
+    private final UserRepository userRepository;
     private final RoleService roleService;
-    private final RoleDao roleDao;
+    private final RoleRepository roleRepository;
     private final RecipeReactionRepository reactionRepo;
     private final RecipeRepository recipeRepo;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
     public CustomUser loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<UserEntity> byUsername = userDao.findByUsername(username);
+        Optional<UserEntity> byUsername = userRepository.findByUsername(username);
         if (byUsername.isEmpty()) {
             throw new UsernameNotFoundException("Username not found");
         }
@@ -85,7 +86,7 @@ public class UserService implements UserDetailsService {
         if (signUpRequestDto.getPassword().length() < 8) {
             msg = "Password must be equal or more than 8 characters";
         } else {
-            Optional<RoleEntity> userRole = roleDao.findByName("User");
+            Optional<RoleEntity> userRole = roleRepository.findByName("User");
             if (userRole.isPresent()) {
                 try {
                     UserEntity user = new UserEntity();
@@ -94,7 +95,7 @@ public class UserService implements UserDetailsService {
                     user.setPassword(passwordEncoder.encode(signUpRequestDto.getPassword()));
                     user.setRoles(Set.of(userRole.get()));
                     user.setFullName(signUpRequestDto.getFullName());
-                    createdUser = UserResponseDto.toDto(userDao.save(user));
+                    createdUser = UserResponseDto.toDto(userRepository.save(user));
                     msg = "Success";
                 } catch (DataIntegrityViolationException e) {
                     msg = "Failed to create user. Username or email is already exists";
@@ -107,11 +108,11 @@ public class UserService implements UserDetailsService {
     }
 
     public UserEntity getById(long id) {
-        return userDao.getById(id);
+        return userRepository.getById(id);
     }
 
     public Pair<String, UserEntity> getByUsername(String username) {
-        Optional<UserEntity> result = userDao.findByUsername(username);
+        Optional<UserEntity> result = userRepository.findByUsername(username);
 
         if (result.isEmpty()) {
             throw new EntityNotFoundException(username);
@@ -121,11 +122,11 @@ public class UserService implements UserDetailsService {
     }
 
     public Optional<UserProfile> findByUsername(String username) {
-        Optional<UserProfile> userProfile = userDao.findDetailByUsername(username);
+        Optional<UserProfile> userProfile = userRepository.findDetailByUsername(username);
         userProfile.ifPresent(it -> {
             int recipeLikes = reactionRepo.getTotalRecipeLikeByUserId(it.getId());
-            Set<RoleEntity> roles = roleDao.findByUserId(it.getId());
-            Long followerCount = userDao.getFollowerCountById(it.getId());
+            Set<RoleEntity> roles = roleRepository.findByUserId(it.getId());
+            Long followerCount = userRepository.getFollowerCountById(it.getId());
             Integer recipeCount = recipeRepo.getTotalRecipeByUsername(username);
             it.setRoles(roles);
             it.setFollowers(followerCount);
@@ -136,11 +137,11 @@ public class UserService implements UserDetailsService {
     }
 
     public PhotoResponseDto getUserPhoto(String username) {
-        return userDao.getProfilePhoto(username);
+        return userRepository.getProfilePhoto(username);
     }
 
     public Pair<Boolean, String> saveProfilePhoto(MultipartFile photo, String username) {
-        Optional<UserEntity> byUsername = userDao.findByUsername(username);
+        Optional<UserEntity> byUsername = userRepository.findByUsername(username);
         String msg = "User not found.";
         boolean uploadedPhoto = false;
         if (byUsername.isPresent()) {
@@ -151,7 +152,7 @@ public class UserService implements UserDetailsService {
                     UserEntity user = byUsername.get();
                     user.setProfilePhoto(resizedPhoto);
                     user.setProfilePhotoType("image/jpeg");
-                    userDao.save(user);
+                    userRepository.save(user);
                     msg = "Success";
                     uploadedPhoto = true;
                 } else {
@@ -178,7 +179,7 @@ public class UserService implements UserDetailsService {
     public PaginatedDto<UserResponseDto> getAllUsers(boolean isPaginated, int page, int size) {
         Pageable pageable = isPaginated ? PageRequest.of(page, size) : Pageable.unpaged();
 
-        Page<UserEntity> allPaged = userDao.findAllPaged(pageable);
+        Page<UserEntity> allPaged = userRepository.findAllPaged(pageable);
         List<UserResponseDto> userResponseDtoList = allPaged.getContent()
                 .stream()
                 .map(UserResponseDto::toDto)
@@ -195,8 +196,8 @@ public class UserService implements UserDetailsService {
             throw new Exception("Cannot follow yourself");
         }
 
-        UserEntity user = userDao.findById(userId).get();
-        UserEntity creator = userDao.findById(creatorId).get();
+        UserEntity user = userRepository.findById(userId).get();
+        UserEntity creator = userRepository.findById(creatorId).get();
 
         Set<UserEntity> follows = user.getFollows();
 
@@ -206,7 +207,7 @@ public class UserService implements UserDetailsService {
 
         follows.add(creator);
         user.setFollows(follows);
-        userDao.save(user);
+        userRepository.save(user);
     }
 
     public void unFollow(long userId, long creatorId) throws Exception {
@@ -214,8 +215,8 @@ public class UserService implements UserDetailsService {
             throw new Exception("Cannot follow yourself");
         }
 
-        UserEntity user = userDao.findById(userId).get();
-        UserEntity creator = userDao.findById(creatorId).get();
+        UserEntity user = userRepository.findById(userId).get();
+        UserEntity creator = userRepository.findById(creatorId).get();
 
         Set<UserEntity> follows = user.getFollows();
 
@@ -225,11 +226,11 @@ public class UserService implements UserDetailsService {
 
         follows.remove(creator);
         user.setFollows(follows);
-        userDao.save(user);
+        userRepository.save(user);
     }
 
     public List<FollowingListResponseDto> getFollowList(long userId) {
-        List<UserEntity> entities = new ArrayList<>(userDao.findById(userId).get().getFollows());
+        List<UserEntity> entities = new ArrayList<>(userRepository.findById(userId).get().getFollows());
         return entities.stream()
                 .map(entity -> new FollowingListResponseDto(
                         entity.getId(),
@@ -239,15 +240,15 @@ public class UserService implements UserDetailsService {
     }
 
     public List<FollowerDto> getFollowerList(long userId) {
-        return userDao.getFollowersById(userId);
+        return userRepository.getFollowersById(userId);
     }
 
     public Long getFollowerCountById(long userId) {
-        return userDao.getFollowerCountById(userId);
+        return userRepository.getFollowerCountById(userId);
     }
 
     public Boolean isFollowing(Long creatorId, Long userId) {
-        return userDao.isFollowing(creatorId, userId);
+        return userRepository.isFollowing(creatorId, userId);
     }
 
     public UserEntity assignRole(String username, String rolename) {
@@ -255,7 +256,7 @@ public class UserService implements UserDetailsService {
         Pair<String, UserEntity> user = getByUsername(username);
 
         user.getSecond().getRoles().add(role.getSecond());
-        return userDao.save(user.getSecond());
+        return userRepository.save(user.getSecond());
     }
 
     public UserEntity removeRole(String username, String rolename) {
@@ -263,14 +264,14 @@ public class UserService implements UserDetailsService {
         Pair<String, UserEntity> user = getByUsername(username);
 
         user.getSecond().getRoles().remove(role.getSecond());
-        return userDao.save(user.getSecond());
+        return userRepository.save(user.getSecond());
     }
 
     public PaginatedDto<UserEntity> getUsersWithRoleRequest(int page) {
         String rolename = "Request";
 
         Pageable pageable = PageRequest.of(page, 10);
-        Page<UserEntity> result = userDao.getUsersWithRole(rolename, pageable);
+        Page<UserEntity> result = userRepository.getUsersWithRole(rolename, pageable);
         return new PaginatedDto<>(result.getContent(),
                 result.getNumber(),
                 result.getTotalPages(),
@@ -288,7 +289,7 @@ public class UserService implements UserDetailsService {
                 UserEntity user = byUsername.getSecond();
                 user.setEmail(updateUserDto.getEmail().toLowerCase());
                 user.setFullName(updateUserDto.getFullName().toLowerCase());
-                userDao.save(user);
+                userRepository.save(user);
                 result = UserResponseDto.toDto(user);
                 status = HttpStatus.OK;
             } catch (DataIntegrityViolationException e) {
@@ -302,7 +303,7 @@ public class UserService implements UserDetailsService {
     public UserResponseDto changePassword(
             String username,
             ChangePasswordRequestDto request) {
-        Optional<UserEntity> byUsername = userDao.findByUsername(username);
+        Optional<UserEntity> byUsername = userRepository.findByUsername(username);
 
         if (byUsername.isEmpty()) {
             throw new EntityNotFoundException(username);
@@ -316,7 +317,7 @@ public class UserService implements UserDetailsService {
         }
 
         user.setPassword(request.getNewPassword());
-        userDao.save(user);
+        userRepository.save(user);
 
         return UserResponseDto.toDto(user);
     }

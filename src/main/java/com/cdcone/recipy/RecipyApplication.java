@@ -5,7 +5,7 @@ import java.util.Set;
 import com.cdcone.recipy.recipe.dto.request.RecipeAddRequestDto;
 import com.cdcone.recipy.user.dto.request.SignUpRequestDto;
 import com.cdcone.recipy.user.entity.RoleEntity;
-import com.cdcone.recipy.user.repository.RoleDao;
+import com.cdcone.recipy.user.repository.RoleRepository;
 import com.cdcone.recipy.user.service.UserService;
 import com.cdcone.recipy.recipe.service.RecipeService;
 import com.cdcone.recipy.recipe.service.TagService;
@@ -29,7 +29,7 @@ public class RecipyApplication {
 	CommandLineRunner run(
 			RecipeService recipeService,
 			UserService userService,
-			RoleDao roleService,
+			RoleRepository roleService,
 			TagService tagService) {
 		return args -> {
 			if (!generateDummyData) {
