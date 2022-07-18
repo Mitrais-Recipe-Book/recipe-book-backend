@@ -146,7 +146,7 @@ public class RecipeService {
 
     public Pair<String, Page<RecipeListResponseDto>> getPublishedRecipes(RecipeSearchRequestDto dto) {
         if (dto.getTagId() == null || dto.getTagId().isEmpty()) {
-            Pair<String, List<TagEntity>> tagResult = tagService.getAllTags();
+            Pair<String, List<TagResponseDto>> tagResult = tagService.getAllTags();
 
             Set<Integer> allTags = tagResult.getSecond()
                     .stream()
@@ -276,12 +276,14 @@ public class RecipeService {
 
     public PaginatedDto<UserRecipeResponseDto> getByUsername(String userName, int page, boolean isDraft) {
         Pageable pageable = PageRequest.of(page, 5);
-        Page<UserRecipeResponseDto> byUserId = recipeRepository.findByUsername(userName, isDraft, pageable);
-        byUserId.getContent().forEach(it -> {
-            Set<TagEntity> tags = tagService.getByRecipeId(it.getId());
-            it.setTags(tags);
-        });
-        return new PaginatedDto<>(byUserId.getContent(),
+        Page<RecipeEntity> byUserId = recipeRepository.findByUserUsernameAndIsDraftIs(userName, isDraft, pageable);
+        List<UserRecipeResponseDto> recipeList = byUserId.stream()
+                .map(it -> new UserRecipeResponseDto(
+                        it.getId(), it.getTitle(),
+                        it.getOverview(), it.getUser().getFullName(),
+                        it.getViews(), it.getDateCreated(),
+                        it.getTags())).collect(Collectors.toList());
+        return new PaginatedDto<>(recipeList,
                 byUserId.getNumber(),
                 byUserId.getTotalPages(),
                 byUserId.isLast(),

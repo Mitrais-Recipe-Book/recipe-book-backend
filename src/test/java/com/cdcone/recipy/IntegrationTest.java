@@ -235,8 +235,8 @@ class IntegrationTest {
 	void testFailDeleteTagIfNotFound() throws Exception {
 		Integer tagId = 99;
 		mockMvc.perform(delete("/api/v1/tag/" + tagId))
-				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.message").value("error: Tag not found"))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.message").value("failed: tag  not found."))
 				.andReturn();
 	}
 

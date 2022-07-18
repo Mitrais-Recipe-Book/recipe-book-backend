@@ -1,13 +1,13 @@
 package com.cdcone.recipy.recipe.dto.response;
 
 import com.cdcone.recipy.recipe.entity.RecipeEntity;
-import com.cdcone.recipy.recipe.entity.TagEntity;
 import com.cdcone.recipy.user.entity.UserEntity;
 import lombok.Getter;
 
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Getter
 public class RecipeDetailResponseDto {
@@ -20,7 +20,7 @@ public class RecipeDetailResponseDto {
     private String videoURL;
     private int views;
     private Map<String, Object> author;
-    private Set<TagEntity> tags;
+    private Set<TagResponseDto> tags;
 
     public RecipeDetailResponseDto(RecipeEntity recipe) {
         UserEntity author = recipe.getUser();
@@ -37,6 +37,8 @@ public class RecipeDetailResponseDto {
                 "id", author.getId(),
                 "username", author.getUsername(),
                 "name", author.getFullName());
-        this.tags = recipe.getTags();
+        this.tags = recipe.getTags().stream()
+                .map(it -> new TagResponseDto(it.getId(), it.getName()))
+                .collect(Collectors.toSet());
     }
 }

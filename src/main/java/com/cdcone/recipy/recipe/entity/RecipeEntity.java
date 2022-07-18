@@ -21,6 +21,7 @@ import javax.persistence.UniqueConstraint;
 import com.cdcone.recipy.user.entity.UserEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.annotations.Type;
 
 import lombok.Data;
@@ -78,6 +79,7 @@ public class RecipeEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
+    @JsonManagedReference
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(joinColumns = @JoinColumn(name = "recipe_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"))
     private Set<TagEntity> tags;

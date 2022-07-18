@@ -5,7 +5,6 @@ import java.util.Set;
 import javax.websocket.server.PathParam;
 
 import com.cdcone.recipy.recipe.dto.response.RecipeListResponseDto;
-import com.cdcone.recipy.recipe.dto.response.UserRecipeResponseDto;
 import com.cdcone.recipy.recipe.entity.RecipeEntity;
 
 import org.springframework.data.domain.Page;
@@ -42,14 +41,6 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
                         "ORDER BY recipe.views DESC ")
         public Set<RecipeListResponseDto> getPopularRecipes();
 
-        @Query(value = "SELECT NEW com.cdcone.recipy.recipe.dto.response.UserRecipeResponseDto" +
-                        "(r.id, r.title, r.overview, r.user.fullName, r.views, r.dateCreated) " +
-                        "FROM RecipeEntity r WHERE r.user.username = :username " +
-                        "AND r.isDraft = :isDraft")
-        Page<UserRecipeResponseDto> findByUsername(
-                @Param("username") String username, 
-                @Param("isDraft") boolean isDraft, Pageable pageable);
-
         @Query("SELECT NEW com.cdcone.recipy.recipe.dto.response.RecipeListResponseDto " +
                         "(recipe.id, recipe.title, recipe.overview, recipe.views, recipe.user) " +
                         "FROM RecipeEntity recipe " +
@@ -61,4 +52,6 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
                 + "WHERE r.user.username = :username "
                 + "AND r.isDraft = 'FALSE'")
         public Integer getTotalRecipeByUsername(@Param("username") String username);
+
+        Page<RecipeEntity> findByUserUsernameAndIsDraftIs(String username, boolean isDraft, Pageable pageable);
 }
