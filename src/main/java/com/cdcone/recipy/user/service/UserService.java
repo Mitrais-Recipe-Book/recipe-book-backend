@@ -303,20 +303,17 @@ public class UserService implements UserDetailsService {
     public UserResponseDto changePassword(
             String username,
             ChangePasswordRequestDto request) {
-        Optional<UserEntity> byUsername = userRepository.findByUsername(username);
+        Pair<String, UserEntity> byUsername = getByUsername(username);
 
-        if (byUsername.isEmpty()) {
-            throw new EntityNotFoundException(username);
-        }
+        UserEntity user = byUsername.getSecond();
 
-        UserEntity user = byUsername.get();
-
-        if (!request.getOldPassword().equals(user.getPassword())
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())
                 || !request.getNewPassword().equals(request.getConfirmPassword())) {
             throw new PasswordNotMatchException();
         }
 
-        user.setPassword(request.getNewPassword());
+        String newPassword = passwordEncoder.encode(request.getNewPassword());
+        user.setPassword(newPassword);
         userRepository.save(user);
 
         return UserResponseDto.toDto(user);

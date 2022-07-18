@@ -58,6 +58,8 @@ class UserServiceTest {
     private static final UserEntity follower1 = mock(UserEntity.class);
     private static UserService userService;
     private static final RoleService ROLE_SERVICE = mock(RoleService.class);
+    private static final BCryptPasswordEncoder passwordEncoder =
+            new BCryptPasswordEncoder();
 
     @BeforeAll
     public static void setUp() {
@@ -337,6 +339,7 @@ class UserServiceTest {
 
     @Test
     void assignRole_willFail_whenRoleNotFound() {
+        reset(userRepo);
         UserEntity mockUser = mock(UserEntity.class);
 
         when(ROLE_SERVICE.getByName("rolename")).thenThrow(EntityNotFoundException.class);
@@ -362,10 +365,9 @@ class UserServiceTest {
         String username = "user1";
         when(userRepo.findByUsername(username)).thenReturn(Optional.empty());
 
-        Pair<HttpStatus, Optional<UserResponseDto>> result = userService.updateUser(username,
-                mock(UpdateUserRequestDto.class));
-
-        assertEquals(HttpStatus.NOT_FOUND, result.getFirst());
+        EntityNotFoundException result = assertThrows(EntityNotFoundException.class,
+                () -> userService.updateUser(username, mock(UpdateUserRequestDto.class)));
+        assertEquals(username, result.getMessage());
     }
 
     @Test
@@ -406,7 +408,6 @@ class UserServiceTest {
         assertEquals(mockUser, userService.removeRole("username", "rolename"));
     }
 
-    // method_will<expectedResult>_when<params>
     @Test
     void changePassword_willThrowError_whenOldPasswordNotMatch() {
         String username = "user1";
@@ -416,13 +417,13 @@ class UserServiceTest {
 
         ChangePasswordRequestDto requestBody = new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
         UserEntity mockUser = mock(UserEntity.class);
-        when(mockUser.getPassword()).thenReturn("original_password");
+        when(mockUser.getPassword()).thenReturn(passwordEncoder.encode("original_password"));
         when(userRepo.findByUsername(username)).thenReturn(Optional.of(mockUser));
 
         PasswordNotMatchException result = assertThrows(PasswordNotMatchException.class,
                 () -> userService.changePassword(username, requestBody));
 
-        assertEquals("Password does not match.", result.getMessage());
+        assertEquals("failed: password does not match", result.getMessage());
     }
 
     @Test
@@ -434,19 +435,19 @@ class UserServiceTest {
 
         UserEntity mockUser = mock(UserEntity.class);
         ChangePasswordRequestDto requestBody = new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
-        when(mockUser.getPassword()).thenReturn("original_password");
+        when(mockUser.getPassword()).thenReturn(passwordEncoder.encode("original_password"));
         when(userRepo.findByUsername(username)).thenReturn(Optional.of(mockUser));
 
         PasswordNotMatchException result = assertThrows(PasswordNotMatchException.class,
                 () -> userService.changePassword(username, requestBody));
 
-        assertEquals("failed: password does not match.", result.getMessage());
+        assertEquals("failed: password does not match", result.getMessage());
     }
 
     @Test
     void changePassword_willReturnUserResponseDto_whenPasswordMatch() {
         String username = "user1";
-        String originalPassword = "original_password";
+        String originalPassword = passwordEncoder.encode("original_password");
         String oldPassword = "original_password";
         String newPassword = "new_password";
         String confirmPassword = "new_password";
