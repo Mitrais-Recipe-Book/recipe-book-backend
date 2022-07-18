@@ -13,9 +13,10 @@ import com.cdcone.recipy.user.entity.RoleEntity;
 import com.cdcone.recipy.user.entity.UserEntity;
 import com.cdcone.recipy.recipe.repository.RecipeReactionRepository;
 import com.cdcone.recipy.recipe.repository.RecipeRepository;
+
 import com.cdcone.recipy.error.PasswordNotMatchException;
-import com.cdcone.recipy.user.repository.RoleDao;
-import com.cdcone.recipy.user.repository.UserDao;
+import com.cdcone.recipy.user.repository.RoleRepository;
+import com.cdcone.recipy.user.repository.UserRepository;
 import com.cdcone.recipy.security.CustomUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -47,9 +48,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
-    private final UserDao userRepository;
+    private final UserRepository userRepository;
     private final RoleService roleService;
-    private final RoleDao roleDao;
+    private final RoleRepository roleRepository;
     private final RecipeReactionRepository reactionRepo;
     private final RecipeRepository recipeRepo;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -85,7 +86,7 @@ public class UserService implements UserDetailsService {
         if (signUpRequestDto.getPassword().length() < 8) {
             msg = "Password must be equal or more than 8 characters";
         } else {
-            Optional<RoleEntity> userRole = roleDao.findByName("User");
+            Optional<RoleEntity> userRole = roleRepository.findByName("User");
             if (userRole.isPresent()) {
                 try {
                     UserEntity user = new UserEntity();
@@ -124,7 +125,7 @@ public class UserService implements UserDetailsService {
         Optional<UserProfile> userProfile = userRepository.findDetailByUsername(username);
         userProfile.ifPresent(it -> {
             int recipeLikes = reactionRepo.getTotalRecipeLikeByUserId(it.getId());
-            Set<RoleEntity> roles = roleDao.findByUserId(it.getId());
+            Set<RoleEntity> roles = roleRepository.findByUserId(it.getId());
             Long followerCount = userRepository.getFollowerCountById(it.getId());
             Integer recipeCount = recipeRepo.getTotalRecipeByUsername(username);
             it.setRoles(roles);
