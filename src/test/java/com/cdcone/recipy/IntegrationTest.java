@@ -677,7 +677,7 @@ class IntegrationTest {
 		RecipeFavoriteRequestDto requestDto = new RecipeFavoriteRequestDto(username);
 
 		MvcResult mr = mockMvc.perform(get("/api/v1/recipe/" + recipeId + "/favorite")
-						.queryParam("username", username))
+				.queryParam("username", username))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.message").value("success: data retrieved"))
 				.andReturn();
@@ -724,9 +724,9 @@ class IntegrationTest {
 		String username = "user1";
 
 		MvcResult mr = mockMvc.perform(get("/api/v1/user/" + username + "/favorite-recipe")
-						.queryParam("isPaginated", "false")
-						.queryParam("page", "0")
-						.queryParam("size", "10"))
+				.queryParam("isPaginated", "false")
+				.queryParam("page", "0")
+				.queryParam("size", "10"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.message").value("success: data retrieved"))
 				.andExpect(jsonPath("$.payload.data").isNotEmpty())
@@ -742,7 +742,7 @@ class IntegrationTest {
 
 		mockMvc.perform(post("/api/v1/user/" + username + "/request-creator"))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.message").value("success: " + username + " adding Request"))
+				.andExpect(jsonPath("$.message").value("success"))
 				.andReturn();
 	}
 
@@ -751,8 +751,8 @@ class IntegrationTest {
 		String username = "noname";
 
 		mockMvc.perform(post("/api/v1/user/" + username + "/request-creator"))
-				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.message").value("failed: user with username " + username + " not found"))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.message").value("failed: " + username + " not found"))
 				.andReturn();
 	}
 
@@ -763,7 +763,7 @@ class IntegrationTest {
 
 		mockMvc.perform(post("/api/v1/user/" + username + "/assign-" + rolename))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.message").value("success: " + username + " adding " + rolename))
+				.andExpect(jsonPath("$.message").value("success"))
 				.andReturn();
 	}
 
@@ -773,8 +773,8 @@ class IntegrationTest {
 		String rolename = "Admin";
 
 		mockMvc.perform(post("/api/v1/user/" + username + "/assign-" + rolename))
-				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.message").value("failed: user with username " + username + " not found"))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.message").value("failed: " + username + " not found"))
 				.andReturn();
 	}
 
@@ -784,13 +784,13 @@ class IntegrationTest {
 		String rolename = "notfound";
 
 		mockMvc.perform(post("/api/v1/user/" + username + "/assign-" + rolename))
-				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.message").value("failed: cannot find role with name " + rolename)).andReturn();
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.message").value("failed: role " + rolename + " not found")).andReturn();
 	}
 
 	@Test
 	void testSuccessGetTagsAndView() throws Exception {
-		MvcResult result = mockMvc.perform(get("/api/v1/tag/all"))
+		mockMvc.perform(get("/api/v1/tag/all"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.message").value("success: data retrieved"))
 				.andExpect(jsonPath("$.payload").isArray())
@@ -812,12 +812,11 @@ class IntegrationTest {
 		String username = "user1";
 		String oldPassword = "wrong_old_password";
 		String newPassword = "new_password";
-		ChangePasswordRequestDto requestDto =
-				new ChangePasswordRequestDto(oldPassword, newPassword, newPassword);
+		ChangePasswordRequestDto requestDto = new ChangePasswordRequestDto(oldPassword, newPassword, newPassword);
 
 		mockMvc.perform(put("/api/v1/user/" + username + "/profile/change-password")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(om.writeValueAsBytes(requestDto)))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(om.writeValueAsBytes(requestDto)))
 				.andExpect(status().isBadRequest())
 				.andReturn();
 	}
@@ -828,12 +827,11 @@ class IntegrationTest {
 		String oldPassword = "user123";
 		String newPassword = "new_password";
 		String confirmPassword = "confirm_password";
-		ChangePasswordRequestDto requestDto =
-				new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
+		ChangePasswordRequestDto requestDto = new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
 
 		mockMvc.perform(put("/api/v1/user/" + username + "/profile/change-password")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(om.writeValueAsBytes(requestDto)))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(om.writeValueAsBytes(requestDto)))
 				.andExpect(status().isBadRequest())
 				.andReturn();
 	}
@@ -844,12 +842,11 @@ class IntegrationTest {
 		String oldPassword = "user123";
 		String newPassword = "new_password";
 		String confirmPassword = "new_password";
-		ChangePasswordRequestDto requestDto =
-				new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
+		ChangePasswordRequestDto requestDto = new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
 
 		mockMvc.perform(put("/api/v1/user/" + username + "/profile/change-password")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(om.writeValueAsBytes(requestDto)))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(om.writeValueAsBytes(requestDto)))
 				.andExpect(status().isBadRequest())
 				.andReturn();
 	}

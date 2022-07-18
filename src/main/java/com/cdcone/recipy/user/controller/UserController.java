@@ -145,13 +145,8 @@ public class UserController {
 
     @PostMapping("{username}/request-creator")
     public ResponseEntity<CommonResponse> requestCreatorRole(@PathVariable(name = "username") String username) {
-        try {
             UserResponseDto dto = UserResponseDto.toDto(userService.assignRole(username, "Request"));
             return ResponseEntity.ok(new CommonResponse("success", dto));
-
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new CommonResponse(e.getMessage()));
-        }
     }
 
     @PutMapping("{username}/approve-creator")
