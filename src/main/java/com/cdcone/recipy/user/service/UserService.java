@@ -272,16 +272,10 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user.getSecond());
     }
 
-    public PaginatedDto<UserEntity> getUsersWithRoleRequest(int page) {
+    public List<UserEntity> getUsersWithRoleRequest() {
         String rolename = "Request";
 
-        Pageable pageable = PageRequest.of(page, 10);
-        Page<UserEntity> result = userRepository.getUsersWithRole(rolename, pageable);
-        return new PaginatedDto<>(result.getContent(),
-                result.getNumber(),
-                result.getTotalPages(),
-                result.isLast(),
-                result.getTotalElements());
+        return userRepository.getUsersWithRole(rolename);
     }
 
     public Pair<HttpStatus, Optional<UserResponseDto>> updateUser(String username, UpdateUserRequestDto updateUserDto) {

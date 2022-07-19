@@ -25,20 +25,4 @@ public class UserProfile {
         this.totalRecipes = totalRecipes;
         this.recipeLikes = recipeLikes;
     }
-
-    public void setRoles(Set<RoleEntity> roles) {
-        this.roles = roles;
-    }
-
-    public void setFollowers(Long followers) {
-        this.followers = followers;
-    }
-    
-    public void setRecipeLikes(int recipeLikes) {
-        this.recipeLikes = recipeLikes;
-    }
-    
-    public void setTotalRecipes(int totalRecipes) {
-        this.totalRecipes = totalRecipes;
-    }
 }
