@@ -175,7 +175,7 @@ public class UserController {
 
     @GetMapping("/role-request/{page}")
     public ResponseEntity<CommonResponse> getAllUserWithRequestRole(
-            @RequestParam int page) {
+            @PathVariable int page) {
         PaginatedDto<UserEntity> result = userService.getUsersWithRoleRequest(page);
         PaginatedDto<UserResponseDto> dto = new PaginatedDto<>(result.getData().stream()
                 .map(i -> new UserResponseDto(i.getId(),
