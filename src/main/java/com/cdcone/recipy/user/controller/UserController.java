@@ -145,8 +145,8 @@ public class UserController {
 
     @PostMapping("{username}/request-creator")
     public ResponseEntity<CommonResponse> requestCreatorRole(@PathVariable(name = "username") String username) {
-            UserResponseDto dto = UserResponseDto.toDto(userService.assignRole(username, "Request"));
-            return ResponseEntity.ok(new CommonResponse("success", dto));
+        UserResponseDto dto = UserResponseDto.toDto(userService.assignRole(username, "Request"));
+        return ResponseEntity.ok(new CommonResponse("success", dto));
     }
 
     @PutMapping("{username}/approve-creator")
@@ -173,18 +173,15 @@ public class UserController {
         return ResponseEntity.ok(new CommonResponse("success", dto));
     }
 
-    @GetMapping("/role-request/{page}")
-    public ResponseEntity<CommonResponse> getAllUserWithRequestRole(
-            @RequestParam int page) {
-        PaginatedDto<UserEntity> result = userService.getUsersWithRoleRequest(page);
-        PaginatedDto<UserResponseDto> dto = new PaginatedDto<>(result.getData().stream()
+    @GetMapping("/role-request/")
+    public ResponseEntity<CommonResponse> getAllUserWithRequestRole() {
+        List<UserResponseDto> dto = userService.getUsersWithRoleRequest().stream()
                 .map(i -> new UserResponseDto(i.getId(),
                         i.getEmail(),
                         i.getUsername(),
                         i.getFullName(),
                         i.getRoles().stream().map(RoleEntity::getName).collect(Collectors.toSet())))
-                .collect(Collectors.toList()),
-                result.getCurrentPage(), result.getTotalPages(), result.isIslast(), result.getTotalItem());
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok(new CommonResponse(dto));
     }
