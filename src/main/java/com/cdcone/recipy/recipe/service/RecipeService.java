@@ -15,7 +15,6 @@ import com.cdcone.recipy.recipe.dto.request.*;
 import com.cdcone.recipy.recipe.entity.*;
 import com.cdcone.recipy.recipe.repository.RecipeFavoriteRepository;
 import com.cdcone.recipy.user.dto.repository.UserProfile;
-import com.cdcone.recipy.user.repository.UserRepository;
 import com.cdcone.recipy.recipe.repository.RecipeReactionRepository;
 import com.cdcone.recipy.recipe.repository.RecipeRepository;
 
@@ -529,6 +528,10 @@ public class RecipeService {
                 resultPage.isLast(),
                 resultPage.getTotalElements());
         return Pair.of("success: data retrieved", result);
+    }
+
+    public int getTotalRecipeLikeByUserId(Long id) {
+        return recipeReactionRepository.getTotalRecipeLikeByUserId(id);
     }
 
     public PaginatedDto<RecipeListResponseDto> getRecipeViewed(String username, Boolean isPaginated, Integer page,

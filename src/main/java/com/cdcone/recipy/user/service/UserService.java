@@ -11,9 +11,8 @@ import com.cdcone.recipy.user.dto.repository.UserProfile;
 import com.cdcone.recipy.user.dto.response.UserResponseDto;
 import com.cdcone.recipy.user.entity.RoleEntity;
 import com.cdcone.recipy.user.entity.UserEntity;
-import com.cdcone.recipy.recipe.repository.RecipeReactionRepository;
 import com.cdcone.recipy.recipe.repository.RecipeRepository;
-
+import com.cdcone.recipy.recipe.service.RecipeService;
 import com.cdcone.recipy.error.PasswordNotMatchException;
 import com.cdcone.recipy.user.repository.RoleRepository;
 import com.cdcone.recipy.user.repository.UserRepository;
@@ -51,8 +50,8 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final RoleService roleService;
     private final RoleRepository roleRepository;
-    private final RecipeReactionRepository reactionRepo;
     private final RecipeRepository recipeRepo;
+    private final RecipeService recipeService;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
@@ -124,7 +123,7 @@ public class UserService implements UserDetailsService {
     public Optional<UserProfile> findByUsername(String username) {
         Optional<UserProfile> userProfile = userRepository.findDetailByUsername(username);
         userProfile.ifPresent(it -> {
-            int recipeLikes = reactionRepo.getTotalRecipeLikeByUserId(it.getId());
+            int recipeLikes = recipeService.getTotalRecipeLikeByUserId(it.getId());
             Set<RoleEntity> roles = roleRepository.findByUserId(it.getId());
             Long followerCount = userRepository.getFollowerCountById(it.getId());
             Integer recipeCount = recipeRepo.getTotalRecipeByUsername(username);

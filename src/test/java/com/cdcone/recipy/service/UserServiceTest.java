@@ -13,6 +13,7 @@ import com.cdcone.recipy.user.entity.RoleEntity;
 import com.cdcone.recipy.user.entity.UserEntity;
 import com.cdcone.recipy.recipe.repository.RecipeReactionRepository;
 import com.cdcone.recipy.recipe.repository.RecipeRepository;
+import com.cdcone.recipy.recipe.service.RecipeService;
 import com.cdcone.recipy.error.PasswordNotMatchException;
 import com.cdcone.recipy.user.repository.RoleRepository;
 import com.cdcone.recipy.user.repository.UserRepository;
@@ -21,7 +22,6 @@ import com.cdcone.recipy.user.service.UserService;
 import com.cdcone.recipy.security.CustomUser;
 import com.cdcone.recipy.util.ImageUtil;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -52,6 +52,7 @@ class UserServiceTest {
     private static final RoleRepository roleRepo = mock(RoleRepository.class);
     private static final RecipeReactionRepository reactionRepo = mock(RecipeReactionRepository.class);
     private static final RecipeRepository recipeRepo = mock(RecipeRepository.class);
+    private static final RecipeService RECIPE_SERVICE = mock(RecipeService.class);
     private static final RoleEntity userRole = mock(RoleEntity.class);
     private static final SignUpRequestDto SIGN_UP_REQUEST_DTO = mock(SignUpRequestDto.class);
     private static final UserEntity creator = mock(UserEntity.class);
@@ -61,8 +62,8 @@ class UserServiceTest {
 
     @BeforeAll
     public static void setUp() {
-        userService = new UserService(userRepo, ROLE_SERVICE, roleRepo,
-                reactionRepo, recipeRepo, new BCryptPasswordEncoder());
+        userService = new UserService(userRepo, ROLE_SERVICE, roleRepo, recipeRepo, RECIPE_SERVICE,
+                new BCryptPasswordEncoder());
 
         when(SIGN_UP_REQUEST_DTO.getEmail()).thenReturn("test@mail.com");
         when(SIGN_UP_REQUEST_DTO.getUsername()).thenReturn("test");
