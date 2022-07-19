@@ -471,11 +471,11 @@ class UserServiceTest {
     @Test
     void getUserWithRequestRole_willReturnPaginatedListOfUserEntityWithRole() {
         UserEntity mockEntity = mock(UserEntity.class);
-        Page<UserEntity> mockResult = new PageImpl<>(List.of(mockEntity));
+        List<UserEntity> mockResult = List.of(mockEntity);
 
-        when(userRepo.getUsersWithRole("Request", PageRequest.of(0, 10)))
+        when(userRepo.getUsersWithRole("Request"))
                 .thenReturn(mockResult);
 
-        assertEquals(mockResult.getContent(), userService.getUsersWithRoleRequest(0).getData());
+        assertEquals(mockResult, userService.getUsersWithRoleRequest());
     }
 }
