@@ -124,7 +124,7 @@ class IntegrationTest {
 		String username = "unavailablexxx";
 		mockMvc.perform(get("/api/v1/user/" + username))
 				.andExpect(status().isNotFound())
-				.andExpect(jsonPath("$.message").value("User not found."))
+				.andExpect(jsonPath("$.message").value("failed: unavailablexxx not found"))
 				.andReturn();
 	}
 

@@ -1,5 +1,8 @@
 package com.cdcone.recipy.user.service;
 
+import com.cdcone.recipy.recipe.entity.RecipeEntity;
+import com.cdcone.recipy.recipe.entity.RecipeReactionEntity;
+import com.cdcone.recipy.recipe.service.RecipeReactionService;
 import com.cdcone.recipy.user.dto.repository.FollowerDto;
 import com.cdcone.recipy.recipe.dto.response.FollowingListResponseDto;
 import com.cdcone.recipy.dto.response.PhotoResponseDto;
@@ -11,8 +14,6 @@ import com.cdcone.recipy.user.dto.repository.UserProfile;
 import com.cdcone.recipy.user.dto.response.UserResponseDto;
 import com.cdcone.recipy.user.entity.RoleEntity;
 import com.cdcone.recipy.user.entity.UserEntity;
-import com.cdcone.recipy.recipe.repository.RecipeReactionRepository;
-import com.cdcone.recipy.recipe.repository.RecipeRepository;
 
 import com.cdcone.recipy.error.PasswordNotMatchException;
 import com.cdcone.recipy.user.repository.RoleRepository;
@@ -51,8 +52,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final RoleService roleService;
     private final RoleRepository roleRepository;
-    private final RecipeReactionRepository reactionRepo;
-    private final RecipeRepository recipeRepo;
+    private final RecipeReactionService recipeReactionService;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
@@ -122,18 +122,23 @@ public class UserService implements UserDetailsService {
     }
 
     public Optional<UserProfile> findByUsername(String username) {
-        Optional<UserProfile> userProfile = userRepository.findDetailByUsername(username);
-        userProfile.ifPresent(it -> {
-            int recipeLikes = reactionRepo.getTotalRecipeLikeByUserId(it.getId());
-            Set<RoleEntity> roles = roleRepository.findByUserId(it.getId());
-            Long followerCount = userRepository.getFollowerCountById(it.getId());
-            Integer recipeCount = recipeRepo.getTotalRecipeByUsername(username);
-            it.setRoles(roles);
-            it.setFollowers(followerCount);
-            it.setRecipeLikes(recipeLikes);
-            it.setTotalRecipes(recipeCount);
-        });
-        return userProfile;
+        UserEntity user = getByUsername(username).getSecond();
+        List<RecipeReactionEntity> recipeReactions = recipeReactionService
+                .getReactionByMultipleRecipeId(user.getRecipes().stream()
+                        .map(RecipeEntity::getId).collect(Collectors.toList()));
+        Long totalRecipe = user.getRecipes().stream()
+                .filter(it -> !it.isDraft())
+                .count();
+        Long followers = getFollowerCountById(user.getId());
+        UserProfile userProfile = new UserProfile(
+                user.getId(),
+                user.getUsername(),
+                user.getFullName(),
+                totalRecipe.intValue(),
+                recipeReactions.size(),
+                followers,
+                user.getRoles());
+        return Optional.of(userProfile);
     }
 
     public PhotoResponseDto getUserPhoto(String username) {

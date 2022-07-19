@@ -1,11 +1,13 @@
 package com.cdcone.recipy.user.dto.repository;
 
 import com.cdcone.recipy.user.entity.RoleEntity;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Set;
 
 @Getter
+@AllArgsConstructor
 public class UserProfile {
 
     private final long id;

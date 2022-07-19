@@ -2,6 +2,7 @@ package com.cdcone.recipy.recipe.repository;
 
 import com.cdcone.recipy.recipe.dto.response.RecipeUserReactionResponseDto;
 import com.cdcone.recipy.recipe.entity.RecipeReactionEntity;
+import com.cdcone.recipy.recipe.entity.RecipeReactionEntity.Reaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -25,4 +26,6 @@ public interface RecipeReactionRepository extends JpaRepository<RecipeReactionEn
     @Query("SELECT COUNT(rr.reaction) FROM RecipeReactionEntity rr "
             + "JOIN rr.recipe r WHERE rr.reaction='LIKED' AND r.id=:userId")
     Integer getTotalRecipeLikeByUserId(@Param("userId") long userId);
+
+    List<RecipeReactionEntity> findByReactionAndRecipeIdIn(Reaction reaction, List<Long> recipes);
 }
