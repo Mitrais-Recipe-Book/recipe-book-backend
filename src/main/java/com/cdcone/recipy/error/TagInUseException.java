@@ -1,4 +1,4 @@
-package com.cdcone.recipy.error.handler;
+package com.cdcone.recipy.error;
 
 public class TagInUseException extends RuntimeException {
     public TagInUseException() {

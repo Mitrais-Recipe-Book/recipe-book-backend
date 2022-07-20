@@ -549,8 +549,8 @@ public class RecipeService {
                             rv.getRecipe().getTitle(),
                             rv.getRecipe().getOverview(),
                             rv.getRecipe().getViews());
-                    AuthorResponseDto author = new AuthorResponseDto(rv.getUser().getUsername(),
-                            rv.getUser().getFullName(),
+                    AuthorResponseDto author = new AuthorResponseDto(rv.getRecipe().getUser().getUsername(),
+                            rv.getRecipe().getUser().getFullName(),
                             userService.getFollowerCountById(rv.getUser().getId()));
                     dto.setAuthor(author);
                     return dto;
