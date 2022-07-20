@@ -44,6 +44,8 @@ public class RecipeServiceTest {
 
         private RecipeService recipeService;
 
+        private RecipeViewedService recipeViewedService;
+
         private static final UserRepository USER_REPOSITORY = mock(UserRepository.class);
         private static final RecipeRepository RECIPE_REPOSITORY = mock(RecipeRepository.class);
         private static final RecipeReactionRepository RECIPE_REACTION_REPOSITORY = mock(RecipeReactionRepository.class);
@@ -63,8 +65,9 @@ public class RecipeServiceTest {
 
         @BeforeEach
         public void init() {
+                recipeViewedService = new RecipeViewedService(RECIPE_VIEWED_REPOSITORY);
                 recipeService = new RecipeService(RECIPE_REPOSITORY, RECIPE_FAVORITE_REPOSITORY,
-                                RECIPE_REACTION_SERVICE, RECIPE_VIEWED_SERVICE, USER_SERVICE, TAG_SERVICE);
+                                RECIPE_REACTION_SERVICE, recipeViewedService, USER_SERVICE, TAG_SERVICE);
         }
 
         @Test
@@ -452,7 +455,6 @@ public class RecipeServiceTest {
                 assertTrue(result.getSecond().isFavorited());
 
                 Json.prettyPrint(result.getSecond());
-
         }
 
         @Test
