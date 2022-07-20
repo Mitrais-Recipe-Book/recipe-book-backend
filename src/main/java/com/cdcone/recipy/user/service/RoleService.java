@@ -60,7 +60,7 @@ public class RoleService {
         Set<RoleEntity> result = roleRepository.findByUserId(userId);
 
         if (result.isEmpty()) {
-            throw new EntityNotFoundException("not found user id " + userId);
+            throw new EntityNotFoundException(userId + " role ");
         }
 
         return result;
