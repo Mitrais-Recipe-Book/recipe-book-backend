@@ -52,7 +52,6 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final RoleService roleService;
-    private final RoleRepository roleRepository;
     private final RecipeReactionService recipeReactionService;
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -87,23 +86,21 @@ public class UserService implements UserDetailsService {
         if (signUpRequestDto.getPassword().length() < 8) {
             msg = "Password must be equal or more than 8 characters";
         } else {
-            Optional<RoleEntity> userRole = roleRepository.findByName("User");
-            if (userRole.isPresent()) {
-                try {
-                    UserEntity user = new UserEntity();
-                    user.setEmail(signUpRequestDto.getEmail().toLowerCase());
-                    user.setUsername(signUpRequestDto.getUsername().toLowerCase());
-                    user.setPassword(passwordEncoder.encode(signUpRequestDto.getPassword()));
-                    user.setRoles(Set.of(userRole.get()));
-                    user.setFullName(signUpRequestDto.getFullName());
-                    createdUser = UserResponseDto.toDto(userRepository.save(user));
-                    msg = "Success";
-                } catch (DataIntegrityViolationException e) {
-                    msg = "Failed to create user. Username or email is already exists";
-                }
-            } else {
-                msg = "Role User not found";
+            RoleEntity userRole = roleService.findByName("User");
+
+            try {
+                UserEntity user = new UserEntity();
+                user.setEmail(signUpRequestDto.getEmail().toLowerCase());
+                user.setUsername(signUpRequestDto.getUsername().toLowerCase());
+                user.setPassword(passwordEncoder.encode(signUpRequestDto.getPassword()));
+                user.setRoles(Set.of(userRole));
+                user.setFullName(signUpRequestDto.getFullName());
+                createdUser = UserResponseDto.toDto(userRepository.save(user));
+                msg = "Success";
+            } catch (DataIntegrityViolationException e) {
+                msg = "Failed to create user. Username or email is already exists";
             }
+
         }
         return Pair.of(Optional.ofNullable(createdUser), msg);
     }

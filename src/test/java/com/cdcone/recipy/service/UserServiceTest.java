@@ -60,14 +60,12 @@ class UserServiceTest {
     private static final UserEntity follower1 = mock(UserEntity.class);
     private static UserService userService;
     private static final RoleService ROLE_SERVICE = mock(RoleService.class);
-    private static final BCryptPasswordEncoder passwordEncoder =
-            new BCryptPasswordEncoder();
-    private static final RecipeReactionService recipeReactionService =
-            mock(RecipeReactionService.class);
+    private static final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private static final RecipeReactionService recipeReactionService = mock(RecipeReactionService.class);
 
     @BeforeAll
     public static void setUp() {
-        userService = new UserService(userRepo, ROLE_SERVICE, roleRepo,
+        userService = new UserService(userRepo, ROLE_SERVICE,
                 recipeReactionService, new BCryptPasswordEncoder());
 
         when(SIGN_UP_REQUEST_DTO.getEmail()).thenReturn("test@mail.com");
@@ -256,8 +254,7 @@ class UserServiceTest {
 
     @Test
     void testSuccessFindUserByUsername() {
-        UserEntity mockUser =
-                new UserEntity("user@mail.com", "mockuser", "password", "user");
+        UserEntity mockUser = new UserEntity("user@mail.com", "mockuser", "password", "user");
         when(userRepo.findByUsername("mockuser")).thenReturn(Optional.of(mockUser));
 
         RecipeEntity recipe1 = mock(RecipeEntity.class);
