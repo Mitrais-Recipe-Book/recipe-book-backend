@@ -52,7 +52,6 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final RoleService roleService;
-    // private final RoleRepository roleRepository;
     private final RecipeReactionService recipeReactionService;
     private final BCryptPasswordEncoder passwordEncoder;
 
