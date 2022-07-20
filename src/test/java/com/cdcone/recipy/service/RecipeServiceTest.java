@@ -48,9 +48,7 @@ public class RecipeServiceTest {
     private final RecipeRepository RECIPE_REPOSITORY = mock(RecipeRepository.class);
     private final RecipeReactionRepository RECIPE_REACTION_REPOSITORY = mock(RecipeReactionRepository.class);
     private final RecipeFavoriteRepository RECIPE_FAVORITE_REPOSITORY = mock(RecipeFavoriteRepository.class);
-
     private final RecipeViewedRepository RECIPE_VIEWED_REPOSITORY = mock(RecipeViewedRepository.class);
-
     private final UserRepository USER_REPOSITORY = mock(UserRepository.class);
     private final UserService USER_SERVICE = mock(UserService.class);
     private final TagService TAG_SERVICE = mock(TagService.class);
@@ -63,10 +61,7 @@ public class RecipeServiceTest {
     @BeforeEach
     public void init() {
         recipeViewedService = new RecipeViewedService(RECIPE_VIEWED_REPOSITORY);
-        recipeService = new RecipeService(RECIPE_REPOSITORY, RECIPE_REACTION_REPOSITORY, RECIPE_FAVORITE_REPOSITORY, recipeViewedService, USER_REPOSITORY, USER_SERVICE,
-                TAG_SERVICE);
-
-
+        recipeService = new RecipeService(RECIPE_REPOSITORY, RECIPE_REACTION_REPOSITORY, RECIPE_FAVORITE_REPOSITORY, recipeViewedService, USER_REPOSITORY, USER_SERVICE, TAG_SERVICE);
     }
 
     @Test

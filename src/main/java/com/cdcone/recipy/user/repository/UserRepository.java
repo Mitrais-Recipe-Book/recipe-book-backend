@@ -48,5 +48,5 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     @Query(value = "SELECT u FROM UserEntity u " +
             "LEFT JOIN u.roles r " +
             "WHERE r.name LIKE CONCAT('%',:rolename,'%')")
-    Page<UserEntity> getUsersWithRole(@PathParam("rolename") String rolename, Pageable pageable);
+    List<UserEntity> getUsersWithRole(@PathParam("rolename") String rolename);
 }

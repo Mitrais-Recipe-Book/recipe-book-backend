@@ -1,5 +1,8 @@
 package com.cdcone.recipy.service;
 
+import com.cdcone.recipy.recipe.entity.RecipeEntity;
+import com.cdcone.recipy.recipe.entity.RecipeReactionEntity;
+import com.cdcone.recipy.recipe.service.RecipeReactionService;
 import com.cdcone.recipy.user.dto.repository.FollowerDto;
 import com.cdcone.recipy.recipe.dto.response.FollowingListResponseDto;
 import com.cdcone.recipy.dto.response.PhotoResponseDto;
@@ -25,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
@@ -37,6 +41,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import javax.persistence.EntityNotFoundException;
 
 import static org.mockito.Mockito.*;
 
@@ -54,11 +60,15 @@ class UserServiceTest {
     private static final UserEntity follower1 = mock(UserEntity.class);
     private static UserService userService;
     private static final RoleService ROLE_SERVICE = mock(RoleService.class);
+    private static final BCryptPasswordEncoder passwordEncoder =
+            new BCryptPasswordEncoder();
+    private static final RecipeReactionService recipeReactionService =
+            mock(RecipeReactionService.class);
 
     @BeforeAll
     public static void setUp() {
         userService = new UserService(userRepo, ROLE_SERVICE, roleRepo,
-                reactionRepo, recipeRepo, new BCryptPasswordEncoder());
+                recipeReactionService, new BCryptPasswordEncoder());
 
         when(SIGN_UP_REQUEST_DTO.getEmail()).thenReturn("test@mail.com");
         when(SIGN_UP_REQUEST_DTO.getUsername()).thenReturn("test");
@@ -246,16 +256,29 @@ class UserServiceTest {
 
     @Test
     void testSuccessFindUserByUsername() {
-        UserProfile mockUser = mock(UserProfile.class);
-        when(mockUser.getId()).thenReturn(1L);
-        when(mockUser.getUsername()).thenReturn("mockuser");
-        when(userRepo.findDetailByUsername("mockuser")).thenReturn(Optional.of(mockUser));
-        when(reactionRepo.getTotalRecipeLikeByUserId(1L)).thenReturn(100);
+        UserEntity mockUser =
+                new UserEntity("user@mail.com", "mockuser", "password", "user");
+        when(userRepo.findByUsername("mockuser")).thenReturn(Optional.of(mockUser));
+
+        RecipeEntity recipe1 = mock(RecipeEntity.class);
+        when(recipe1.getId()).thenReturn(111L);
+        when(recipe1.isDraft()).thenReturn(false);
+        mockUser.setRecipes(List.of(recipe1));
+        mockUser.setId(33L);
+
+        List<Long> recipeId = List.of(111L);
+        RecipeReactionEntity reaction1 = mock(RecipeReactionEntity.class);
+        when(reaction1.getRecipe()).thenReturn(recipe1);
+
+        List<RecipeReactionEntity> reactionList = List.of(reaction1);
+        when(recipeReactionService.getReactionByMultipleRecipeId(recipeId))
+                .thenReturn(reactionList);
 
         Optional<UserProfile> findMockUser = userService.findByUsername("mockuser");
         assertTrue(findMockUser.isPresent());
-        assertEquals("mockuser", findMockUser.get().getUsername());
-        verify(mockUser).setRecipeLikes(100);
+        UserProfile userProfile = findMockUser.get();
+        assertEquals("mockuser", userProfile.getUsername());
+        assertEquals(1, userProfile.getRecipeLikes());
     }
 
     @Test
@@ -319,12 +342,12 @@ class UserServiceTest {
     }
 
     @Test
-    void successAssignRole() {
+    void assignRole_willSuccess_whenUsernameAndRolenameAreFound() {
         Pair<String, RoleEntity> mockRole = Pair.of("success", mock(RoleEntity.class));
         UserEntity mockUser = mock(UserEntity.class);
 
-        when(ROLE_SERVICE.getByName("any")).thenReturn(mockRole);
-        when(userRepo.findByUsername("User")).thenReturn(Optional.of(mockUser));
+        when(ROLE_SERVICE.getByName("rolename")).thenReturn(mockRole);
+        when(userRepo.findByUsername("username")).thenReturn(Optional.of(mockUser));
         when(userRepo.save(mockUser)).thenReturn(mockUser);
 
         assertDoesNotThrow(() -> userService.removeRole("username", "rolename"));
@@ -332,26 +355,26 @@ class UserServiceTest {
     }
 
     @Test
-    void failedGetRoleAssignRole() {
-        Pair<String, RoleEntity> mockRole = Pair.of("failed", mock(RoleEntity.class));
+    void assignRole_willFail_whenRoleNotFound() {
+        reset(userRepo);
         UserEntity mockUser = mock(UserEntity.class);
 
-        when(ROLE_SERVICE.getByName("any")).thenReturn(mockRole);
-        when(userRepo.findByUsername("User")).thenReturn(Optional.of(mockUser));
+        when(ROLE_SERVICE.getByName("rolename")).thenThrow(EntityNotFoundException.class);
+        when(userRepo.findByUsername("username")).thenReturn(Optional.of(mockUser));
 
-        assertThrows(NullPointerException.class,
-                () -> userService.assignRole("User", "any"));
+        assertThrows(EntityNotFoundException.class,
+                () -> userService.assignRole("username", "rolename"));
     }
 
     @Test
-    void failedGetUserAssignRole() {
+    void assignRole_willFail_whenUsernameNotFound() {
         Pair<String, RoleEntity> mockRole = Pair.of("success", mock(RoleEntity.class));
 
-        when(ROLE_SERVICE.getByName("any")).thenReturn(mockRole);
-        when(userRepo.findByUsername("User")).thenReturn(Optional.empty());
+        when(ROLE_SERVICE.getByName("rolename")).thenReturn(mockRole);
+        when(userRepo.findByUsername("username")).thenThrow(EntityNotFoundException.class);
 
-        assertThrows(NullPointerException.class,
-                () -> userService.assignRole("User", "any"));
+        assertThrows(EntityNotFoundException.class,
+                () -> userService.assignRole("username", "rolename"));
     }
 
     @Test
@@ -359,10 +382,9 @@ class UserServiceTest {
         String username = "user1";
         when(userRepo.findByUsername(username)).thenReturn(Optional.empty());
 
-        Pair<HttpStatus, Optional<UserResponseDto>> result = userService.updateUser(username,
-                mock(UpdateUserRequestDto.class));
-
-        assertEquals(HttpStatus.NOT_FOUND, result.getFirst());
+        EntityNotFoundException result = assertThrows(EntityNotFoundException.class,
+                () -> userService.updateUser(username, mock(UpdateUserRequestDto.class)));
+        assertEquals(username, result.getMessage());
     }
 
     @Test
@@ -403,7 +425,6 @@ class UserServiceTest {
         assertEquals(mockUser, userService.removeRole("username", "rolename"));
     }
 
-    //method_will<expectedResult>_when<params>
     @Test
     void changePassword_willThrowError_whenOldPasswordNotMatch() {
         String username = "user1";
@@ -411,16 +432,15 @@ class UserServiceTest {
         String newPassword = "new_password";
         String confirmPassword = "new_password";
 
-        ChangePasswordRequestDto requestBody =
-                new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
+        ChangePasswordRequestDto requestBody = new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
         UserEntity mockUser = mock(UserEntity.class);
-        when(mockUser.getPassword()).thenReturn("original_password");
+        when(mockUser.getPassword()).thenReturn(passwordEncoder.encode("original_password"));
         when(userRepo.findByUsername(username)).thenReturn(Optional.of(mockUser));
 
         PasswordNotMatchException result = assertThrows(PasswordNotMatchException.class,
                 () -> userService.changePassword(username, requestBody));
 
-        assertEquals("Password does not match.", result.getMessage());
+        assertEquals("failed: password does not match", result.getMessage());
     }
 
     @Test
@@ -431,28 +451,26 @@ class UserServiceTest {
         String confirmPassword = "confirm_password";
 
         UserEntity mockUser = mock(UserEntity.class);
-        ChangePasswordRequestDto requestBody =
-                new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
-        when(mockUser.getPassword()).thenReturn("original_password");
+        ChangePasswordRequestDto requestBody = new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
+        when(mockUser.getPassword()).thenReturn(passwordEncoder.encode("original_password"));
         when(userRepo.findByUsername(username)).thenReturn(Optional.of(mockUser));
 
         PasswordNotMatchException result = assertThrows(PasswordNotMatchException.class,
                 () -> userService.changePassword(username, requestBody));
 
-        assertEquals("Password does not match.", result.getMessage());
+        assertEquals("failed: password does not match", result.getMessage());
     }
 
     @Test
     void changePassword_willReturnUserResponseDto_whenPasswordMatch() {
         String username = "user1";
-        String originalPassword = "original_password";
+        String originalPassword = passwordEncoder.encode("original_password");
         String oldPassword = "original_password";
         String newPassword = "new_password";
         String confirmPassword = "new_password";
         String email = "user1@mail.com";
 
-        ChangePasswordRequestDto requestBody =
-                new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
+        ChangePasswordRequestDto requestBody = new ChangePasswordRequestDto(oldPassword, newPassword, confirmPassword);
         UserEntity mockUser = new UserEntity(email, username, originalPassword, "user 1");
         mockUser.setId(11L);
         mockUser.setRoles(Set.of(userRole));
@@ -468,7 +486,13 @@ class UserServiceTest {
     }
 
     @Test
-    void getUserWithRequestRole_willReturnPaginatedListOfUserEntityWithRole(){
+    void getUserWithRequestRole_willReturnPaginatedListOfUserEntityWithRole() {
+        UserEntity mockEntity = mock(UserEntity.class);
+        List<UserEntity> mockResult = List.of(mockEntity);
 
+        when(userRepo.getUsersWithRole("Request"))
+                .thenReturn(mockResult);
+
+        assertEquals(mockResult, userService.getUsersWithRoleRequest());
     }
 }

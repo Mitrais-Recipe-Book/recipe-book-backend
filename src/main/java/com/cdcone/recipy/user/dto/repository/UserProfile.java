@@ -1,11 +1,13 @@
 package com.cdcone.recipy.user.dto.repository;
 
 import com.cdcone.recipy.user.entity.RoleEntity;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Set;
 
 @Getter
+@AllArgsConstructor
 public class UserProfile {
 
     private final long id;
@@ -22,21 +24,5 @@ public class UserProfile {
         this.fullName = fullName;
         this.totalRecipes = totalRecipes;
         this.recipeLikes = recipeLikes;
-    }
-
-    public void setRoles(Set<RoleEntity> roles) {
-        this.roles = roles;
-    }
-
-    public void setFollowers(Long followers) {
-        this.followers = followers;
-    }
-    
-    public void setRecipeLikes(int recipeLikes) {
-        this.recipeLikes = recipeLikes;
-    }
-    
-    public void setTotalRecipes(int totalRecipes) {
-        this.totalRecipes = totalRecipes;
     }
 }

@@ -239,14 +239,6 @@ public class UserControllerTest {
     }
 
     @Test
-    void failedAssignRole() {
-        when(USER_SERVICE.assignRole("any user", "any role")).thenThrow(NullPointerException.class);
-
-        assertEquals(HttpStatus.BAD_REQUEST,
-                userController.assignRole("any user", "any role").getStatusCode());
-    }
-
-    @Test
     void successGetProfile() {
         String username = "user1";
         UserEntity mockUser = mock(UserEntity.class);
