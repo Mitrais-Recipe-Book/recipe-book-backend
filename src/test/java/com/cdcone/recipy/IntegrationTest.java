@@ -1,12 +1,14 @@
 package com.cdcone.recipy;
 
-import com.cdcone.recipy.recipe.dto.request.*;
+import com.cdcone.recipy.recipe.dto.request.AddCommentRequestDto;
+import com.cdcone.recipy.recipe.dto.request.RecipeAddRequestDto;
+import com.cdcone.recipy.recipe.dto.request.RecipeFavoriteRequestDto;
+import com.cdcone.recipy.recipe.dto.request.RecipeReactionRequestDto;
 import com.cdcone.recipy.user.dto.request.ChangePasswordRequestDto;
 import com.cdcone.recipy.user.dto.request.UpdateUserRequestDto;
 import com.cdcone.recipy.util.ImageUtil;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.v3.core.util.Json;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -849,40 +851,4 @@ class IntegrationTest {
 				.andReturn();
 	}
 
-	@Test
-	void getRecipeViewed_willReturnRecipeList_whenUsernameFound() throws Exception {
-		String username = "user1";
-		boolean isPaginated = true;
-		int page = 0;
-		int size = 10;
-
-		MvcResult result = mockMvc.perform(get("/api/v1/recipe/viewed")
-						.queryParam("username", username)
-						.queryParam("isPaginated", String.valueOf(isPaginated))
-						.queryParam("page", String.valueOf(page))
-						.queryParam("size", String.valueOf(size)))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.message").value("success"))
-				.andExpect(jsonPath("$.payload.data").isNotEmpty())
-				.andReturn();
-
-		Json.prettyPrint(result.getResponse().getContentAsString());
-	}
-
-	@Test
-	void saveRecipeViewed_willReturnId_whenUserAndRecipeFound() throws Exception {
-		String username = "user1";
-		Long userId = 1L;
-		Long recipeId = 4L;
-
-		RecipeViewedRequestDto requestDto = new RecipeViewedRequestDto(username, recipeId);
-
-		mockMvc.perform(post("/api/v1/recipe/viewed")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(om.writeValueAsBytes(requestDto)))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.message").value("success"))
-				.andExpect(jsonPath("$.payload.recipeId").value(recipeId))
-				.andExpect(jsonPath("$.payload.userId").value(userId));
-	}
 }

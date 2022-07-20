@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -22,7 +21,6 @@ import com.cdcone.recipy.recipe.repository.RecipeReactionRepository;
 import com.cdcone.recipy.recipe.repository.RecipeRepository;
 import com.cdcone.recipy.recipe.repository.RecipeViewedRepository;
 import com.cdcone.recipy.recipe.service.RecipeViewedService;
-import com.cdcone.recipy.user.dto.repository.UserProfile;
 import com.cdcone.recipy.user.repository.UserRepository;
 import com.cdcone.recipy.recipe.service.RecipeService;
 import com.cdcone.recipy.recipe.service.TagService;
@@ -36,19 +34,22 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 
 public class RecipeServiceTest {
 
     private RecipeService recipeService;
 
-    private RecipeViewedService recipeViewedService;
-
     private final RecipeRepository RECIPE_REPOSITORY = mock(RecipeRepository.class);
     private final RecipeReactionRepository RECIPE_REACTION_REPOSITORY = mock(RecipeReactionRepository.class);
     private final RecipeFavoriteRepository RECIPE_FAVORITE_REPOSITORY = mock(RecipeFavoriteRepository.class);
-    private final RecipeViewedRepository RECIPE_VIEWED_REPOSITORY = mock(RecipeViewedRepository.class);
+
+    private final RecipeViewedService RECIPE_VIEWED_SERVICE = mock(RecipeViewedService.class);
+
     private final UserRepository USER_REPOSITORY = mock(UserRepository.class);
     private final UserService USER_SERVICE = mock(UserService.class);
     private final TagService TAG_SERVICE = mock(TagService.class);
@@ -60,8 +61,8 @@ public class RecipeServiceTest {
 
     @BeforeEach
     public void init() {
-        recipeViewedService = new RecipeViewedService(RECIPE_VIEWED_REPOSITORY);
-        recipeService = new RecipeService(RECIPE_REPOSITORY, RECIPE_REACTION_REPOSITORY, RECIPE_FAVORITE_REPOSITORY, recipeViewedService, USER_REPOSITORY, USER_SERVICE, TAG_SERVICE);
+        recipeService = new RecipeService(RECIPE_REPOSITORY, RECIPE_REACTION_REPOSITORY, RECIPE_FAVORITE_REPOSITORY, RECIPE_VIEWED_SERVICE, USER_REPOSITORY, USER_SERVICE,
+                TAG_SERVICE);
     }
 
     @Test
@@ -551,73 +552,5 @@ public class RecipeServiceTest {
         assertEquals("success: data retrieved", result2.getFirst());
         assertEquals(2, result2.getSecond().getTotalItem());
         assertEquals(1, result2.getSecond().getTotalPages());
-    }
-
-    @Test
-    void getRecipeViewed_willReturnRecipeList_whenRecipeViewedDataExist() {
-        UserEntity user = new UserEntity();
-        user.setId(1L);
-        user.setUsername("user1");
-        user.setFullName("User One");
-
-        UserEntity author = new UserEntity();
-        author.setId(10L);
-        author.setUsername("user1");
-        author.setFullName("User One");
-
-        UserProfile userProfile = new UserProfile(user.getId(), user.getUsername(), user.getFullName(), 0,0);
-
-        RecipeEntity recipe1 = new RecipeEntity();
-        recipe1.setId(1L);
-        recipe1.setTitle("Recipe 1");
-        recipe1.setOverview("Recipe 1 Overview");
-        recipe1.setViews(10);
-        recipe1.setUser(author);
-
-        RecipeEntity recipe2 = new RecipeEntity();
-        recipe2.setId(2L);
-        recipe2.setTitle("Recipe 2");
-        recipe2.setOverview("Recipe 2 Overview");
-        recipe2.setViews(20);
-        recipe2.setUser(author);
-
-        List<RecipeViewedEntity> data = Arrays.asList(
-                new RecipeViewedEntity(user, recipe1, LocalDateTime.now()),
-                new RecipeViewedEntity(user, recipe2, LocalDateTime.now())
-        );
-
-        when(USER_SERVICE.findByUsername(user.getUsername())).thenReturn(Optional.of(userProfile));
-        when(RECIPE_VIEWED_REPOSITORY.findByUserId(user.getId(), Sort.by(Sort.Direction.DESC, "timestamp"))).thenReturn(data);
-        when(USER_SERVICE.getFollowerCountById(author.getId())).thenReturn(5L);
-
-        PaginatedDto<RecipeListResponseDto> result = recipeService.getRecipeViewed(user.getUsername(), false, 0 , 10);
-
-        assertEquals(2, result.getTotalItem());
-        assertEquals(recipe1.getTitle(), result.getData().get(0).getRecipeName());
-        assertEquals(recipe2.getTitle(), result.getData().get(1).getRecipeName());
-    }
-
-    @Test
-    void saveRecipeViewed_willReturnId_whenUserAndRecipeFound() {
-        UserEntity user = new UserEntity();
-        user.setId(1L);
-        user.setUsername("user1");
-
-        RecipeEntity recipe1 = new RecipeEntity();
-        recipe1.setId(1L);
-        recipe1.setTitle("Recipe 1");
-
-        RecipeViewedEntity rv = new RecipeViewedEntity(user, recipe1, LocalDateTime.now());
-
-        RecipeViewedRequestDto requestDto = new RecipeViewedRequestDto(user.getUsername(), recipe1.getId());
-
-        when(USER_SERVICE.getByUsername(user.getUsername())).thenReturn(Pair.of("success: user found", user));
-        when(RECIPE_REPOSITORY.findById(recipe1.getId())).thenReturn(Optional.of(recipe1));
-        when(RECIPE_VIEWED_REPOSITORY.save(any(RecipeViewedEntity.class))).thenReturn(rv);
-
-        RecipeViewedEntity result = recipeService.saveViewedRecipe(requestDto);
-
-        assertEquals(recipe1.getId(), result.getRecipe().getId());
-        assertEquals(user.getId(), result.getUser().getId());
     }
 }

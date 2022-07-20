@@ -14,13 +14,12 @@ import com.cdcone.recipy.user.dto.repository.UserProfile;
 import com.cdcone.recipy.user.dto.response.UserResponseDto;
 import com.cdcone.recipy.user.entity.RoleEntity;
 import com.cdcone.recipy.user.entity.UserEntity;
+
 import com.cdcone.recipy.error.PasswordNotMatchException;
 import com.cdcone.recipy.user.repository.RoleRepository;
 import com.cdcone.recipy.user.repository.UserRepository;
 import com.cdcone.recipy.security.CustomUser;
-
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -275,6 +274,7 @@ public class UserService implements UserDetailsService {
 
     public List<UserEntity> getUsersWithRoleRequest() {
         String rolename = "Request";
+
         return userRepository.getUsersWithRole(rolename);
     }
 
@@ -302,7 +302,6 @@ public class UserService implements UserDetailsService {
     public UserResponseDto changePassword(
             String username,
             ChangePasswordRequestDto request) {
-
         Pair<String, UserEntity> byUsername = getByUsername(username);
 
         UserEntity user = byUsername.getSecond();
