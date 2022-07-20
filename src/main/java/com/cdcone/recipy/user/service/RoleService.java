@@ -2,6 +2,7 @@ package com.cdcone.recipy.user.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -43,5 +44,25 @@ public class RoleService {
         }
 
         return Pair.of("success: data retrieved", result.get());
+    }
+
+    public RoleEntity findByName(String name) throws EntityNotFoundException {
+        Optional<RoleEntity> result = roleRepository.findByName(name);
+
+        if (result.isEmpty()) {
+            throw new EntityNotFoundException("role " + name);
+        }
+
+        return result.get();
+    }
+
+    public Set<RoleEntity> findByUserId(long userId) throws EntityNotFoundException {
+        Set<RoleEntity> result = roleRepository.findByUserId(userId);
+
+        if (result.isEmpty()) {
+            throw new EntityNotFoundException("not found user id " + userId);
+        }
+
+        return result;
     }
 }

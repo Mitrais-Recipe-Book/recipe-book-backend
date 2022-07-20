@@ -30,10 +30,6 @@ public class RecipeReactionService {
         return recipeReactionRepository.findByRecipeIdAndUserId(recipeId, userId);
     }
 
-    public RecipeReactionEntity save(RecipeReactionEntity entity) {
-        return recipeReactionRepository.save(entity);
-    }
-
     public Optional<RecipeReactionEntity> findByRecipeIdAndUserIdAndReaction(long recipeId, Long userId,
             Reaction reaction) {
         return recipeReactionRepository.findByRecipeIdAndUserIdAndReaction(recipeId, userId, reaction);
@@ -41,5 +37,9 @@ public class RecipeReactionService {
 
     public void delete(RecipeReactionEntity recipeReactionEntity) {
         recipeReactionRepository.delete(recipeReactionEntity);
+    }
+    
+    public RecipeReactionEntity save(RecipeReactionEntity entity) {
+        return recipeReactionRepository.save(entity);
     }
 }

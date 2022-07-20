@@ -66,7 +66,7 @@ class UserServiceTest {
 
     @BeforeAll
     public static void setUp() {
-        USER_SERVICE = new UserService(USER_REPOSITORY, ROLE_SERVICE, ROLE_REPOSITORY, RECIPE_REPOSITORY,
+        USER_SERVICE = new UserService(USER_REPOSITORY, ROLE_SERVICE,
                 RECIPE_REACTION_SERVICE, PASSWORD_ENCODER);
 
         when(SIGN_UP_REQUEST_DTO.getEmail()).thenReturn("test@mail.com");

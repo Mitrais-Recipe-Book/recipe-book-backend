@@ -15,13 +15,11 @@ import com.cdcone.recipy.recipe.dto.request.*;
 import com.cdcone.recipy.recipe.entity.*;
 import com.cdcone.recipy.recipe.repository.RecipeFavoriteRepository;
 import com.cdcone.recipy.user.dto.repository.UserProfile;
-import com.cdcone.recipy.recipe.repository.RecipeReactionRepository;
 import com.cdcone.recipy.recipe.repository.RecipeRepository;
 
 import com.cdcone.recipy.user.entity.UserEntity;
 import com.cdcone.recipy.user.service.UserService;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -39,6 +37,7 @@ import lombok.RequiredArgsConstructor;
 public class RecipeService {
     private final RecipeRepository recipeRepository;
     private final RecipeFavoriteRepository recipeFavoriteRepository;
+
     private final RecipeReactionService recipeReactionService;
     private final RecipeViewedService recipeViewedService;
     private final UserService userService;

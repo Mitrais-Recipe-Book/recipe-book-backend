@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityNotFoundException;
+
 import com.cdcone.recipy.dto.response.CommonResponse;
 import com.cdcone.recipy.user.controller.UserController;
 import org.junit.jupiter.api.BeforeAll;
@@ -219,14 +221,6 @@ public class UserControllerTest {
         when(USER_SERVICE.assignRole("any user", "Request")).thenReturn(mock(UserEntity.class));
 
         assertEquals(HttpStatus.OK,
-                userController.requestCreatorRole("any user").getStatusCode());
-    }
-
-    @Test
-    void failedRequestCreatorRole() {
-        when(USER_SERVICE.assignRole("any user", "Request")).thenThrow(NullPointerException.class);
-
-        assertEquals(HttpStatus.BAD_REQUEST,
                 userController.requestCreatorRole("any user").getStatusCode());
     }
 

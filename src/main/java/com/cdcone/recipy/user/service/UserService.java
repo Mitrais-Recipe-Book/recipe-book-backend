@@ -13,14 +13,11 @@ import com.cdcone.recipy.user.entity.RoleEntity;
 import com.cdcone.recipy.user.entity.UserEntity;
 import com.cdcone.recipy.recipe.repository.RecipeRepository;
 import com.cdcone.recipy.recipe.service.RecipeReactionService;
-import com.cdcone.recipy.recipe.service.RecipeService;
 import com.cdcone.recipy.error.PasswordNotMatchException;
-import com.cdcone.recipy.user.repository.RoleRepository;
 import com.cdcone.recipy.user.repository.UserRepository;
 import com.cdcone.recipy.security.CustomUser;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -51,12 +48,10 @@ import java.util.stream.Collectors;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
+
     private final RoleService roleService;
-    private final RoleRepository roleRepository;
-    private final RecipeRepository recipeRepo;
     private final RecipeReactionService recipeReactionService;
     private final BCryptPasswordEncoder passwordEncoder;
-
 
     @Override
     public CustomUser loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -89,23 +84,17 @@ public class UserService implements UserDetailsService {
         if (signUpRequestDto.getPassword().length() < 8) {
             msg = "Password must be equal or more than 8 characters";
         } else {
-            Optional<RoleEntity> userRole = roleRepository.findByName("User");
-            if (userRole.isPresent()) {
-                try {
-                    UserEntity user = new UserEntity();
-                    user.setEmail(signUpRequestDto.getEmail().toLowerCase());
-                    user.setUsername(signUpRequestDto.getUsername().toLowerCase());
-                    user.setPassword(passwordEncoder.encode(signUpRequestDto.getPassword()));
-                    user.setRoles(Set.of(userRole.get()));
-                    user.setFullName(signUpRequestDto.getFullName());
-                    createdUser = UserResponseDto.toDto(userRepository.save(user));
-                    msg = "Success";
-                } catch (DataIntegrityViolationException e) {
-                    msg = "Failed to create user. Username or email is already exists";
-                }
-            } else {
-                msg = "Role User not found";
-            }
+            RoleEntity userRole = roleService.findByName("User");
+
+            UserEntity user = new UserEntity();
+            user.setEmail(signUpRequestDto.getEmail().toLowerCase());
+            user.setUsername(signUpRequestDto.getUsername().toLowerCase());
+            user.setPassword(passwordEncoder.encode(signUpRequestDto.getPassword()));
+            user.setRoles(Set.of(userRole));
+            user.setFullName(signUpRequestDto.getFullName());
+            createdUser = UserResponseDto.toDto(userRepository.save(user));
+            msg = "Success";
+
         }
         return Pair.of(Optional.ofNullable(createdUser), msg);
     }
@@ -128,9 +117,9 @@ public class UserService implements UserDetailsService {
         Optional<UserProfile> userProfile = userRepository.findDetailByUsername(username);
         userProfile.ifPresent(it -> {
             int recipeLikes = recipeReactionService.getTotalRecipeLikeByUserId(it.getId());
-            Set<RoleEntity> roles = roleRepository.findByUserId(it.getId());
+            Set<RoleEntity> roles = roleService.findByUserId(it.getId());
             Long followerCount = userRepository.getFollowerCountById(it.getId());
-            Integer recipeCount = recipeRepo.getTotalRecipeByUsername(username);
+            Integer recipeCount = userRepository.getTotalRecipeByUsername(username);
             it.setRoles(roles);
             it.setFollowers(followerCount);
             it.setRecipeLikes(recipeLikes);
