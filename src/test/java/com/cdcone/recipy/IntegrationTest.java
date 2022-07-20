@@ -236,7 +236,7 @@ class IntegrationTest {
 		Integer tagId = 99;
 		mockMvc.perform(delete("/api/v1/tag/" + tagId))
 				.andExpect(status().isNotFound())
-				.andExpect(jsonPath("$.message").value("failed: tag  not found."))
+				.andExpect(jsonPath("$.message").value("failed: tag not found"))
 				.andReturn();
 	}
 
@@ -537,8 +537,8 @@ class IntegrationTest {
 		MvcResult mr = mockMvc.perform(post("/api/v1/recipe/" + recipeId + "/comment/add")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestbody))
-				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.message").value("failed: cannot find recipe with id " + recipeId))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.message").value("failed: recipe not found"))
 				.andReturn();
 
 		System.out.println(mr.getResponse().getContentAsString());
@@ -554,9 +554,9 @@ class IntegrationTest {
 		MvcResult mr = mockMvc.perform(post("/api/v1/recipe/" + recipeId + "/comment/add")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestbody))
-				.andExpect(status().isBadRequest())
+				.andExpect(status().isNotFound())
 				.andExpect(jsonPath("$.message")
-						.value("failed: user with username " + requestDto.getUsername() + " not found"))
+						.value("failed: " + requestDto.getUsername() + " not found"))
 				.andReturn();
 
 		System.out.println(mr.getResponse().getContentAsString());
@@ -618,7 +618,7 @@ class IntegrationTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(om.writeValueAsString(updateUserDto)))
 				.andExpect(status().isNotFound())
-				.andExpect(jsonPath("$.message").value("Failed: user not found"))
+				.andExpect(jsonPath("$.message").value("failed: " + username + " not found"))
 				.andReturn();
 	}
 

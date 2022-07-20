@@ -12,12 +12,15 @@ import com.cdcone.recipy.user.dto.response.UserResponseDto;
 import com.cdcone.recipy.user.entity.RoleEntity;
 import com.cdcone.recipy.user.entity.UserEntity;
 import com.cdcone.recipy.recipe.repository.RecipeRepository;
+import com.cdcone.recipy.recipe.service.RecipeReactionService;
 import com.cdcone.recipy.recipe.service.RecipeService;
 import com.cdcone.recipy.error.PasswordNotMatchException;
 import com.cdcone.recipy.user.repository.RoleRepository;
 import com.cdcone.recipy.user.repository.UserRepository;
 import com.cdcone.recipy.security.CustomUser;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -51,8 +54,9 @@ public class UserService implements UserDetailsService {
     private final RoleService roleService;
     private final RoleRepository roleRepository;
     private final RecipeRepository recipeRepo;
-    private final RecipeService recipeService;
+    private final RecipeReactionService recipeReactionService;
     private final BCryptPasswordEncoder passwordEncoder;
+
 
     @Override
     public CustomUser loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -123,7 +127,7 @@ public class UserService implements UserDetailsService {
     public Optional<UserProfile> findByUsername(String username) {
         Optional<UserProfile> userProfile = userRepository.findDetailByUsername(username);
         userProfile.ifPresent(it -> {
-            int recipeLikes = recipeService.getTotalRecipeLikeByUserId(it.getId());
+            int recipeLikes = recipeReactionService.getTotalRecipeLikeByUserId(it.getId());
             Set<RoleEntity> roles = roleRepository.findByUserId(it.getId());
             Long followerCount = userRepository.getFollowerCountById(it.getId());
             Integer recipeCount = recipeRepo.getTotalRecipeByUsername(username);
@@ -266,16 +270,10 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user.getSecond());
     }
 
-    public PaginatedDto<UserEntity> getUsersWithRoleRequest(int page) {
+    public List<UserEntity> getUsersWithRoleRequest() {
         String rolename = "Request";
 
-        Pageable pageable = PageRequest.of(page, 10);
-        Page<UserEntity> result = userRepository.getUsersWithRole(rolename, pageable);
-        return new PaginatedDto<>(result.getContent(),
-                result.getNumber(),
-                result.getTotalPages(),
-                result.isLast(),
-                result.getTotalElements());
+        return userRepository.getUsersWithRole(rolename);
     }
 
     public Pair<HttpStatus, Optional<UserResponseDto>> updateUser(String username, UpdateUserRequestDto updateUserDto) {
@@ -302,20 +300,17 @@ public class UserService implements UserDetailsService {
     public UserResponseDto changePassword(
             String username,
             ChangePasswordRequestDto request) {
-        Optional<UserEntity> byUsername = userRepository.findByUsername(username);
+        Pair<String, UserEntity> byUsername = getByUsername(username);
 
-        if (byUsername.isEmpty()) {
-            throw new EntityNotFoundException(username);
-        }
+        UserEntity user = byUsername.getSecond();
 
-        UserEntity user = byUsername.get();
-
-        if (!request.getOldPassword().equals(user.getPassword())
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())
                 || !request.getNewPassword().equals(request.getConfirmPassword())) {
             throw new PasswordNotMatchException();
         }
 
-        user.setPassword(request.getNewPassword());
+        String newPassword = passwordEncoder.encode(request.getNewPassword());
+        user.setPassword(newPassword);
         userRepository.save(user);
 
         return UserResponseDto.toDto(user);
