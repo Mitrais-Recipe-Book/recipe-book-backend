@@ -14,10 +14,8 @@ import com.cdcone.recipy.recipe.dto.response.*;
 import com.cdcone.recipy.recipe.dto.request.*;
 import com.cdcone.recipy.recipe.entity.*;
 import com.cdcone.recipy.recipe.repository.RecipeFavoriteRepository;
-import com.cdcone.recipy.recipe.repository.RecipeViewedRepository;
 import com.cdcone.recipy.user.dto.repository.UserProfile;
 import com.cdcone.recipy.user.repository.UserRepository;
-import com.cdcone.recipy.recipe.repository.RecipeReactionRepository;
 import com.cdcone.recipy.recipe.repository.RecipeRepository;
 
 import com.cdcone.recipy.user.entity.UserEntity;
