@@ -38,8 +38,14 @@ public class RecipeReactionService {
     public void delete(RecipeReactionEntity recipeReactionEntity) {
         recipeReactionRepository.delete(recipeReactionEntity);
     }
-    
+
     public RecipeReactionEntity save(RecipeReactionEntity entity) {
         return recipeReactionRepository.save(entity);
+    }
+
+    public List<RecipeReactionEntity> getReactionByMultipleRecipeId(
+            List<Long> recipeId) {
+        return recipeReactionRepository
+                .findByReactionAndRecipeIdIn(Reaction.LIKED, recipeId);
     }
 }

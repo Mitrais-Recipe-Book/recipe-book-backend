@@ -1,5 +1,8 @@
 package com.cdcone.recipy.service;
 
+import com.cdcone.recipy.recipe.entity.RecipeEntity;
+import com.cdcone.recipy.recipe.entity.RecipeReactionEntity;
+import com.cdcone.recipy.recipe.service.RecipeReactionService;
 import com.cdcone.recipy.user.dto.repository.FollowerDto;
 import com.cdcone.recipy.recipe.dto.response.FollowingListResponseDto;
 import com.cdcone.recipy.dto.response.PhotoResponseDto;
@@ -13,7 +16,6 @@ import com.cdcone.recipy.user.entity.RoleEntity;
 import com.cdcone.recipy.user.entity.UserEntity;
 import com.cdcone.recipy.recipe.repository.RecipeReactionRepository;
 import com.cdcone.recipy.recipe.repository.RecipeRepository;
-import com.cdcone.recipy.recipe.service.RecipeReactionService;
 import com.cdcone.recipy.recipe.service.RecipeService;
 import com.cdcone.recipy.error.PasswordNotMatchException;
 import com.cdcone.recipy.user.repository.RoleRepository;
@@ -52,9 +54,6 @@ class UserServiceTest {
 
     private static final UserRepository USER_REPOSITORY = mock(UserRepository.class);
     private static final RoleRepository ROLE_REPOSITORY = mock(RoleRepository.class);
-    private static final RecipeReactionRepository REACTION_REPOSITORY = mock(RecipeReactionRepository.class);
-    private static final RecipeRepository RECIPE_REPOSITORY = mock(RecipeRepository.class);
-    private static final RecipeService RECIPE_SERVICE = mock(RecipeService.class);
     private static final RecipeReactionService RECIPE_REACTION_SERVICE = mock(RecipeReactionService.class);
     private static final RoleEntity ROLE_ENTITY = mock(RoleEntity.class);
     private static final SignUpRequestDto SIGN_UP_REQUEST_DTO = mock(SignUpRequestDto.class);
@@ -255,16 +254,29 @@ class UserServiceTest {
 
     @Test
     void testSuccessFindUserByUsername() {
-        UserProfile mockUser = mock(UserProfile.class);
-        when(mockUser.getId()).thenReturn(1L);
-        when(mockUser.getUsername()).thenReturn("mockuser");
-        when(USER_REPOSITORY.findDetailByUsername("mockuser")).thenReturn(Optional.of(mockUser));
-        when(REACTION_REPOSITORY.getTotalRecipeLikeByUserId(1L)).thenReturn(100);
+        UserEntity mockUser =
+                new UserEntity("user@mail.com", "mockuser", "password", "user");
+        when(USER_REPOSITORY.findByUsername("mockuser")).thenReturn(Optional.of(mockUser));
+
+        RecipeEntity recipe1 = mock(RecipeEntity.class);
+        when(recipe1.getId()).thenReturn(111L);
+        when(recipe1.isDraft()).thenReturn(false);
+        mockUser.setRecipes(List.of(recipe1));
+        mockUser.setId(33L);
+
+        List<Long> recipeId = List.of(111L);
+        RecipeReactionEntity reaction1 = mock(RecipeReactionEntity.class);
+        when(reaction1.getRecipe()).thenReturn(recipe1);
+
+        List<RecipeReactionEntity> reactionList = List.of(reaction1);
+        when(RECIPE_REACTION_SERVICE.getReactionByMultipleRecipeId(recipeId))
+                .thenReturn(reactionList);
 
         Optional<UserProfile> findMockUser = USER_SERVICE.findByUsername("mockuser");
         assertTrue(findMockUser.isPresent());
-        assertEquals("mockuser", findMockUser.get().getUsername());
-        verify(mockUser).setRecipeLikes(100);
+        UserProfile userProfile = findMockUser.get();
+        assertEquals("mockuser", userProfile.getUsername());
+        assertEquals(1, userProfile.getRecipeLikes());
     }
 
     @Test
