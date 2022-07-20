@@ -46,3 +46,7 @@ INSERT INTO users_roles VALUES (11, 2);
 INSERT INTO users_roles VALUES (12, 1);
 INSERT INTO users_roles VALUES (16, 1);
 INSERT INTO users_roles VALUES (17, 1);
+
+INSERT INTO recipes_viewed VALUES (1, 1, CURRENT_TIMESTAMP);
+INSERT INTO recipes_viewed VALUES (2, 1, CURRENT_TIMESTAMP);
+INSERT INTO recipes_viewed VALUES (3, 1, CURRENT_TIMESTAMP);
