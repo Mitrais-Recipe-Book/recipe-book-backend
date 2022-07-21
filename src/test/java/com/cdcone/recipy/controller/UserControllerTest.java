@@ -11,10 +11,13 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.cdcone.recipy.dto.response.CommonResponse;
 import com.cdcone.recipy.user.controller.UserController;
+import com.cdcone.recipy.user.dto.request.SignInRequestDto;
+import com.cdcone.recipy.user.dto.request.SignUpRequestDto;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.util.Pair;
@@ -41,6 +44,9 @@ public class UserControllerTest {
 
     private static final UserService USER_SERVICE = mock(UserService.class);
     private static final RecipeService RECIPE_SERVICE = mock(RecipeService.class);
+
+    private static final SignUpRequestDto SIGN_UP_DTO = mock(SignUpRequestDto.class);
+    private static final SignInRequestDto SIGN_IN_DTO = mock(SignInRequestDto.class);
 
     private static UserController userController;
 
@@ -267,5 +273,49 @@ public class UserControllerTest {
 
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals("success: data retrieved", result.getBody().getMessage());
+    }
+
+    @Test
+    void signUp() {
+        Pair<Optional<UserResponseDto>, String> mockResult = Pair.of(Optional.of(mock(UserResponseDto.class)), "any");
+
+        when(USER_SERVICE.addUser(SIGN_UP_DTO))
+                .thenReturn(mockResult);
+
+        assertEquals(HttpStatus.OK, userController.signUp(SIGN_UP_DTO).getStatusCode());
+    }
+
+    @Test
+    void failedSignUp() {
+        Pair<Optional<UserResponseDto>, String> mockResult = Pair.of(Optional.empty(), "any");
+
+        when(USER_SERVICE.addUser(SIGN_UP_DTO))
+                .thenReturn(mockResult);
+
+        assertNotEquals(HttpStatus.OK, userController.signUp(SIGN_UP_DTO).getStatusCode());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void signIn() {
+        Map<String, Object> mockMap = mock(Map.class);
+        Optional<Map<String, Object>> mockResult = Optional.of(mockMap);
+
+        when(USER_SERVICE.signIn(SIGN_IN_DTO))
+                .thenReturn(mockResult);
+
+        assertEquals(HttpStatus.OK,
+                userController.signIn(SIGN_IN_DTO).getStatusCode());
+    }
+
+    @Test
+    void failedSignIn() {
+        Optional<Map<String, Object>> mockResult = Optional.empty();
+
+        when(USER_SERVICE.signIn(SIGN_IN_DTO))
+                .thenReturn(mockResult);
+
+        assertNotEquals(HttpStatus.OK,
+                userController.signIn(SIGN_IN_DTO).getStatusCode());
     }
 }

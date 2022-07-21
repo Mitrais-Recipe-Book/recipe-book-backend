@@ -43,7 +43,7 @@ class IntegrationTest {
 	@Test
 	void testFailSignIn() throws Exception {
 		String signIn = "{\"username\":\"unavailable\",\"password\":\"unavailable\"}";
-		mockMvc.perform(post("/auth/sign-in")
+		mockMvc.perform(post("/api/v1/user/sign-in")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(signIn))
 				.andExpect(status().isBadRequest())
@@ -55,7 +55,7 @@ class IntegrationTest {
 	@Test
 	void testSuccessSignIn() throws Exception {
 		String signIn = "{\"username\":\"user1\",\"password\":\"password\"}";
-		mockMvc.perform(post("/auth/sign-in")
+		mockMvc.perform(post("/api/v1/user/sign-in")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(signIn))
 				.andExpect(status().isOk())
@@ -67,7 +67,7 @@ class IntegrationTest {
 	@Test
 	void testFailSignUpIfEmptyField() throws Exception {
 		String signUp = "{\"email\":\"\",\"username\":\"\",\"password\":\"\",\"fullName\":\"\"}";
-		mockMvc.perform(post("/auth/sign-up")
+		mockMvc.perform(post("/api/v1/user/sign-up")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(signUp))
 				.andExpect(status().isBadRequest())
@@ -78,7 +78,7 @@ class IntegrationTest {
 	@Test
 	void testFailSignUpIfUserAlreadyExist() throws Exception {
 		String signUp = "{\"email\":\"user1@test.com\",\"username\":\"user1\",\"password\":\"password\",\"fullName\":\"test test\"}";
-		mockMvc.perform(post("/auth/sign-up")
+		mockMvc.perform(post("/api/v1/user/sign-up")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(signUp))
 				.andExpect(status().isBadRequest())
@@ -89,7 +89,7 @@ class IntegrationTest {
 	@Test
 	void testSuccessSignUp() throws Exception {
 		String signUp = "{\"email\":\"test@test.com\",\"username\":\"test\",\"password\":\"password\",\"fullName\":\"test test\"}";
-		mockMvc.perform(post("/auth/sign-up")
+		mockMvc.perform(post("/api/v1/user/sign-up")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(signUp))
 				.andExpect(status().isOk())
@@ -100,7 +100,7 @@ class IntegrationTest {
 	@Test
 	void testFailSignUpIfPasswordLessThanEightCharacters() throws Exception {
 		String signUp = "{\"email\":\"test2@test.com\",\"username\":\"test2\",\"password\":\"pass\",\"fullName\":\"test test\"}";
-		mockMvc.perform(post("/auth/sign-up")
+		mockMvc.perform(post("/api/v1/user/sign-up")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(signUp))
 				.andExpect(status().isBadRequest())

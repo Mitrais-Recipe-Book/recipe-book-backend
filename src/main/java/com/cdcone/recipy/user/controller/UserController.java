@@ -6,10 +6,8 @@ import com.cdcone.recipy.dto.response.PhotoResponseDto;
 import com.cdcone.recipy.recipe.dto.response.UserRecipeResponseDto;
 import com.cdcone.recipy.dto.response.PaginatedDto;
 import com.cdcone.recipy.user.dto.repository.UserProfile;
-import com.cdcone.recipy.user.dto.request.FollowUserRequestDto;
-import com.cdcone.recipy.user.dto.request.UpdateUserRequestDto;
+import com.cdcone.recipy.user.dto.request.*;
 import com.cdcone.recipy.user.dto.response.UserResponseDto;
-import com.cdcone.recipy.user.dto.request.ChangePasswordRequestDto;
 import com.cdcone.recipy.user.entity.RoleEntity;
 import com.cdcone.recipy.user.entity.UserEntity;
 import com.cdcone.recipy.dto.response.CommonResponse;
@@ -25,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -36,6 +35,30 @@ public class UserController {
 
     private final UserService userService;
     private final RecipeService recipeService;
+
+    @PostMapping("sign-up")
+    public ResponseEntity<CommonResponse> signUp(@RequestBody SignUpRequestDto signUpRequestDto) {
+        Pair<Optional<UserResponseDto>, String> signUpUser = userService.addUser(signUpRequestDto);
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        UserResponseDto userResponseDto = null;
+        if (signUpUser.getFirst().isPresent()) {
+            userResponseDto = signUpUser.getFirst().get();
+            httpStatus = HttpStatus.OK;
+        }
+        return ResponseEntity.status(httpStatus).body(new CommonResponse(signUpUser.getSecond(), userResponseDto));
+    }
+
+    @PostMapping("sign-in")
+    public ResponseEntity<CommonResponse> signIn(@RequestBody SignInRequestDto signInRequestDto) {
+        Optional<Map<String, Object>> auth = userService.signIn(signInRequestDto);
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        String msg = "Wrong username or password";
+        if (auth.isPresent()) {
+            status = HttpStatus.OK;
+            msg = "Success";
+        }
+        return ResponseEntity.status(status).body(new CommonResponse(msg, auth));
+    }
 
     @GetMapping("{username}")
     public ResponseEntity<CommonResponse> getByUsername(@PathVariable String username) {
