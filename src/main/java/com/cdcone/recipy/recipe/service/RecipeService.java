@@ -13,7 +13,6 @@ import com.cdcone.recipy.dto.response.PaginatedDto;
 import com.cdcone.recipy.recipe.dto.response.*;
 import com.cdcone.recipy.recipe.dto.request.*;
 import com.cdcone.recipy.recipe.entity.*;
-import com.cdcone.recipy.recipe.repository.RecipeFavoriteRepository;
 import com.cdcone.recipy.user.dto.repository.UserProfile;
 import com.cdcone.recipy.recipe.repository.RecipeRepository;
 
@@ -35,8 +34,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RecipeService {
     private final RecipeRepository recipeRepository;
-    private final RecipeFavoriteRepository recipeFavoriteRepository;
 
+    private final RecipeFavoriteService recipeFavoriteService;
     private final RecipeViewedService recipeViewedService;
     private final RecipeReactionService recipeReactionService;
     private final UserService userService;
@@ -428,7 +427,7 @@ public class RecipeService {
                     recipeOptional.get(),
                     LocalDateTime.now());
 
-            entity = recipeFavoriteRepository.save(entity);
+            entity = recipeFavoriteService.save(entity);
 
             return Pair.of("success: data saved", new RecipeFavoriteResponseDto(
                     entity.getRecipe().getId(),
@@ -443,39 +442,39 @@ public class RecipeService {
             RecipeFavoriteRequestDto requestDto) {
         UserEntity userOptional = userService.getByUsername(requestDto.getUsername()).getSecond();
 
-        Optional<RecipeFavoriteEntity> recipeFavoriteOptional = recipeFavoriteRepository
+        RecipeFavoriteEntity recipeFavorite = recipeFavoriteService
                 .findByRecipeIdAndUserId(recipeId, userOptional.getId());
-        if (recipeFavoriteOptional.isPresent()) {
-            recipeFavoriteRepository.delete(recipeFavoriteOptional.get());
-            return Pair.of("success: data deleted", new RecipeFavoriteResponseDto(
-                    recipeFavoriteOptional.get().getRecipe().getId(),
-                    recipeFavoriteOptional.get().getUser().getId(),
-                    null,
-                    false));
-        }
 
-        return Pair.of("failed: data not found", new RecipeFavoriteResponseDto());
+        recipeFavoriteService.delete(recipeFavorite);
+        return Pair.of("success: data deleted", new RecipeFavoriteResponseDto(
+                recipeFavorite.getRecipe().getId(),
+                recipeFavorite.getUser().getId(),
+                null,
+                false));
     }
 
+    /*
+     * Please look onto this code later, possibly bug emerged
+     */
     public Pair<String, RecipeFavoriteResponseDto> getRecipeFavorite(long recipeId, String username) {
         UserEntity userOptional = userService.getByUsername(username).getSecond();
         Optional<RecipeEntity> recipeOptional = recipeRepository.findById(recipeId);
 
         if (recipeOptional.isPresent()) {
-            Optional<RecipeFavoriteEntity> recipeFavoriteOptional = recipeFavoriteRepository
+            RecipeFavoriteEntity recipeFavoriteOptional = recipeFavoriteService
                     .findByRecipeIdAndUserId(recipeId, userOptional.getId());
-            if (recipeFavoriteOptional.isPresent()) {
-                return Pair.of("success: data retrieved", new RecipeFavoriteResponseDto(
-                        recipeFavoriteOptional.get().getRecipe().getId(),
-                        recipeFavoriteOptional.get().getUser().getId(),
-                        recipeFavoriteOptional.get().getTimestamp(),
-                        true));
-            }
+            // if (recipeFavoriteOptional.isPresent()) {
             return Pair.of("success: data retrieved", new RecipeFavoriteResponseDto(
-                    recipeOptional.get().getId(),
-                    userOptional.getId(),
-                    null,
-                    false));
+                    recipeFavoriteOptional.getRecipe().getId(),
+                    recipeFavoriteOptional.getUser().getId(),
+                    recipeFavoriteOptional.getTimestamp(),
+                    true));
+
+            // return Pair.of("success: data retrieved", new RecipeFavoriteResponseDto(
+            // recipeOptional.get().getId(),
+            // userOptional.getId(),
+            // null,
+            // false));
         }
         return Pair.of("failed: data not found", new RecipeFavoriteResponseDto());
     }
@@ -490,9 +489,9 @@ public class RecipeService {
 
         if (isPaginated) {
             paging = PageRequest.of(page, size);
-            resultPage = recipeFavoriteRepository.findByUserId(userId, paging);
+            resultPage = recipeFavoriteService.findByUserId(userId, paging);
         } else {
-            List<RecipeFavoriteEntity> entityList = recipeFavoriteRepository.findByUserId(userId);
+            List<RecipeFavoriteEntity> entityList = recipeFavoriteService.findByUserId(userId);
             resultPage = new PageImpl<>(entityList);
         }
 
