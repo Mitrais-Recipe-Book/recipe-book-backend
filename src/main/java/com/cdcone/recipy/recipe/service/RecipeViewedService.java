@@ -4,13 +4,10 @@ import com.cdcone.recipy.recipe.entity.RecipeEntity;
 import com.cdcone.recipy.recipe.entity.RecipeViewedEntity;
 import com.cdcone.recipy.recipe.repository.RecipeViewedRepository;
 import com.cdcone.recipy.user.entity.UserEntity;
-import com.cdcone.recipy.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.util.Pair;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -35,6 +32,5 @@ public class RecipeViewedService {
 
     public RecipeViewedEntity save(RecipeEntity recipe, UserEntity user) {
         return recipeViewedRepository.save(new RecipeViewedEntity(user, recipe, LocalDateTime.now()));
-    };
-
+    }
 }

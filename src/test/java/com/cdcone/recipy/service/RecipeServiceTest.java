@@ -24,6 +24,7 @@ import com.cdcone.recipy.recipe.repository.RecipeViewedRepository;
 import com.cdcone.recipy.recipe.service.RecipeViewedService;
 import com.cdcone.recipy.user.dto.repository.UserProfile;
 import com.cdcone.recipy.user.repository.UserRepository;
+import com.cdcone.recipy.recipe.service.RecipeReactionService;
 import com.cdcone.recipy.recipe.service.RecipeService;
 import com.cdcone.recipy.recipe.service.TagService;
 import com.cdcone.recipy.user.entity.UserEntity;
@@ -50,6 +51,8 @@ public class RecipeServiceTest {
     private final RecipeFavoriteRepository RECIPE_FAVORITE_REPOSITORY = mock(RecipeFavoriteRepository.class);
     private final RecipeViewedRepository RECIPE_VIEWED_REPOSITORY = mock(RecipeViewedRepository.class);
     private final UserRepository USER_REPOSITORY = mock(UserRepository.class);
+
+    private final RecipeReactionService RECIPE_REACTION_SERVICE = mock(RecipeReactionService.class);
     private final UserService USER_SERVICE = mock(UserService.class);
     private final TagService TAG_SERVICE = mock(TagService.class);
 
@@ -61,7 +64,13 @@ public class RecipeServiceTest {
     @BeforeEach
     public void init() {
         recipeViewedService = new RecipeViewedService(RECIPE_VIEWED_REPOSITORY);
-        recipeService = new RecipeService(RECIPE_REPOSITORY, RECIPE_REACTION_REPOSITORY, RECIPE_FAVORITE_REPOSITORY, recipeViewedService, USER_REPOSITORY, USER_SERVICE, TAG_SERVICE);
+        recipeService = new RecipeService(RECIPE_REPOSITORY, 
+        RECIPE_FAVORITE_REPOSITORY, 
+        USER_REPOSITORY, 
+        recipeViewedService, 
+        RECIPE_REACTION_SERVICE, 
+        USER_SERVICE, 
+        TAG_SERVICE);
     }
 
     @Test
