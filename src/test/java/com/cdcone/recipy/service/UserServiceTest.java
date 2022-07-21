@@ -19,6 +19,7 @@ import com.cdcone.recipy.recipe.repository.RecipeRepository;
 import com.cdcone.recipy.error.PasswordNotMatchException;
 import com.cdcone.recipy.user.repository.RoleRepository;
 import com.cdcone.recipy.user.repository.UserRepository;
+import com.cdcone.recipy.user.service.AuthService;
 import com.cdcone.recipy.user.service.RoleService;
 import com.cdcone.recipy.user.service.UserService;
 import com.cdcone.recipy.security.CustomUser;
@@ -61,11 +62,12 @@ class UserServiceTest {
     private static final RoleService ROLE_SERVICE = mock(RoleService.class);
     private static final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private static final RecipeReactionService recipeReactionService = mock(RecipeReactionService.class);
+    private static final AuthService authService = mock(AuthService.class);
 
     @BeforeAll
     public static void setUp() {
         userService = new UserService(userRepo, ROLE_SERVICE,
-                recipeReactionService, new BCryptPasswordEncoder());
+                recipeReactionService, new BCryptPasswordEncoder(), authService);
 
         when(SIGN_UP_REQUEST_DTO.getEmail()).thenReturn("test@mail.com");
         when(SIGN_UP_REQUEST_DTO.getUsername()).thenReturn("test");
@@ -80,7 +82,7 @@ class UserServiceTest {
     void testSuccessAddUser() {
         UserEntity mockUser = mock(UserEntity.class);
         when(SIGN_UP_REQUEST_DTO.getPassword()).thenReturn("password");
-        when(roleRepo.findByName("User")).thenReturn(Optional.of(userRole));
+        when(ROLE_SERVICE.findByName("User")).thenReturn(userRole);
         when(userRepo.save(any(UserEntity.class))).thenReturn(mockUser);
         Pair<Optional<UserResponseDto>, String> addUserSuccess = userService.addUser(SIGN_UP_REQUEST_DTO);
         verify(userRepo).save(any(UserEntity.class));
@@ -99,7 +101,7 @@ class UserServiceTest {
     @Test
     void testFailToAddUserIfUsernameAlreadyExists() {
         when(SIGN_UP_REQUEST_DTO.getPassword()).thenReturn("password");
-        when(roleRepo.findByName("User")).thenReturn(Optional.of(userRole));
+        when(ROLE_SERVICE.findByName("User")).thenReturn(userRole);
         when(userRepo.save(any())).thenThrow(DataIntegrityViolationException.class);
         Pair<Optional<UserResponseDto>, String> addUserFailed = userService.addUser(SIGN_UP_REQUEST_DTO);
         assertEquals("Failed to create user. Username or email is already exists",
@@ -109,12 +111,13 @@ class UserServiceTest {
 
     @Test
     void testFailToAddUserIfRoleUserIsNotPresent() {
-        UserEntity mockUser = mock(UserEntity.class);
         when(SIGN_UP_REQUEST_DTO.getPassword()).thenReturn("password");
-        when(roleRepo.findByName("User")).thenReturn(Optional.empty());
-        when(userRepo.save(any(UserEntity.class))).thenReturn(mockUser);
-        Pair<Optional<UserResponseDto>, String> addUserFailed = userService.addUser(SIGN_UP_REQUEST_DTO);
-        assertEquals("Role User not found", addUserFailed.getSecond());
+        when(ROLE_SERVICE.findByName("User")).thenThrow(new EntityNotFoundException("role user not found"));
+
+        EntityNotFoundException result = assertThrows(EntityNotFoundException.class,
+                () -> userService.addUser(SIGN_UP_REQUEST_DTO));
+
+        assertEquals("role user not found", result.getMessage());
     }
 
     @Test

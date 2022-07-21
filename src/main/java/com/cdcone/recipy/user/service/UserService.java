@@ -8,6 +8,7 @@ import com.cdcone.recipy.recipe.dto.response.FollowingListResponseDto;
 import com.cdcone.recipy.dto.response.PhotoResponseDto;
 import com.cdcone.recipy.dto.response.PaginatedDto;
 import com.cdcone.recipy.user.dto.request.ChangePasswordRequestDto;
+import com.cdcone.recipy.user.dto.request.SignInRequestDto;
 import com.cdcone.recipy.user.dto.request.SignUpRequestDto;
 import com.cdcone.recipy.user.dto.request.UpdateUserRequestDto;
 import com.cdcone.recipy.user.dto.repository.UserProfile;
@@ -39,10 +40,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,6 +52,8 @@ public class UserService implements UserDetailsService {
     private final RoleService roleService;
     private final RecipeReactionService recipeReactionService;
     private final BCryptPasswordEncoder passwordEncoder;
+
+    private final AuthService authService;
 
     @Override
     public CustomUser loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -72,6 +73,10 @@ public class UserService implements UserDetailsService {
                 userEntity.getEmail(),
                 userEntity.getFullName(),
                 authorities);
+    }
+
+    public Optional<Map<String, Object>> signIn(SignInRequestDto signInRequestDto) {
+        return authService.auth(signInRequestDto);
     }
 
     public Pair<Optional<UserResponseDto>, String> addUser(SignUpRequestDto signUpRequestDto) {
