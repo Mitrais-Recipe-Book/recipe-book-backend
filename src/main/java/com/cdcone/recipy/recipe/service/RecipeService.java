@@ -13,7 +13,6 @@ import com.cdcone.recipy.dto.response.PaginatedDto;
 import com.cdcone.recipy.recipe.dto.response.*;
 import com.cdcone.recipy.recipe.dto.request.*;
 import com.cdcone.recipy.recipe.entity.*;
-import com.cdcone.recipy.recipe.repository.RecipeFavoriteRepository;
 import com.cdcone.recipy.user.dto.repository.UserProfile;
 import com.cdcone.recipy.recipe.repository.RecipeRepository;
 
@@ -35,10 +34,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RecipeService {
     private final RecipeRepository recipeRepository;
-<<<<<<< HEAD
-=======
-    private final RecipeFavoriteRepository recipeFavoriteRepository;
->>>>>>> 2f0743c1473c3d148481df4aec2716401f5f96c5
 
     private final RecipeFavoriteService recipeFavoriteService;
     private final RecipeViewedService recipeViewedService;
