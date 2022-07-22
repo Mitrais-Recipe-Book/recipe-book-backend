@@ -44,4 +44,14 @@ public class RoleService {
 
         return Pair.of("success: data retrieved", result.get());
     }
+
+    public RoleEntity findByName(String name) {
+        Optional<RoleEntity> result = roleRepository.findByName(name);
+
+        if(result.isEmpty()){
+            throw new EntityNotFoundException("role "+ name);
+        }
+
+        return result.get();
+    }
 }

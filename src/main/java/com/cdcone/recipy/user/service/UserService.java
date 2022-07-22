@@ -8,6 +8,7 @@ import com.cdcone.recipy.recipe.dto.response.FollowingListResponseDto;
 import com.cdcone.recipy.dto.response.PhotoResponseDto;
 import com.cdcone.recipy.dto.response.PaginatedDto;
 import com.cdcone.recipy.user.dto.request.ChangePasswordRequestDto;
+import com.cdcone.recipy.user.dto.request.SignInRequestDto;
 import com.cdcone.recipy.user.dto.request.SignUpRequestDto;
 import com.cdcone.recipy.user.dto.request.UpdateUserRequestDto;
 import com.cdcone.recipy.user.dto.repository.UserProfile;
@@ -15,7 +16,6 @@ import com.cdcone.recipy.user.dto.response.UserResponseDto;
 import com.cdcone.recipy.user.entity.RoleEntity;
 import com.cdcone.recipy.user.entity.UserEntity;
 import com.cdcone.recipy.error.PasswordNotMatchException;
-import com.cdcone.recipy.user.repository.RoleRepository;
 import com.cdcone.recipy.user.repository.UserRepository;
 import com.cdcone.recipy.security.CustomUser;
 
@@ -40,10 +40,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,9 +50,10 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final RoleService roleService;
-    private final RoleRepository roleRepository;
     private final RecipeReactionService recipeReactionService;
     private final BCryptPasswordEncoder passwordEncoder;
+
+    private final AuthService authService;
 
     @Override
     public CustomUser loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -76,6 +75,10 @@ public class UserService implements UserDetailsService {
                 authorities);
     }
 
+    public Optional<Map<String, Object>> signIn(SignInRequestDto signInRequestDto) {
+        return authService.auth(signInRequestDto);
+    }
+
     public Pair<Optional<UserResponseDto>, String> addUser(SignUpRequestDto signUpRequestDto) {
         if (signUpRequestDto.checkBlank()) {
             return Pair.of(Optional.empty(), "Please fill out all required fields.");
@@ -87,23 +90,21 @@ public class UserService implements UserDetailsService {
         if (signUpRequestDto.getPassword().length() < 8) {
             msg = "Password must be equal or more than 8 characters";
         } else {
-            Optional<RoleEntity> userRole = roleRepository.findByName("User");
-            if (userRole.isPresent()) {
-                try {
-                    UserEntity user = new UserEntity();
-                    user.setEmail(signUpRequestDto.getEmail().toLowerCase());
-                    user.setUsername(signUpRequestDto.getUsername().toLowerCase());
-                    user.setPassword(passwordEncoder.encode(signUpRequestDto.getPassword()));
-                    user.setRoles(Set.of(userRole.get()));
-                    user.setFullName(signUpRequestDto.getFullName());
-                    createdUser = UserResponseDto.toDto(userRepository.save(user));
-                    msg = "Success";
-                } catch (DataIntegrityViolationException e) {
-                    msg = "Failed to create user. Username or email is already exists";
-                }
-            } else {
-                msg = "Role User not found";
+            RoleEntity userRole = roleService.findByName("User");
+
+            try {
+                UserEntity user = new UserEntity();
+                user.setEmail(signUpRequestDto.getEmail().toLowerCase());
+                user.setUsername(signUpRequestDto.getUsername().toLowerCase());
+                user.setPassword(passwordEncoder.encode(signUpRequestDto.getPassword()));
+                user.setRoles(Set.of(userRole));
+                user.setFullName(signUpRequestDto.getFullName());
+                createdUser = UserResponseDto.toDto(userRepository.save(user));
+                msg = "Success";
+            } catch (DataIntegrityViolationException e) {
+                msg = "Failed to create user. Username or email is already exists";
             }
+
         }
         return Pair.of(Optional.ofNullable(createdUser), msg);
     }
