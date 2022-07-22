@@ -338,10 +338,6 @@ public class RecipeService {
     public String addCommentToRecipe(Long recipeId, CommentEntity comment) {
         Pair<String, RecipeEntity> recipeEntity = getById(recipeId);
 
-        if (recipeEntity.getFirst().charAt(0) != 's') {
-            return recipeEntity.getFirst();
-        }
-
         if (recipeEntity.getSecond().isDraft()) {
             return "failed: cannot comment on unpublished recipe";
         }
@@ -453,28 +449,28 @@ public class RecipeService {
                 false));
     }
 
-    /*
-     * Please look onto this code later, possibly bug emerged
-     */
     public Pair<String, RecipeFavoriteResponseDto> getRecipeFavorite(long recipeId, String username) {
         UserEntity userOptional = userService.getByUsername(username).getSecond();
         Optional<RecipeEntity> recipeOptional = recipeRepository.findById(recipeId);
 
         if (recipeOptional.isPresent()) {
-            RecipeFavoriteEntity recipeFavoriteOptional = recipeFavoriteService
-                    .findByRecipeIdAndUserId(recipeId, userOptional.getId());
-            // if (recipeFavoriteOptional.isPresent()) {
-            return Pair.of("success: data retrieved", new RecipeFavoriteResponseDto(
-                    recipeFavoriteOptional.getRecipe().getId(),
-                    recipeFavoriteOptional.getUser().getId(),
-                    recipeFavoriteOptional.getTimestamp(),
-                    true));
-
-            // return Pair.of("success: data retrieved", new RecipeFavoriteResponseDto(
-            // recipeOptional.get().getId(),
-            // userOptional.getId(),
-            // null,
-            // false));
+            try {
+                RecipeFavoriteEntity recipeFavoriteOptional = recipeFavoriteService
+                        .findByRecipeIdAndUserId(recipeId, userOptional.getId());
+                return Pair.of("success: data retrieved", new RecipeFavoriteResponseDto(
+                        recipeFavoriteOptional.getRecipe().getId(),
+                        recipeFavoriteOptional.getUser().getId(),
+                        recipeFavoriteOptional.getTimestamp(),
+                        true)
+                );
+            } catch (EntityNotFoundException e) {
+                 return Pair.of("success: data retrieved", new RecipeFavoriteResponseDto(
+                     recipeOptional.get().getId(),
+                     userOptional.getId(),
+                     null,
+                     false)
+                 );
+            }
         }
         return Pair.of("failed: data not found", new RecipeFavoriteResponseDto());
     }
