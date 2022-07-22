@@ -17,6 +17,7 @@ import com.cdcone.recipy.dto.response.PaginatedDto;
 import com.cdcone.recipy.recipe.dto.response.*;
 import com.cdcone.recipy.recipe.dto.request.*;
 import com.cdcone.recipy.recipe.entity.*;
+import com.cdcone.recipy.recipe.repository.RecipeFavoriteRepository;
 import com.cdcone.recipy.recipe.repository.RecipeReactionRepository;
 import com.cdcone.recipy.recipe.repository.RecipeRepository;
 import com.cdcone.recipy.recipe.repository.RecipeViewedRepository;
@@ -40,23 +41,19 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.*;
 import org.springframework.data.util.Pair;
 
+import javax.persistence.EntityNotFoundException;
+
 public class RecipeServiceTest {
 
     private RecipeService recipeService;
 
-    private RecipeViewedService recipeViewedService;
-
     private final RecipeRepository RECIPE_REPOSITORY = mock(RecipeRepository.class);
     private final RecipeReactionRepository RECIPE_REACTION_REPOSITORY = mock(RecipeReactionRepository.class);
-    private final RecipeFavoriteService RECIPE_FAVORITE_SERVICE = mock(RecipeFavoriteService.class);
-
+    private final RecipeFavoriteRepository RECIPE_FAVORITE_REPOSITORY = mock(RecipeFavoriteRepository.class);
     private final RecipeViewedRepository RECIPE_VIEWED_REPOSITORY = mock(RecipeViewedRepository.class);
-    private final UserRepository USER_REPOSITORY = mock(UserRepository.class);
 
-    private final RecipeReactionService RECIPE_REACTION_SERVICE = mock(RecipeReactionService.class);
     private final UserService USER_SERVICE = mock(UserService.class);
     private final TagService TAG_SERVICE = mock(TagService.class);
-
     private final RecipeAddRequestDto ADD_RECIPE_DTO = mock(RecipeAddRequestDto.class);
     private final RecipeSearchRequestDto RECIPE_SEARCH_DTO = mock(RecipeSearchRequestDto.class);
 
@@ -64,11 +61,14 @@ public class RecipeServiceTest {
 
     @BeforeEach
     public void init() {
-        recipeViewedService = new RecipeViewedService(RECIPE_VIEWED_REPOSITORY);
+        RecipeViewedService recipeViewedService = new RecipeViewedService(RECIPE_VIEWED_REPOSITORY);
+        RecipeFavoriteService recipeFavoriteService = new RecipeFavoriteService(RECIPE_FAVORITE_REPOSITORY);
+        RecipeReactionService recipeReactionService = new RecipeReactionService(RECIPE_REACTION_REPOSITORY);
+
         recipeService = new RecipeService(RECIPE_REPOSITORY,
-                RECIPE_FAVORITE_SERVICE,
+                recipeFavoriteService,
                 recipeViewedService,
-                RECIPE_REACTION_SERVICE,
+                recipeReactionService,
                 USER_SERVICE,
                 TAG_SERVICE);
     }
@@ -123,9 +123,7 @@ public class RecipeServiceTest {
     @Test
     void failedGetById() {
         when(RECIPE_REPOSITORY.findById(1L)).thenReturn(Optional.empty());
-
-        assertEquals('f',
-                recipeService.getById(1L).getFirst().charAt(0));
+        assertThrows(EntityNotFoundException.class, ()->  recipeService.getById(1L));
     }
 
     @Test
@@ -242,22 +240,18 @@ public class RecipeServiceTest {
     @Test
     void addViewer() {
         when(RECIPE_REPOSITORY.findById(1L)).thenReturn(Optional.of(RECIPE_ENTITY));
-
         assertEquals('s', recipeService.addViewer(1L).charAt(0));
     }
 
     @Test
     void failedAddViewerRecipeNotFound() {
         when(RECIPE_REPOSITORY.findById(1L)).thenReturn(Optional.empty());
-
-        assertEquals('f',
-                recipeService.addViewer(1L).charAt(0));
+        assertThrows(EntityNotFoundException.class, ()-> recipeService.addViewer(1L));
     }
 
     @Test
     void getTotalRecipes() {
         when(RECIPE_REPOSITORY.count()).thenReturn(1L);
-
         assertEquals(1L, recipeService.totalRecipes());
     }
 
@@ -273,10 +267,7 @@ public class RecipeServiceTest {
     @Test
     void failedDeleteRecipeNotFound() {
         when(RECIPE_REPOSITORY.findById(1L)).thenReturn(Optional.empty());
-
-        assertEquals('f',
-                recipeService.deleteRecipe(1L).getFirst().charAt(0));
-
+        assertThrows(EntityNotFoundException.class, ()-> recipeService.deleteRecipe(1L));
     }
 
     @Test
@@ -316,7 +307,7 @@ public class RecipeServiceTest {
     }
 
     @Test
-    void successGetRecipeReaction() {
+    void getRecipeReaction_willReturnReaction_whenDataFound() {
         RecipeEntity recipe = new RecipeEntity();
         recipe.setId(1L);
         recipe.setTitle("Recipe 1");
@@ -337,7 +328,7 @@ public class RecipeServiceTest {
 
         when(RECIPE_REPOSITORY.findById(1L)).thenReturn(Optional.of(recipe));
         when(RECIPE_REACTION_REPOSITORY.getCountByReaction(1L)).thenReturn(recipeReaction);
-        when(USER_REPOSITORY.findByUsername("user1")).thenReturn(Optional.of(user));
+        when(USER_SERVICE.getByUsername("user1")).thenReturn(Pair.of("success", user));
         when(RECIPE_REACTION_REPOSITORY.findByRecipeIdAndUserId(1L, 10L)).thenReturn(reactionEntity);
 
         Pair<String, RecipeReactionSummaryResponseDto> result = recipeService.getRecipeReaction(1L, "user1");
@@ -350,7 +341,7 @@ public class RecipeServiceTest {
     }
 
     @Test
-    void successSaveRecipeReaction() {
+    void saveRecipeReaction_willReturnEntity_whenDataSaved() {
         RecipeEntity recipe = new RecipeEntity();
         recipe.setId(1L);
         recipe.setTitle("Recipe 1");
@@ -370,7 +361,7 @@ public class RecipeServiceTest {
                 LocalDateTime.now());
 
         when(RECIPE_REPOSITORY.findById(1L)).thenReturn(Optional.of(recipe));
-        when(USER_REPOSITORY.findByUsername("user1")).thenReturn(Optional.of(user));
+        when(USER_SERVICE.getByUsername("user1")).thenReturn(Pair.of("success", user));
         when(RECIPE_REACTION_REPOSITORY.save(saveEntity)).thenReturn(saveEntity);
 
         Pair<String, RecipeReactionEntity> result = recipeService.saveRecipeReaction(1L, requestDto);
@@ -382,7 +373,7 @@ public class RecipeServiceTest {
     }
 
     @Test
-    void successDeleteRecipeReaction() {
+    void deleteRecipeReaction_willReturnEntity_whenDataDeleted() {
         RecipeEntity recipe = new RecipeEntity();
         recipe.setId(1L);
         recipe.setTitle("Recipe 1");
@@ -401,7 +392,7 @@ public class RecipeServiceTest {
                 RecipeReactionEntity.Reaction.valueOf(requestDto.getReaction()),
                 LocalDateTime.now());
 
-        when(USER_REPOSITORY.findByUsername("user1")).thenReturn(Optional.of(user));
+        when(USER_SERVICE.getByUsername("user1")).thenReturn(Pair.of("success", user));
         when(RECIPE_REACTION_REPOSITORY.findByRecipeIdAndUserIdAndReaction(1L, 10L,
                 RecipeReactionEntity.Reaction.LIKED)).thenReturn(Optional.of(reactionEntity));
 
@@ -411,15 +402,13 @@ public class RecipeServiceTest {
         assertEquals("LIKED", result.getSecond().getReaction().toString());
 
         Json.prettyPrint(result.getSecond());
-
     }
 
     @Test
     void failedCommentRecipeNotFound() {
         when(RECIPE_REPOSITORY.findById(1L)).thenReturn(Optional.empty());
 
-        assertEquals('f',
-                recipeService.addCommentToRecipe(1L, new CommentEntity()).charAt(0));
+        assertThrows(EntityNotFoundException.class, ()-> recipeService.addCommentToRecipe(1L, new CommentEntity()));
     }
 
     @Test
@@ -434,7 +423,7 @@ public class RecipeServiceTest {
     }
 
     @Test
-    void successGetRecipeFavorite() {
+    void getRecipeFavorite_willReturnId_whenFound() {
         UserEntity user = new UserEntity();
         user.setId(10L);
         user.setUsername("user1");
@@ -445,10 +434,10 @@ public class RecipeServiceTest {
 
         RecipeFavoriteEntity recipeFavorite = new RecipeFavoriteEntity(user, recipe, LocalDateTime.now());
 
-        when(USER_REPOSITORY.findByUsername("user1")).thenReturn(Optional.of(user));
+        when(USER_SERVICE.getByUsername("user1")).thenReturn(Pair.of("success", user));
         when(RECIPE_REPOSITORY.findById(1L)).thenReturn(Optional.of(recipe));
-        when(RECIPE_FAVORITE_SERVICE.findByRecipeIdAndUserId(recipe.getId(), user.getId()))
-                .thenReturn(recipeFavorite);
+        when(RECIPE_FAVORITE_REPOSITORY.findByRecipeIdAndUserId(recipe.getId(), user.getId()))
+                .thenReturn(Optional.of(recipeFavorite));
 
         Pair<String, RecipeFavoriteResponseDto> result = recipeService.getRecipeFavorite(1L, "user1");
 
@@ -462,7 +451,7 @@ public class RecipeServiceTest {
     }
 
     @Test
-    void successSaveRecipeFavorite() {
+    void saveRecipeFavorite_willReturnSavedId_whenRecipeUserIdFound() {
         UserEntity user = new UserEntity();
         user.setId(10L);
         user.setUsername("user1");
@@ -473,9 +462,9 @@ public class RecipeServiceTest {
 
         RecipeFavoriteEntity recipeFavorite = new RecipeFavoriteEntity(user, recipe, LocalDateTime.now());
 
-        when(USER_REPOSITORY.findByUsername("user1")).thenReturn(Optional.of(user));
+        when(USER_SERVICE.getByUsername("user1")).thenReturn(Pair.of("success", user));
         when(RECIPE_REPOSITORY.findById(1L)).thenReturn(Optional.of(recipe));
-        when(RECIPE_FAVORITE_SERVICE.save(any(RecipeFavoriteEntity.class))).thenReturn(recipeFavorite);
+        when(RECIPE_FAVORITE_REPOSITORY.save(any(RecipeFavoriteEntity.class))).thenReturn(recipeFavorite);
 
         Pair<String, RecipeFavoriteResponseDto> result = recipeService.saveRecipeFavorite(1L,
                 new RecipeFavoriteRequestDto("user1"));
@@ -489,7 +478,7 @@ public class RecipeServiceTest {
     }
 
     @Test
-    void successDeleteRecipeFavorite() {
+    void deleteRecipeFavorite_willReturnDeletedId_whenDataFound() {
         UserEntity user = new UserEntity();
         user.setId(10L);
         user.setUsername("user1");
@@ -500,9 +489,9 @@ public class RecipeServiceTest {
 
         RecipeFavoriteEntity recipeFavorite = new RecipeFavoriteEntity(user, recipe, LocalDateTime.now());
 
-        when(USER_REPOSITORY.findByUsername("user1")).thenReturn(Optional.of(user));
-        when(RECIPE_FAVORITE_SERVICE.findByRecipeIdAndUserId(recipe.getId(), user.getId()))
-                .thenReturn(recipeFavorite);
+        when(USER_SERVICE.getByUsername("user1")).thenReturn(Pair.of("success", user));
+        when(RECIPE_FAVORITE_REPOSITORY.findByRecipeIdAndUserId(recipe.getId(), user.getId()))
+                .thenReturn(Optional.of(recipeFavorite));
 
         Pair<String, RecipeFavoriteResponseDto> result = recipeService.deleteRecipeFavorite(1L,
                 new RecipeFavoriteRequestDto("user1"));
@@ -516,7 +505,7 @@ public class RecipeServiceTest {
     }
 
     @Test
-    void successGetUserFavoriteRecipes() {
+    void getUserFavoriteRecipes_willReturnListRecipe_whenUserFound() {
 
         UserEntity userCreator = new UserEntity();
         userCreator.setId(20L);
@@ -549,10 +538,10 @@ public class RecipeServiceTest {
                 new RecipeFavoriteEntity(userFavorite, recipe, LocalDateTime.now()),
                 new RecipeFavoriteEntity(userFavorite, recipe2, LocalDateTime.now()));
 
-        when(USER_REPOSITORY.findByUsername("user1")).thenReturn(Optional.of(userFavorite));
-        when(RECIPE_FAVORITE_SERVICE.findByUserId(userFavorite.getId(), PageRequest.of(0, 10)))
+        when(USER_SERVICE.getByUsername("user1")).thenReturn(Pair.of("success",userFavorite));
+        when(RECIPE_FAVORITE_REPOSITORY.findByUserId(userFavorite.getId(), PageRequest.of(0, 10)))
                 .thenReturn(new PageImpl<>(recipesFavoriteAll));
-        when(RECIPE_FAVORITE_SERVICE.findByUserId(userFavorite.getId())).thenReturn(recipesFavoriteAll);
+        when(RECIPE_FAVORITE_REPOSITORY.findByUserId(userFavorite.getId())).thenReturn(recipesFavoriteAll);
 
         Pair<String, PaginatedDto<UserRecipeResponseDto>> result = recipeService.getUserFavoriteRecipes("user1", true,
                 0, 10);
